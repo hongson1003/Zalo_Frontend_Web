@@ -1,0 +1,30 @@
+.verify-container {
+    height: 100vh;
+    width: 100%;
+    padding-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .title {
+        text-align: center;
+        font-size: calc(20px + 2vw);
+    }
+    .footer {
+        p {
+            font-weight: bold;
+            font-style: italic;
+            font-size: calc(10px + 0.8vw);
+            text-align: center;
+            max-width: 80%;
+            margin: auto;
+            margin-top: 30px;
+        }
+    }
+    .btn-group {
+        margin: 20px 0;
+        .verify {
+            width: 100px;
+            height: 40px;
+        }
+    }
+}

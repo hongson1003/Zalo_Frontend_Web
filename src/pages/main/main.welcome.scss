@@ -1,0 +1,60 @@
+.welcome-carousel {
+    width: 100%;
+    height: 100vh;
+    .main {
+        padding: 30px;
+        padding-top: 90px;
+        .title {
+            text-align: center;
+            font-size: calc(12px + 0.8vw);
+            .zalopc {
+                font-size: calc(14px + 0.8vw);
+                font-weight: bold;
+            }
+        }
+        .cover {
+            margin: auto;
+            margin-top: 20px;
+
+            max-width: 45%;
+            text-align: center;
+            font-size: calc(6px + 0.4vw);
+        }
+        .slick-list {
+            height: 70vh;
+        }
+        .slick-arrow {
+            width: 50px;
+            height: 50px;
+            z-index: 1;
+            &.slick-prev {
+                left: 10px;
+            }
+            &.slick-next {
+                right: 10px;
+            }
+            &::before {
+                // display: flex;
+                // justify-content: center;
+                // align-items: center;
+                font-size: 40px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+            }
+        }
+        .slick-dots {
+            bottom: 50px;
+            z-index: 1;
+            li {
+                button:before {
+                    font-size: 15px;
+                }
+            }
+        }
+        img {
+            width: 100%;
+            height: 100vh;
+        }
+    }
+}

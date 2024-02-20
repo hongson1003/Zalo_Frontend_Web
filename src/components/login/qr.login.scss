@@ -1,0 +1,20 @@
+.login-qr {
+    .qr {
+        margin: auto;
+        max-width: 250px;
+        max-height: 250px;
+        width: 100% !important;
+        height: 100% !important;
+        canvas {
+            max-width: 250px;
+            max-height: 250px;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    }
+    .more-qr {
+        margin-top: 5px;
+        text-align: center;
+        font-size: calc(10px + 0.4vw);
+    }
+}
