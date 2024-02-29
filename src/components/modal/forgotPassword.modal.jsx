@@ -29,6 +29,7 @@ const ForgotPasswordModal = ({ children }) => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -40,6 +41,7 @@ const ForgotPasswordModal = ({ children }) => {
             data.status = STATE.FORGOT_PASSWORD;
             dispatch(loginStart(data));
             navigate(`/verify?id=${rs?.data?.id}`);
+            setIsModalOpen(false);
         } else {
             toast.error(rs.message);
         }
@@ -47,7 +49,6 @@ const ForgotPasswordModal = ({ children }) => {
 
     const handleOk = () => {
         fetchUserByPhone(phoneNumber);
-        // setIsModalOpen(false);
     };
 
     const handleCancel = () => {
@@ -70,6 +71,11 @@ const ForgotPasswordModal = ({ children }) => {
                 <Input type="text"
                     style={{ ...style.input }} placeholder="Basic usage" value={phoneNumber}
                     onChange={onChange}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleOk();
+                        }
+                    }}
                 />
             </Modal>
         </>

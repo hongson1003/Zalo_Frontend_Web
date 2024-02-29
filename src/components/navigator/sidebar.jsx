@@ -13,6 +13,7 @@ import { logoutSuccess } from "../../redux/actions/action.app";
 import { useNavigate } from "react-router-dom";
 import axios from '../../utils/axios';
 import { toast } from "react-toastify";
+import InforUserModal from "../modal/inforUser.modal";
 
 const items = [MessageOutlined, ContactsOutlined, CheckSquareOutlined, AntCloudOutlined].map(
     (icon, index) => {
@@ -51,13 +52,16 @@ const Sidebar = () => {
                     },
                 }}
             >
-                <Button block>Hồ sơ của bạn</Button>
+                <InforUserModal userInfo={state?.userInfo}>
+                    <Button block>Hồ sơ của bạn</Button>
+                </InforUserModal>
                 <Button style={{ marginBottom: '10px' }} block>Cài đặt</Button>
                 <hr />
                 <div style={{ marginTop: '10px' }}>
                     <Button block
                         onClick={handleLogout}
-                    >Đăng xuất</Button>
+                    >Đăng xuất
+                    </Button>
                 </div>
             </ConfigProvider>
         </div>

@@ -9,6 +9,7 @@ import { loginStart } from "../../redux/actions/action.app";
 import axios from '../../utils/axios';
 import ForgotPasswordModal from "../modal/forgotPassword.modal";
 import { toast } from "react-toastify";
+import { STATE } from "../../redux/types/type.app";
 
 const LoginPhone = () => {
     const dispatch = useDispatch();
@@ -17,8 +18,9 @@ const LoginPhone = () => {
 
     const onFinish = async (values) => {
         let rs = await axios.post('/auth/login', values);
+        const data = rs.data;
         if (rs.errCode === 0) {
-            dispatch(loginStart(rs.data));
+            dispatch(loginStart(data));
             navigate(`/verify?id=${rs?.data?.id}`);
         } else {
             toast.error(rs.message);

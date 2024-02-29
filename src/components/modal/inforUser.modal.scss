@@ -1,0 +1,13 @@
+.ant-modal-content {
+    padding: 0px !important;
+    padding-bottom: 10px !important;
+    .ant-modal-header {
+        background-color: #ffffff;
+        padding: 10px;
+    }
+    .modal-background {
+        min-height: 200px;
+        height: 100%;
+        background-color: blue;
+    }
+}

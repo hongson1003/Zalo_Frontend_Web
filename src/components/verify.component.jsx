@@ -134,13 +134,14 @@ const VerifyComponent = (props) => {
             let confirmationResult = window.confirmationResult;
             confirmationResult.confirm(otp).then(async (result) => {
                 // gọi api xác nhận
-                const action = await verifyUser(state?.userInfo?.id, state?.userInfo?.phoneNumber);
-                dispatch(action);
                 setIsLoading(false);
                 if (state.userInfo?.status === STATE.FORGOT_PASSWORD)
                     navigate('/reset-password')
-                else
+                else {
+                    const action = await verifyUser(state?.userInfo?.id, state?.userInfo?.phoneNumber);
+                    dispatch(action);
                     navigate('/');
+                }
 
             }).catch((error) => {
                 toast.error('Mã OTP không chính xác, vui lòng thử lại !');
