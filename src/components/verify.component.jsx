@@ -8,7 +8,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from '../utils/axios';
 import { loginSuccess } from '../redux/actions/action.app';
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import ReactLoading from 'react-loading';
+import { STATE } from "../redux/types/type.app";
+
 
 const VerifyComponent = (props) => {
     const [otp, setOtp] = useState('');
@@ -18,6 +21,11 @@ const VerifyComponent = (props) => {
     const recaptchaRef = useRef(null);
     const dispatch = useDispatch();
     const onlyRef = useRef(0);
+    const [recaptchaIsResolve, setRecaptchaIsResolve] = useState(false);
+    const [isFocus, setIsFocus] = useState(false);
+    const [time, setTime] = useState(60);
+    const [sent, setSent] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         if (state?.isLogin === true) {
             navigate('/');
@@ -31,6 +39,7 @@ const VerifyComponent = (props) => {
             navigate('/login');
         }
 
+
     }, [state])
 
     useEffect(() => {
@@ -38,7 +47,30 @@ const VerifyComponent = (props) => {
             handleSend(phoneNumber);
             onlyRef.current = 1;
         }
-    }, [phoneNumber, state])
+    }, [phoneNumber, state]);
+
+    useEffect(() => {
+        let clock = null;
+        if (sent) {
+            clock = setInterval(() => {
+                setTime(time => {
+                    if (time === 0) {
+                        clearInterval(clock);
+                        setTimeout(() => {
+                            navigate('/login');
+                        }, 500);
+                        return time;
+                    }
+                    return time - 1;
+                });
+            }, 1000);
+        }
+        return () => {
+            if (clock) {
+                clearInterval(clock)
+            }
+        }
+    }, [sent]);
 
 
 
@@ -46,7 +78,16 @@ const VerifyComponent = (props) => {
         try {
             window.recaptchaVerifier = new RecaptchaVerifier(
                 "recaptcha-container",
-                {},
+                {
+                    // 'size': 'invisible',
+                    'callback': (response) => {
+                        // reCAPTCHA solved, allow signInWithPhoneNumber.
+                        setRecaptchaIsResolve(true);
+                        setTimeout(() => {
+                            setIsFocus(true);
+                        }, 200);
+                    }
+                },
                 auth
             );
         } catch (error) {
@@ -59,13 +100,13 @@ const VerifyComponent = (props) => {
             toast.warning('Có lỗi xảy ra, vui lòng đăng nhập lại !')
             return;
         }
-
         generateRecaptcha();
         let appVerifier = window.recaptchaVerifier;
         signInWithPhoneNumber(auth, phoneNumber, appVerifier)
             .then((confirmationResult) => {
                 // SMS sent. Prompt user to type the code from the message, then sign the
                 // user in with confirmationResult.confirm(code).
+                setSent(true);
                 if (recaptchaRef.current) {
                     recaptchaRef.current.style.display = 'none'
                 }
@@ -89,14 +130,20 @@ const VerifyComponent = (props) => {
         // Kiểm tra thôi mà
         if (otp.length === 6) {
             // verifu otp
+            setIsLoading(true);
             let confirmationResult = window.confirmationResult;
             confirmationResult.confirm(otp).then(async (result) => {
                 // gọi api xác nhận
                 const action = await verifyUser(state?.userInfo?.id, state?.userInfo?.phoneNumber);
                 dispatch(action);
-                navigate('/');
+                setIsLoading(false);
+                if (state.userInfo?.status === STATE.FORGOT_PASSWORD)
+                    navigate('/reset-password')
+                else
+                    navigate('/');
+
             }).catch((error) => {
-                alert('User couldn\'t sign in (bad verification code?)');
+                toast.error('Mã OTP không chính xác, vui lòng thử lại !');
             });
         }
     }
@@ -105,37 +152,76 @@ const VerifyComponent = (props) => {
 
     return (
         <div className="verify-container">
-            <h1 className="title">Xác minh tài khoản</h1>
-            <OtpInput
-                value={otp}
-                onChange={(value) => { setOtp(value) }}
-                numInputs={6}
-                renderSeparator={<span>-</span>}
-                renderInput={(props) => <input {...props} />}
-                inputStyle={{
-                    width: 'calc(30px + 3.5vw)',
-                    height: '45px',
-                    fontSize: '20px'
-                }}
-                containerStyle={{
-                    minWidth: '400px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    margin: '40px 0px'
-                }}
-                shouldAutoFocus
-                inputType="tel"
-            />
+            <h1 className="title">Xác thực tài khoản</h1>
+            {
+                state.userInfo?.avatar &&
+                <>
+                    <img className="avatar" src={state.userInfo.avatar} />
+                    <p style={{ textAlign: 'center', marginTop: '5px', fontWeight: 'bold' }}>{state.userInfo.userName}</p>
+                    {
+                        recaptchaIsResolve === false ?
+                            <p className="notify">Vui lòng xác thực bạn là người thật
+                                <img className="xacminh-img" src="/images/xacminhnguoithat.jpg" />
+                                ...</p> :
+                            <p className="notify">Vui lòng nhập mã OTP để đăng nhập vào máy tính</p>
+                    }
+                </>
+            }
+            {
+                recaptchaIsResolve &&
+                <>
+                    <OtpInput
+                        value={otp}
+                        onChange={(value) => { setOtp(value) }}
+                        numInputs={6}
+                        renderSeparator={<span>-</span>}
+                        renderInput={(props) => <input {...props} />}
+                        inputStyle={{
+                            width: 'calc(30px + 3.5vw)',
+                            height: '45px',
+                            fontSize: '20px'
+                        }}
+                        containerStyle={{
+                            minWidth: '400px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            margin: '20px 0px'
+                        }}
+                        shouldAutoFocus={isFocus}
+                        inputType="tel"
+                    />
+                    {
+                        sent &&
+                        (
+                            time === 0 ?
+                                <>
+                                    <ReactLoading type={'cylon'} color={'blue'} />
+                                    <p style={{ textAlign: 'center' }}>Hết thời gian, vui lòng đăng nhập lại</p>
+                                </>
+                                :
+                                <p style={{ textAlign: 'center' }}>{time} s</p>
+                        )
+                    }
+                    <Flex justify="space-around" gap='60px' className="btn-group">
+                        <Button loading={isLoading} className="verify" type="primary" onClick={() => verifyOtp()}>Verify</Button>
+                    </Flex>
+                </>
+            }
             <div ref={recaptchaRef} id="recaptcha-container"></div>
 
-            <Flex justify="space-around" gap='60px' className="btn-group">
-                <Button className="verify" type="primary" onClick={() => verifyOtp()}>Verify</Button>
-            </Flex>
-
-            <div className="footer">
-                <p>** Vui lòng kiểm tra điện thoại để nhận mã xác thực</p>
-            </div>
-
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition:Bounce
+            />
         </div>
     )
 }

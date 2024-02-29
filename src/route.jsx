@@ -5,6 +5,7 @@ import HomeLayout from './layouts/homeLayout';
 import LoginPage from './pages/auth/auth.loginPage';
 import HomeSubLayout from './layouts/homeSublayout';
 import VerifyComponent from './components/verify.component';
+import ResetPassword from './components/resetPassword.component';
 
 
 const routes = [
@@ -25,6 +26,10 @@ const routes = [
     {
         path: '/verify',
         element: <VerifyComponent />
+    },
+    {
+        path: '/reset-password',
+        element: <ResetPassword />
     },
 ];
 

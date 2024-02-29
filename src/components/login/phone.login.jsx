@@ -3,11 +3,12 @@ import { LockOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import './phone.login.scss';
 import { useNavigate } from "react-router-dom";
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { notification } from 'antd'
+import { Modal } from 'antd'
 import { useDispatch } from "react-redux";
-import { loginStart, loginSuccess } from "../../redux/actions/action.app";
-import axios, { setAuthorizationAxios } from '../../utils/axios';
+import { loginStart } from "../../redux/actions/action.app";
+import axios from '../../utils/axios';
+import ForgotPasswordModal from "../modal/forgotPassword.modal";
+import { toast } from "react-toastify";
 
 const LoginPhone = () => {
     const dispatch = useDispatch();
@@ -19,6 +20,8 @@ const LoginPhone = () => {
         if (rs.errCode === 0) {
             dispatch(loginStart(rs.data));
             navigate(`/verify?id=${rs?.data?.id}`);
+        } else {
+            toast.error(rs.message);
         }
 
     };
@@ -56,10 +59,12 @@ const LoginPhone = () => {
                 </Button>
 
             </Form.Item>
-            <div>
-                <p className="forgot-pw">
-                    <a href="#">Quên mật khẩu ?</a>
-                </p>
+            <div className="d-flex-center">
+                <ForgotPasswordModal>
+                    <span className="forgot-pw">
+                        Quên mật khẩu
+                    </span>
+                </ForgotPasswordModal>
             </div>
         </Form>
     )

@@ -13,5 +13,6 @@ export const LOGOUT_STATUS = {
 export const STATE = {
     PENDING: 'PENDING',
     RESOLVE: true,
-    REJECT: false
+    REJECT: false,
+    FORGOT_PASSWORD: 'FORGOT_PASSWORD',
 }

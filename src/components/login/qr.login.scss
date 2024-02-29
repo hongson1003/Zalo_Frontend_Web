@@ -1,16 +1,9 @@
 .login-qr {
-    .qr {
+    svg {
         margin: auto;
-        max-width: 250px;
-        max-height: 250px;
-        width: 100% !important;
-        height: 100% !important;
-        canvas {
-            max-width: 250px;
-            max-height: 250px;
-            width: 100% !important;
-            height: 100% !important;
-        }
+        display: block;
+        padding: 6px 0px;
+        max-width: calc(200px + 5vw);
     }
     .more-qr {
         margin-top: 5px;
