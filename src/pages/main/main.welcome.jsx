@@ -6,11 +6,8 @@ import './main.welcome.scss';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-<<<<<<< HEAD
 
 //Informations for welcome pages
-=======
->>>>>>> 003ce0f20e27256268ef30e2d270370d117316e8
 const pages = [
     {
         img: "/images/welcome1.PNG",

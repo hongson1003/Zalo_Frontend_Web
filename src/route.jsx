@@ -47,8 +47,12 @@ const routes = [
         ],
     },
     {
-        path: '*',
+        path: '/notfound',
         element: <NotFound />
+    },
+    {
+        path: '/error',
+        element: <ErrorPage />
     },
 ];
 
