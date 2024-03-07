@@ -40,7 +40,6 @@ const friends = () => {
         if (onlyRef.current === false) {
             socket.then(socket => {
                 socket.on('need-accept-addFriend', (data) => {
-                    console.log(data)
                     fetchNotifications();
                 })
             })

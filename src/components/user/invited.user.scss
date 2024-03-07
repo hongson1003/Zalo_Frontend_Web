@@ -1,0 +1,40 @@
+.invited-user-container {
+    background-color: #ffffff;
+    padding: 5px calc(10px + 1vw) 10px;
+    gap: 20px;
+    .top {
+        gap: calc(5px + 0.5vw);
+        width: 100%;
+        display: flex;
+        .description {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            .username {
+                font-size: 16px;
+                font-weight: bold;
+            }
+            .date {
+                font-size: 14px;
+                color: #8e8e8e;
+            }
+            .content {
+                display: block;
+                padding: 10px;
+                max-width: 300px;
+                width: calc(150px + 10%);
+                resize: none;
+                min-height: 100px;
+            }
+        }
+    }
+    .footer {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        gap: 20px;
+        button {
+            flex: 0.5;
+        }
+    }
+}

@@ -85,13 +85,14 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
 
     const handleAddFriend = async () => {
         const res = await axios.post('/users/friendShip',
-            { userId: friendData?.id }
+            { userId: friendData?.id, content: description }
         );
         if (res.errCode === 0) {
             fetchFriendShip(friendData?.id);
             socket.then(socket => {
                 socket.emit('send-add-friend', friendData);
             })
+            handleCancel();
         } else {
             toast.warn(res.message);
         }
@@ -123,7 +124,9 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 onClick={() => {
                     if (type === 'button') {
                         setTimeout(() => {
-                            // showModal();
+                            if (!friendShipData && myHandleOk) {
+                                myHandleOk();
+                            }
                             setAcceptOpenModal(true);
                         }, 50);
                     }
