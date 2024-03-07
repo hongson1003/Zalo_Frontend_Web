@@ -1,4 +1,4 @@
-import { LOGIN_STATUS, LOGOUT_STATUS } from '../types/type.app';
+import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from '../types/type.app';
 
 export function loginStart(userInfo) {
     return {
@@ -6,7 +6,6 @@ export function loginStart(userInfo) {
         payload: userInfo
     }
 }
-
 
 export function loginSuccess(userInfo) {
     return {
@@ -24,5 +23,24 @@ export function loginFail(userInfo) {
 export function logoutSuccess() {
     return {
         type: LOGOUT_STATUS.LOGOUT_SUCCESS,
+    }
+}
+
+export function connectSocketSuccess() {
+    return {
+        type: SOCKET.CONNECTED_SUCCESS,
+    }
+}
+
+export function setError() {
+    return {
+        type: STATE.ERROR,
+    }
+}
+
+export function changeKeySubMenu(key) {
+    return {
+        type: STATE.CHANGE_SUB_KEY_MENU,
+        payload: key
     }
 }

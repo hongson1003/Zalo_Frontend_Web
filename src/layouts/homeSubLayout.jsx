@@ -1,42 +1,48 @@
-import React, { useEffect, useState } from "react";
-import { Flex } from 'antd';
+import React, { useState } from "react";
 import './homeSubLayout.scss';
 import SplitPane, { Pane } from 'split-pane-react';
 import 'split-pane-react/esm/themes/default.css';
-import SidebarHome from "../pages/sidebar/home.message.sidebar";
-import Welcome from "../pages/main/main.welcome";
+import SidebarHome from "../pages/sidebar/home.sidebar";
+import ContentMain from "../pages/main/content.main";
 
 const homeSublayout = () => {
     const [sizes, setSizes] = useState([
-        '330px',
+        document.body.offsetWidth <= 800 ? document.body.offsetWidth - 70 + 'px' : '330px',
         'auto',
     ]);
 
-    const layoutCSS = {
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    };
 
-    useEffect(() => {
+    useState(() => {
+        window.addEventListener("resize", function (event) {
+            if (document.body.offsetWidth <= 800) {
+                setSizes([document.body.offsetWidth - 70 + 'px', 'auto'])
+            }
+        });
+        return () => {
+            window.removeEventListener("resize", function (event) {
+            });
+        }
     })
+
+
+
+
     return (
-        <div style={{ height: '100%', minHeight: '100vh' }}>
+        <div className="homeSublayout">
             <SplitPane
                 split='vertical'
                 sizes={sizes}
                 onChange={setSizes}
             >
-                <Pane minSize='70px' maxSize='350px' style={{ backgroundColor: '#ffffff' }}>
+                <Pane minSize='70px' maxSize={document.body.offsetWidth <= 800 ? document.body.offsetWidth + 'px' : '330px'} style={{ backgroundColor: '#ffffff' }}>
                     <SidebarHome />
                 </Pane>
 
                 {/* <div style={{ ...layoutCSS, background: '#a1a5a9' }}>
                     <Welcome />
                 </div> */}
-                <Pane style={{ ...layoutCSS }} minSize='70px'>
-                    <Welcome />
+                <Pane minSize='200px' className="pane-content">
+                    <ContentMain />
                 </Pane>
             </SplitPane>
         </div>

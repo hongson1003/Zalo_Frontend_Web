@@ -1,0 +1,157 @@
+.modal-infor-user {
+    .ant-modal-content {
+        padding: 0px !important;
+        border-radius: 24px;
+        overflow: auto;
+        .ant-modal-header {
+            background-color: #ffffff;
+            padding: 10px;
+        }
+        .modal-background {
+            display: block;
+            height: calc(100px + 5vw);
+            width: 100%;
+            object-fit: cover;
+        }
+        .modal-avatar {
+            padding: 5px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+            border-bottom: 7px solid #eef0f1;
+            .modal-avatar-info {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 15px;
+            }
+            .add-friends {
+                display: flex;
+                justify-content: space-around;
+                padding: 5px 0px;
+                gap: 10px;
+                button {
+                    border-radius: 10px;
+                    flex: 1;
+                }
+            }
+            .avatar-container .ant-avatar-image,
+            img {
+                display: block;
+                width: 80px !important;
+                height: 80px !important;
+            }
+            .avatar-container,
+            .top-10px {
+                position: relative;
+                top: -10px;
+            }
+        }
+        .description-modal {
+            min-height: 150px;
+            .text-description {
+                width: 100%;
+                max-height: 150px;
+                height: 150px;
+                border: 1px solid #eef0f1;
+                resize: none;
+                padding: 10px 20px;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+            }
+        }
+        .modal-footer {
+            cursor: pointer;
+            padding: 10px;
+        }
+        .modal-footer:hover {
+            background-color: #dfe2e7;
+        }
+        .modal-content {
+            padding: 5px 15px;
+
+            .title {
+                p {
+                    font-size: 16px;
+                    font-weight: 600;
+                    margin-bottom: 5px;
+                }
+            }
+            .info-detail {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                .info-item {
+                    display: flex;
+                    gap: 5px;
+                    align-items: center;
+                    .item-label {
+                        min-width: 150px;
+                        font-size: 14px;
+                        color: #888;
+                    }
+                    .item-value {
+                        font-size: 14px;
+                        color: #333;
+                    }
+                }
+                .note {
+                    font-style: italic;
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}
+
+.camara-container {
+    width: 30px;
+    height: 30px;
+    background-color: #eaedf0;
+    position: absolute;
+    right: 0;
+    bottom: -10px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 200;
+    span {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+@keyframes disappear {
+    0% {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+
+.appear {
+    animation: appear 0.7s ease-out forwards;
+}
+
+.dissapear {
+    animation: disappear 0.6s ease-out forwards;
+}

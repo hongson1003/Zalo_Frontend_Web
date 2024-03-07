@@ -1,21 +1,49 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { Button, Checkbox, Form, Input } from 'antd';
 import './resetPassword.component.scss';
+import axios from '../utils/axios';
 
 const ResetPassword = () => {
     const state = useSelector(state => state.appReducer);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
-        // if (!state.userInfo) {
-        //     navigate('/login');
-        // }
+        if (!state.userInfo) {
+            navigate('/login');
+        }
     }, [])
 
-    const onFinish = ({ values }) => {
-        console.log('Success:', values);
+
+    const onFinish = async (values) => {
+        const data = {
+            id: state?.userInfo?.id,
+            phoneNumber: state?.userInfo?.phoneNumber,
+            newPassword: values.newPassword,
+            confirmPassword: values.confirmPassword
+        }
+        if (values.newPassword !== values.confirmPassword) {
+            toast.error('Mật khẩu không khớp');
+            return;
+        }
+        if (values.newPassword.length < 6) {
+            toast.error('Mật khẩu phải có ít nhất 6 ký tự');
+            return;
+        }
+        delete data.confirmPassword;
+        const res = await axios.post('/auth/reset-password', data);
+        if (res.errCode === 0) {
+            setIsLoading(true);
+            toast.success('Đổi mật khẩu thành công');
+            setTimeout(() => {
+                setIsLoading(false);
+                navigate('/login');
+            }, 1000);
+        } else
+            toast.error(res.message);
+
     };
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
@@ -46,7 +74,6 @@ const ResetPassword = () => {
             >
                 <Form.Item
                     label="Số điện thoại"
-                    name="phoneNumber"
                     rules={[
                         {
                             required: true,
@@ -54,7 +81,11 @@ const ResetPassword = () => {
                         },
                     ]}
                 >
-                    <Input disabled value={state?.userInfo?.phoneNumber} />
+                    <Input
+                        accessKey="phoneNumber"
+                        value={state?.userInfo?.phoneNumber}
+                        disabled
+                    />
                 </Form.Item>
 
                 <Form.Item
@@ -91,8 +122,8 @@ const ResetPassword = () => {
                         span: 16,
                     }}
                 >
-                    <Button type="primary" htmlType="submit">
-                        Submit
+                    <Button type="primary" htmlType="submit" loading={isLoading}>
+                        Reset Password
                     </Button>
                 </Form.Item>
             </Form>

@@ -3,9 +3,8 @@ import { LockOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import './phone.login.scss';
 import { useNavigate } from "react-router-dom";
-import { Modal } from 'antd'
 import { useDispatch } from "react-redux";
-import { loginStart } from "../../redux/actions/action.app";
+import { loginStart } from "../../redux/actions/app.action";
 import axios from '../../utils/axios';
 import ForgotPasswordModal from "../modal/forgotPassword.modal";
 import { toast } from "react-toastify";
@@ -17,8 +16,9 @@ const LoginPhone = () => {
 
     const onFinish = async (values) => {
         let rs = await axios.post('/auth/login', values);
+        const data = rs.data;
         if (rs.errCode === 0) {
-            dispatch(loginStart(rs.data));
+            dispatch(loginStart(data));
             navigate(`/verify?id=${rs?.data?.id}`);
         } else {
             toast.error(rs.message);
