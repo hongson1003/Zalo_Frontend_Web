@@ -6,11 +6,8 @@ import './main.welcome.scss';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const informations = [
-    {
 
-    }
-]
+//Informations for welcome pages
 const pages = [
     {
         img: "/images/welcome1.PNG",
@@ -49,6 +46,7 @@ const pages = [
         title: "Với PC Zalo"
     }
 ]
+//Render welcome page
 const Page = ({ imgLink, title }) => {
     return (
         <div className="page_wrapper">
@@ -66,7 +64,7 @@ const Welcome = () => {
         slidesToScroll: 1,
         arrows: true,
         autoplay: true,
-        autoplaySpeed: 3000
+        autoplaySpeed: 1500
     };
     return (
         <div className="welcome-carousel">

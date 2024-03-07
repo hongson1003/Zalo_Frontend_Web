@@ -3,7 +3,7 @@ import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import HomeLayout from './layouts/homeLayout';
 import LoginPage from './pages/auth/auth.loginPage';
-import HomeSubLayout from './layouts/homeSublayout';
+import HomeSubLayout from './layouts/homeSubLayout';
 import VerifyComponent from './components/verify.component';
 import ResetPassword from './components/resetPassword.component';
 
