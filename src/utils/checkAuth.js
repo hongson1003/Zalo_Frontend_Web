@@ -1,11 +1,12 @@
 import { LOGIN_STATUS } from '../redux/types/type.app';
-import axios from '../utils/axios';
-import { loginFail, loginSuccess } from '../redux/actions/action.app';
+import axios, { setAuthorizationAxios } from '../utils/axios';
+import { loginFail, loginSuccess } from '../redux/actions/app.action';
 
 export const checkUserIsLogin = async () => {
     try {
         let rs = await axios.post('/auth/check');
         if (rs.errCode === 0) {
+            setAuthorizationAxios(rs.data.access_token);
             return loginSuccess(rs.data);
         } else {
             return loginFail();

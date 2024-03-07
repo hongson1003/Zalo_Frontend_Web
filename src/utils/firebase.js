@@ -3,13 +3,13 @@ import { getAuth } from 'firebase/auth'
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBxQ8NDoqY2N4RkMoIQj7ht2VQCjqfefVg",
-    authDomain: "zalo-project-f6a4d.firebaseapp.com",
-    projectId: "zalo-project-f6a4d",
-    storageBucket: "zalo-project-f6a4d.appspot.com",
-    messagingSenderId: "317974607476",
-    appId: "1:317974607476:web:0be560642c5e486eb68321",
-    measurementId: "G-VVPXHJ1ET9"
+    apiKey: "AIzaSyAFn614q6SXvpNBGTqxwWBUiXiK1sId9FY",
+    authDomain: "zalo-web.firebaseapp.com",
+    projectId: "zalo-web",
+    storageBucket: "zalo-web.appspot.com",
+    messagingSenderId: "397340346509",
+    appId: "1:397340346509:web:bcbd80745003ae254dbac4",
+    measurementId: "G-WGVDH2K1EN"
 };
 
 // Initialize Firebase

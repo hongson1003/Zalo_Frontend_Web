@@ -1,3 +1,16 @@
-.hi {
-    background-color: grey;
+.homeSublayout {
+    min-height: 100vh;
+    height: 100%;
+    .pane-content .content-main-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+}
+
+@media (max-width: 800px) {
+    .pane-content .content-main-container {
+        display: none !important;
+    }
 }

@@ -6,11 +6,6 @@ import './main.welcome.scss';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const informations = [
-    {
-
-    }
-]
 const pages = [
     {
         img: "/images/welcome1.PNG",
@@ -52,8 +47,8 @@ const pages = [
 const Page = ({ imgLink, title }) => {
     return (
         <div className="page_wrapper">
-            <img src={imgLink} className= "page_img"/>
-            <p className= "page_title">{title}</p>
+            <img src={imgLink} className="page_img" />
+            <p className="page_title">{title}</p>
         </div>
     );
 };
@@ -80,9 +75,11 @@ const Welcome = () => {
                     Khám phá những tiện ích hỗ trợ làm việc và trò chuyện cùng người thân, bạn bè được tối ưu hoá cho máy tính của bạn.
                 </p>
                 <Slider {...settings}>
-                    {pages.map((page, index) => (
-                        <Page key={index} imgLink={page.img} title={page.title}/>
-                    ))}
+                    {
+                        pages.map((page, index) => (
+                            <Page key={index} imgLink={page.img} title={page.title} />
+                        ))
+                    }
                 </Slider>
             </div>
 

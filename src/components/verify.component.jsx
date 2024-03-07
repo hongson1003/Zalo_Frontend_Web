@@ -6,8 +6,8 @@ import { auth } from "../utils/firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from '../utils/axios';
-import { loginSuccess } from '../redux/actions/action.app';
+import axios, { setAuthorizationAxios } from '../utils/axios';
+import { loginSuccess } from '../redux/actions/app.action';
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
 import { STATE } from "../redux/types/type.app";
@@ -26,6 +26,7 @@ const VerifyComponent = (props) => {
     const [time, setTime] = useState(60);
     const [sent, setSent] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         if (state?.isLogin === true) {
             navigate('/');
@@ -43,7 +44,7 @@ const VerifyComponent = (props) => {
     }, [state])
 
     useEffect(() => {
-        if (phoneNumber && onlyRef.current === 0 && state.isLogin === false) {
+        if (phoneNumber && onlyRef.current === 0 && state.isLogin !== true) {
             handleSend(phoneNumber);
             onlyRef.current = 1;
         }
@@ -72,6 +73,11 @@ const VerifyComponent = (props) => {
         }
     }, [sent]);
 
+    useEffect(() => {
+        if (otp.length === 6) {
+            verifyOtp();
+        }
+    }, [otp])
 
 
     const generateRecaptcha = () => {
@@ -122,6 +128,7 @@ const VerifyComponent = (props) => {
             id, phoneNumber
         });
         if (rs.errCode === 0) {
+            setAuthorizationAxios(rs.data.access_token);
             return loginSuccess(rs.data);
         }
     }
@@ -150,7 +157,6 @@ const VerifyComponent = (props) => {
     }
 
 
-
     return (
         <div className="verify-container">
             <h1 className="title">Xác thực tài khoản</h1>
@@ -173,10 +179,11 @@ const VerifyComponent = (props) => {
                 <>
                     <OtpInput
                         value={otp}
-                        onChange={(value) => { setOtp(value) }}
+                        onChange={(value) => setOtp(value)}
                         numInputs={6}
                         renderSeparator={<span>-</span>}
                         renderInput={(props) => <input {...props} />}
+
                         inputStyle={{
                             width: 'calc(30px + 3.5vw)',
                             height: '45px',
@@ -204,7 +211,7 @@ const VerifyComponent = (props) => {
                         )
                     }
                     <Flex justify="space-around" gap='60px' className="btn-group">
-                        <Button loading={isLoading} className="verify" type="primary" onClick={() => verifyOtp()}>Verify</Button>
+                        <Button disabled={otp.length !== 6} loading={isLoading} className="verify" type="primary" onClick={() => verifyOtp()}>Verify</Button>
                     </Flex>
                 </>
             }

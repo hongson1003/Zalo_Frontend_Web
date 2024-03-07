@@ -4,11 +4,10 @@ import './qr.login.scss';
 import QRCode from "react-qr-code";
 import { v4 as uuidv4 } from 'uuid';
 import { socket } from '../../utils/io';
-import { loginStart } from '../../redux/actions/action.app';
+import { loginStart } from '../../redux/actions/app.action';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-
 const LoginQR = () => {
     const [value, setValue] = useState('');
     const onlyRender = useRef(false);
@@ -20,14 +19,16 @@ const LoginQR = () => {
             let token = uuidv4() + JSON.stringify(Date.now())
             setValue(token);
             // fetchWaitScanner(token);
-            socket.emit('setup', token);
-            socket.on('connected', (id) => {
-                setIsConnected(true);
-                socket.emit('join-qr-room', token);
-                socket.on('joined', (data) => {
-                    socket.on('need-to-verify', (data) => { // Khi người dùng quét mã
-                        dispatch(loginStart(data));
-                        navigate(`/verify?id=${data.id}`);
+            socket.then((socket) => {
+                socket.emit('setup', token);
+                socket.on('connected', () => {
+                    setIsConnected(true);
+                    socket.emit('join-qr-room', token);
+                    socket.on('joined', () => {
+                        socket.on('need-to-verify', (data) => { // Khi người dùng quét mã
+                            dispatch(loginStart(data));
+                            navigate(`/verify?id=${data.id}`);
+                        })
                     })
                 })
             })

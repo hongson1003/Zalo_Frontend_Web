@@ -1,21 +1,64 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Menu, Button } from "antd";
 import AvatarUser from "../user/avatar";
 import { ITEMS, KEYITEMS } from "../../utils/keyMenuItem";
 import {
-    CheckSquareOutlined, ContactsOutlined, MessageOutlined, AntCloudOutlined
+    CheckSquareOutlined, MessageOutlined, AntCloudOutlined
 } from '@ant-design/icons';
 import './sidebar.scss'
 import { Popover } from 'antd';
 import { useDispatch, useSelector } from "react-redux";
 import { ConfigProvider } from 'antd';
-import { logoutSuccess } from "../../redux/actions/action.app";
+import { logoutSuccess } from "../../redux/actions/app.action";
 import { useNavigate } from "react-router-dom";
 import axios from '../../utils/axios';
 import { toast } from "react-toastify";
 import InforUserModal from "../modal/inforUser.modal";
+import WrapperItemSidebar from "./wrapperItem.sidebar";
+import { socket } from '../../utils/io';
+import { STATE } from "../../redux/types/type.app";
+import { notificationsFriends } from "../../redux/actions/user.action";
 
-const items = [MessageOutlined, ContactsOutlined, CheckSquareOutlined, AntCloudOutlined].map(
+const friends = () => {
+    const user = useSelector(state => state?.appReducer?.userInfo?.user);
+    const onlyRef = useRef(false);
+    const stylePhoneBook = {
+        fontSize: '24px',
+    }
+    const dispatch = useDispatch();
+    const [count, setCount] = useState(0);
+    const fetchNotifications = async () => {
+        const res = await axios.get(`/users/notifications/friendShip?userId=${user?.id}`);
+        if (res.errCode === 0) {
+            setCount(res.data.length);
+            dispatch(notificationsFriends(res.data));
+        } else {
+            toast.warn('Có lỗi xảy ra !')
+        }
+    }
+    useEffect(() => {
+        if (onlyRef.current === false) {
+            socket.then(socket => {
+                socket.on('need-accept-addFriend', (data) => {
+                    console.log(data)
+                    fetchNotifications();
+                })
+            })
+        }
+        fetchNotifications();
+        onlyRef.current = true;
+    }, [])
+
+
+
+    return (
+        <WrapperItemSidebar count={count}>
+            <i style={{ ...stylePhoneBook }} className="fa-regular fa-address-book"></i>
+        </WrapperItemSidebar>
+    )
+}
+
+const items = [MessageOutlined, friends, CheckSquareOutlined, AntCloudOutlined].map(
     (icon, index) => {
         return ({
             key: KEYITEMS[ITEMS[index]],
@@ -52,7 +95,10 @@ const Sidebar = () => {
                     },
                 }}
             >
-                <InforUserModal userInfo={state?.userInfo}>
+                <InforUserModal
+                    friendData={state?.userInfo?.user}
+                    type={'button'}
+                >
                     <Button block>Hồ sơ của bạn</Button>
                 </InforUserModal>
                 <Button style={{ marginBottom: '10px' }} block>Cài đặt</Button>
@@ -70,18 +116,15 @@ const Sidebar = () => {
 
     const title = (
         <div>
-            <h3 style={{ marginBottom: '10px' }}>{state?.userInfo?.user?.name}</h3>
+            <h3 style={{ marginBottom: '10px' }}>{state?.userInfo?.user?.userName}</h3>
             <hr />
         </div>
     )
 
     const handleOnSelectItem = (e) => {
-        console.log(e);
+        dispatch({ type: STATE.CHANGE_KEY_MENU, payload: e.key });
     }
 
-    const handleOpenPopUpAvatar = () => {
-
-    }
 
     return (
         <div className="sidebar-main">
@@ -92,9 +135,7 @@ const Sidebar = () => {
                 trigger={"click"}
             >
                 <div className="base-avatar">
-                    <div
-                        onClick={handleOpenPopUpAvatar}
-                    >
+                    <div>
                         <AvatarUser
                             image={state?.userInfo?.user?.avatar}
                         />
@@ -105,10 +146,10 @@ const Sidebar = () => {
             <Menu
                 theme="light"
                 mode="inline"
-                defaultSelectedKeys={'ms'}
                 items={items}
                 onClick={handleOnSelectItem}
                 className='custom-menu'
+                defaultSelectedKeys={'ms'}
             />
         </div >
     )

@@ -18,7 +18,6 @@
         .cover {
             margin: auto;
             margin-top: 20px;
-
             max-width: 45%;
             text-align: center;
             font-size: calc(6px + 0.4vw);
@@ -29,8 +28,6 @@
             align-items: center;
         }
         .slick-arrow {
-            width: 50px;
-            height: 50px;
             z-index: 1;
             font-weight: 900;
             color: blue !important;
@@ -44,8 +41,7 @@
             }
             &::before {
                 font-size: 40px;
-                width: 50px;
-                height: 50px;
+                display: block;
                 border-radius: 50%;
                 color: rgb(113, 175, 247) !important;
             }
@@ -61,7 +57,7 @@
         }
         .slick-track {
             width: 100%;
-            height: 100%
+            height: 100%;
         }
         img {
             width: 100%;
@@ -75,29 +71,26 @@
             height: 100%;
             height: 90%;
             background-color: white;
-            .page_img{
+            .page_img {
                 width: 40%;
                 height: 70%;
                 margin-left: 20%;
                 border-radius: 10%;
-                margin: 3%
+                margin: 3%;
             }
-            .page_title{
+            .page_title {
                 text-align: center;
-                font-size: calc(0.8rem + 0.4vw);
-             }
-             
-            
+                font-size: calc(0.5rem + 0.8vw);
+                max-width: 70%;
+            }
         }
-        .slick-slider .page_wrapper{
+        .slick-slider .page_wrapper {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             background-color: white;
-
         }
-        
     }
 }

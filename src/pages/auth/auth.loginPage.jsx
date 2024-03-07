@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
+import { STATE } from "../../redux/types/type.app";
 
 
 
@@ -12,7 +13,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const state = useSelector(state => state?.appReducer);
     useEffect(() => {
-        if (state?.isLogin === true) {
+        if (state?.isLogin === STATE.RESOLVE) {
             navigate('/');
         }
     }, [state])

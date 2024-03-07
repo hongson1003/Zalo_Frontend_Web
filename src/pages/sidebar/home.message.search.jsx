@@ -6,6 +6,11 @@ import { Button } from 'antd';
 import { Menu } from 'antd'
 import { DownOutlined, SmileOutlined } from '@ant-design/icons';
 import { Dropdown, Space } from 'antd';
+import AddFriendModal from '../../components/modal/addFriend.modal';
+import { KEYITEMS } from "../../utils/keyMenuItem";
+import { useSelector } from "react-redux";
+
+
 const items1 = [
     {
         label: <span>Tất cả</span>,
@@ -40,6 +45,9 @@ const { Search } = Input;
 const SearchMessage = () => {
     const onSearch = (value, _e, info) => console.log(info?.source, value);
     const [current, setCurrent] = useState('all');
+    const state = useSelector(state => state?.appReducer);
+
+
     const onClick = (e) => {
         setCurrent(e.key);
     };
@@ -54,31 +62,36 @@ const SearchMessage = () => {
                     onSearch={onSearch}
                 />
                 <div className="btn-group">
-                    <Button style={{ border: 'none', boxShadow: 'none' }} icon={<UserAddOutlined />}></Button>
+                    <AddFriendModal>
+                        <Button style={{ border: 'none', boxShadow: 'none' }} icon={<UserAddOutlined />}></Button>
+                    </AddFriendModal>
                     <Button style={{ border: 'none', boxShadow: 'none' }} icon={<UsergroupAddOutlined />}></Button>
                 </div>
             </div>
-            <div className="sidebar-nav-classify">
-                <Menu
-                    onClick={onClick}
-                    selectedKeys={[current]}
-                    mode="horizontal"
-                    items={items1}
-                />
-                <Dropdown
-                    menu={{ items: items2 }}
-                    className="classify"
-                >
-                    <a onClick={(e) => e.preventDefault()}>
-                        <Space>
-                            <span>Phân loại</span>
-                            <DownOutlined />
-                        </Space>
-                    </a>
+            {
+                state?.nav === KEYITEMS.MESSAGE &&
+                <div className="sidebar-nav-classify">
+                    <Menu
+                        onClick={onClick}
+                        selectedKeys={[current]}
+                        mode="horizontal"
+                        items={items1}
+                    />
+                    <Dropdown
+                        menu={{ items: items2 }}
+                        className="classify"
+                    >
+                        <a onClick={(e) => e.preventDefault()}>
+                            <Space>
+                                <span>Phân loại</span>
+                                <DownOutlined />
+                            </Space>
+                        </a>
 
-                </Dropdown>
+                    </Dropdown>
 
-            </div>
+                </div>
+            }
         </div>
     )
 }
