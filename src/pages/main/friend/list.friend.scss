@@ -1,0 +1,21 @@
+.friends-container {
+    width: 100%;
+    height: 100%;
+    .friends-body {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+        .friends-main {
+            width: 95%;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            .interactaction {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                max-height: 80px;
+            }
+        }
+    }
+}

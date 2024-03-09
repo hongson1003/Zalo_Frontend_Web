@@ -22,23 +22,7 @@ const items1 = [
     },
 ]
 
-const items2 = [
-    {
-        key: '1',
-        type: 'customer',
-        label: 'Khách hàng',
-    },
-    {
-        key: '2',
-        type: 'customer',
-        label: 'Gia đình',
-    },
-    {
-        key: '3',
-        type: 'customer',
-        label: 'Công việc',
-    },
-];
+
 
 const { Search } = Input;
 
@@ -46,7 +30,6 @@ const SearchMessage = () => {
     const onSearch = (value, _e, info) => console.log(info?.source, value);
     const [current, setCurrent] = useState('all');
     const state = useSelector(state => state?.appReducer);
-
 
     const onClick = (e) => {
         setCurrent(e.key);
@@ -77,19 +60,6 @@ const SearchMessage = () => {
                         mode="horizontal"
                         items={items1}
                     />
-                    <Dropdown
-                        menu={{ items: items2 }}
-                        className="classify"
-                    >
-                        <a onClick={(e) => e.preventDefault()}>
-                            <Space>
-                                <span>Phân loại</span>
-                                <DownOutlined />
-                            </Space>
-                        </a>
-
-                    </Dropdown>
-
                 </div>
             }
         </div>

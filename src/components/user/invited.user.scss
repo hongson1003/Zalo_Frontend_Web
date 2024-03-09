@@ -21,14 +21,15 @@
             .content {
                 display: block;
                 padding: 10px;
-                max-width: 300px;
-                width: calc(150px + 10%);
+                max-width: 260px;
+                width: calc(150px + 20vw);
                 resize: none;
                 min-height: 100px;
             }
         }
     }
     .footer {
+        width: 100%;
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -36,5 +37,11 @@
         button {
             flex: 0.5;
         }
+    }
+}
+@media screen and (max-width: 768px) {
+    .footer {
+        margin: auto;
+        width: 100%;
     }
 }

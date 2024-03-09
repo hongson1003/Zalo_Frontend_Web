@@ -52,7 +52,7 @@ const HomeLayout = () => {
       <Layout
         className='homelayout-container'
       >
-        <Sider width={64}>
+        <Sider width={'calc(30px+2vw)'}>
           {/* <div className="demo-logo-vertical" /> */}
           <Sidebar />
         </Sider>

@@ -6,14 +6,25 @@ import moment from "moment";
 import InforUserModal from "../modal/inforUser.modal";
 import axios from '../../utils/axios';
 
-const InvitedUser = ({ user, content, date }) => {
+const InvitedUser = ({ user, content, date, fetchInvitedFriends }) => {
     const [friendShipData, setFriendShipData] = useState(null);
     const handleOk = async () => {
         const res = await axios.get(`users/friendShip?userId=${user.id}`)
         setFriendShipData(res.data);
+        return res.data;
     }
-    useEffect(() => {
-    }, [user, content])
+
+    const handleResolve = async () => {
+        const res = await axios.put('/users/friendShip', { userId: user.id });
+        if (res.errCode === 0) {
+            await fetchInvitedFriends();
+        }
+    }
+
+    const handleReject = async () => {
+
+    }
+
     return (
         <Flex vertical className="invited-user-container" >
             <div className="top">
@@ -32,8 +43,8 @@ const InvitedUser = ({ user, content, date }) => {
                 </div>
             </div>
             <div className="footer">
-                <Button type="default">Đồng ý</Button>
-                <Button type="default">Từ chối</Button>
+                <Button type="default" onClick={handleResolve}>Đồng ý</Button>
+                <Button type="default" onClick={handleReject}>Từ chối</Button>
             </div>
         </Flex>
     )
