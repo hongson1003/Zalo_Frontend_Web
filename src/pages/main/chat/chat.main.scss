@@ -81,6 +81,7 @@
                 padding: 10px;
                 gap: 8px;
                 overflow-y: auto;
+
                 .message {
                     background-color: #e5efff;
                     padding: 10px 15px;
@@ -88,6 +89,15 @@
                     box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);
                     max-width: 60%;
                     word-wrap: break-word;
+                    white-space: pre-wrap; /* Đảm bảo dòng mới được hiển thị */
+                    .sticker {
+                        width: 150px;
+                        height: 150px;
+                    }
+                }
+                .de-bg {
+                    background-color: transparent;
+                    box-shadow: none;
                 }
                 .group-message {
                     display: flex;
@@ -181,17 +191,45 @@
     }
     .right {
         flex: 2;
-        .right-content {
-            height: 100%;
-            background-color: #ffffff;
+        .title {
+            font-size: calc(12px + 0.3vw);
+        }
+        .right-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            .item-avatar {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                .name {
+                    font-size: calc(14px + 0.3vw);
+                    font-weight: 640;
+                    .edit {
+                        cursor: pointer;
+                    }
+                }
+            }
+            .item-change-bg {
+                margin-top: 10px;
+                display: flex;
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                span {
+                    width: 90%;
+                    button {
+                        width: 100%;
+                    }
+                }
+            }
         }
     }
 }
 
 @media screen and (max-width: 998px) {
-    .chat-container .right {
-        display: none;
-    }
     .chat-container .friend-info {
         flex: 5 !important;
         width: 100%;
@@ -203,6 +241,9 @@
 }
 
 @media screen and (max-width: 490px) {
+    .chat-container .right {
+        display: none;
+    }
     .info-button {
         display: none !important;
     }

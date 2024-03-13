@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import StatusUser from "../../../components/user/status.user";
 import "./chat.main.scss";
 import { MergeCellsOutlined } from "@ant-design/icons";
@@ -7,14 +7,16 @@ import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import axios from '../../../utils/axios';
 import AvatarUser from "../../../components/user/avatar";
-import { Menu } from 'antd';
+import { Button, Menu } from 'antd';
 import { socket } from "../../../utils/io";
 import { toast } from "react-toastify";
 import _ from 'lodash';
 import ReactLoading from 'react-loading';
 import { STATE } from "../../../redux/types/type.app";
 import TextareaAutosize from 'react-textarea-autosize';
-
+import StickyPopover from '../../../components/popover/sticky.popover';
+import { MESSAGES } from "../../../redux/types/type.user";
+import ChangeBackgroundModal from "../../../components/modal/changeBackground.modal";
 
 
 const ChatMain = () => {
@@ -35,6 +37,8 @@ const ChatMain = () => {
     const footer = useRef(null);
     const [footerHeight, setFooterHeight] = useState(0);
     const textAreaRef = useRef(null);
+    const dispatch = useDispatch();
+    const dispatchRef = useRef(false);
 
     // Menu
     const [current, setCurrent] = useState('');
@@ -112,16 +116,23 @@ const ChatMain = () => {
         return Math.floor(value).toString(16)
     }
 
-    const sendMessage = async (chatId, text) => {
+    const sendMessage = async (data, type) => {
+        if (!data) {
+            return;
+        }
         const ObjectId = objectId();
         const createMessage = {
-            "_id": ObjectId,
-            "chatId": chatId,
-            "content": text,
+            _id: ObjectId,
+            chatId: chat._id,
+            type,
             senderId: user.id,
             createdAt: new Date(),
             updatedAt: new Date(),
         }
+        if (type === MESSAGES.TEXT)
+            createMessage.content = data;
+        else if (type === MESSAGES.STICKER)
+            createMessage.sticker = data;
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
         const res = await axios.post('/chat/message', createMessage);
@@ -144,13 +155,10 @@ const ChatMain = () => {
 
     const handleOnKeyDown = (e) => {
         if (e.key === 'Enter' && e.shiftKey === true) {
-            setText(prev => {
-                console.log(prev)
-            });
+            return;
         } else if (e.key === 'Enter') {
-            sendMessage(chat._id, text);
+            sendMessage(text, MESSAGES.TEXT);
             setText('');
-            console.log('Enter')
         }
     }
 
@@ -202,8 +210,6 @@ const ChatMain = () => {
 
     }
 
-
-
     const handleShowHideEmoij = () => {
         setShowEmoij(prev => !prev);
     }
@@ -220,13 +226,19 @@ const ChatMain = () => {
         setText(prev => prev + e.native);
     }
 
+
+    const handleDispatchSendMessageFunc = () => {
+        if (dispatchRef.current === false) {
+            dispatch({ type: MESSAGES.SEND_MESSAGE_FUNC, payload: sendMessage });
+            dispatchRef.current = true;
+        }
+    }
+
     useEffect(() => {
         if (scroolRef.current) {
             scroolRef.current.scrollTop = scroolRef.current.scrollHeight - 10;
         }
     }, [messages, typing, footerHeight])
-
-
 
     return (
         <div className="chat-container">
@@ -270,16 +282,26 @@ const ChatMain = () => {
                                                             }
                                                         </div>
                                                     }
-                                                    <div className="message">
-                                                        {message.content}
+                                                    <div
+                                                        className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
+
+                                                    >
+                                                        {message.type === MESSAGES.TEXT ? message.content : (
+                                                            message.type === MESSAGES.STICKER &&
+                                                            <img className="sticker" src={message.sticker} alt="sticker" />
+
+                                                        )}
                                                     </div>
                                                 </div>
                                                 :
                                                 <div
                                                     style={{ alignSelf: 'flex-end' }}
-                                                    className="message"
+                                                    className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
                                                 >
-                                                    {message.content}
+                                                    {message.type === MESSAGES.TEXT ? message.content : (
+                                                        message.type === MESSAGES.STICKER &&
+                                                        <img className="sticker" src={message.sticker} alt="sticker" />
+                                                    )}
                                                 </div>
                                         }
                                         {
@@ -324,9 +346,12 @@ const ChatMain = () => {
 
                     <div className="footer" ref={footer}>
                         <div className="footer-top footer-item">
-                            <div className="item-icon">
-                                <img src="/images/sticker.png" />
-                            </div>
+                            <StickyPopover >
+                                <div className="item-icon" onClick={() => handleDispatchSendMessageFunc()}>
+                                    <img src="/images/sticker.png" />
+                                </div>
+                            </StickyPopover>
+
                             <div className="item-icon">
                                 <i className="fa-regular fa-image"></i>
                             </div>
@@ -351,7 +376,7 @@ const ChatMain = () => {
                                 <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
                                     <i className="fa-regular fa-face-smile emoijj"></i>
                                 </div>
-                                <div className="item-icon emoij-like" onClick={() => sendMessage(chat._id, '👍')}>
+                                <div className="item-icon emoij-like" onClick={() => sendMessage('👍', MESSAGES.TEXT)}>
                                     <em-emoji id="+1" size="2em" ></em-emoji>
                                 </div>
                             </div>
@@ -360,16 +385,30 @@ const ChatMain = () => {
                 </div>
             </div>
 
-
-
-
-
-
             {
                 show &&
                 <div className="right chat-item" ref={moreInfoRef}>
-                    <header><h3>Thông tin hội thoại</h3></header>
-                    <div className="right-content">
+                    <header>
+                        <h3 className="title">Thông tin trò chuyện</h3>
+                    </header>
+                    <div className="right-body">
+                        <div className="item-avatar">
+                            <AvatarUser image={chat?.image} />
+                            <p className="name">
+                                <span>{chat?.user?.userName}</span>
+                                <span style={{
+                                    padding: '0 5px'
+                                }}>
+                                    <i className="fa-solid fa-pen-to-square edit"></i>
+                                </span>
+                            </p>
+                        </div>
+
+                        <div className="item-change-bg">
+                            <ChangeBackgroundModal>
+                                <Button className="change-background-btn">Đổi màu nền</Button>
+                            </ChangeBackgroundModal>
+                        </div>
                     </div>
                 </div>
             }

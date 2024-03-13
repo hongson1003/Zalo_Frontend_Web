@@ -1,10 +1,10 @@
 import { KEYITEMS } from "../../utils/keyMenuItem";
 import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from "../types/type.app"
-import { CHAT_STATUS, NOTIFICATIONS } from "../types/type.user";
+import { CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/type.user";
 
 const initialState = {
-    selectedChat: null,
-    notificationsFriends: []
+    notificationsFriends: [],
+    sendMessageFunc: {},
 }
 
 export default function userReducer(state = initialState, action) {
@@ -18,6 +18,12 @@ export default function userReducer(state = initialState, action) {
             let stateNotificationsFriends = { ...state };
             stateNotificationsFriends.notificationsFriends = action.payload;
             return stateNotificationsFriends;
+        }
+
+        case MESSAGES.SEND_MESSAGE_FUNC: {
+            let stateSendMessageFunc = { ...state };
+            stateSendMessageFunc.sendMessageFunc = action.payload;
+            return stateSendMessageFunc;
         }
 
 

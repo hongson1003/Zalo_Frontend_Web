@@ -154,7 +154,8 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 className='modal-infor-user'
             >
                 {
-                    friendData && <Zoom>
+                    friendData &&
+                    <Zoom>
                         <img src={`${profile?.coverImage}`} className='modal-background' />
                     </Zoom>
                 }

@@ -7,10 +7,10 @@ const ListFriends = ({ data }) => {
     const [friends, setFriends] = React.useState([]);
     const stateApp = useSelector(state => state.appReducer);
     useEffect(() => {
-        if (data) {
+        if (data && data.length > 0) {
             const newData = data?.map(item => {
                 let user = null;
-                if (stateApp.userInfo.user.id === item.id)
+                if (stateApp.userInfo.user.id === item.user1.id)
                     user = item.user2;
                 else
                     user = item.user1;

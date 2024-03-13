@@ -1,0 +1,31 @@
+.background-container {
+    .background-body {
+        margin: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        padding: 5px;
+        .background-item {
+            cursor: pointer;
+        }
+        .selected {
+            // border: 2px solid blue;
+            position: relative;
+            box-shadow: -2px 2px 5px 0px #888;
+            &::after {
+                content: "✓";
+                position: absolute;
+                bottom: -10px;
+                right: -10px;
+                background-color: yellowgreen;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-weight: 690;
+            }
+        }
+    }
+}

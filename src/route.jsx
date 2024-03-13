@@ -9,6 +9,7 @@ import ResetPassword from './components/resetPassword.component';
 import OutsideLayout from './layouts/outsideLayout';
 import ErrorPage from './pages/error.page';
 import NotFound from './pages/notFound.page';
+import TestPage from './pages/test.page';
 
 
 const routes = [
@@ -54,6 +55,11 @@ const routes = [
         path: '/error',
         element: <ErrorPage />
     },
+    {
+        path: '/test',
+        element: <TestPage />
+    },
+
 ];
 
 export const router = createBrowserRouter(routes);

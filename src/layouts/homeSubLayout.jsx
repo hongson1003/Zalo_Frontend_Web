@@ -55,7 +55,7 @@ const homeSublayout = () => {
                 sizes={sizes}
                 onChange={size => handleOnChange(size)}
             >
-                <Pane minSize={250} maxSize={500} className={`${visibleLeft}`}>
+                <Pane minSize={200} maxSize={500} className={`${visibleLeft}`}>
                     <SidebarHome />
                 </Pane>
 
