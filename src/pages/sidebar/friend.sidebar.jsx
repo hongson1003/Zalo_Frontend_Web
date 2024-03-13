@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { TeamOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { useDispatch } from "react-redux";
@@ -31,10 +31,31 @@ export const items = [
 const FriendSideBar = () => {
     const [current, setCurrent] = useState(FRIEND_ITEM_MENU.LIST_FRIENDS);
     const dispatch = useDispatch();
+
+    const [windowSize, setWindowSize] = useState([0, 0]);
+    useLayoutEffect(() => {
+        function updateSize() {
+            setWindowSize([window.innerWidth, window.innerHeight]);
+        }
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window.removeEventListener('resize', updateSize);
+    }, []);
+
     const onClick = (e) => {
         setCurrent(e.key);
         dispatch(changeKeySubMenu(e.key))
     };
+
+    useEffect(() => {
+        if (windowSize[0] < 768) {
+            setCurrent('');
+        } else {
+            dispatch(changeKeySubMenu(FRIEND_ITEM_MENU.LIST_FRIENDS))
+            setCurrent(FRIEND_ITEM_MENU.LIST_FRIENDS)
+        }
+    }, [windowSize])
+
     return (
         <Menu
             onClick={onClick}

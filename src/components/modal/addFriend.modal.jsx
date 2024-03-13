@@ -23,7 +23,7 @@ const AddFriendModal = ({ children }) => {
     const handleOk = async () => {
         // validate phone number
         if (phoneNumber.length <= 8) {
-            toast.error('Số điện thoại không hợp lệ');
+            toast.warn('Số điện thoại không hợp lệ');
             return false;
         }
         const res = await axios.get(`/users/detail?phoneNumber=${phoneNumber}`);

@@ -8,6 +8,7 @@ import { FRIEND_ITEM_MENU } from '../sidebar/friend.sidebar';
 import InvitedFriend from "./friend/invited.friend";
 import ListFriend from "./friend/list.friend";
 import GroupFriend from "./friend/group.friend";
+import { STATE } from "../../redux/types/type.app";
 
 const ContentMain = () => {
 
@@ -44,7 +45,11 @@ const ContentMain = () => {
                         case FRIEND_ITEM_MENU.LIST_GROUP:
                             return <GroupFriend />
                         default:
-                            return <ListFriend />
+                            return <></>
+                    }
+                case 'ms':
+                    if (subNav?.key === STATE.ACCESS_CHAT) {
+                        return <ChatMain />
                     }
                 default:
                     return <Welcome />
@@ -55,7 +60,16 @@ const ContentMain = () => {
 
 
     return (
-        <div className="content-main-container">
+        <div className="content-main-container"
+            style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}
+        >
             {isLoading ?
                 <ReactLoading type={'spokes'} color="#1A70FF" height={'100px'} width={'100px'} /> :
                 getRightSplitPane()

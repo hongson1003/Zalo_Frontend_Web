@@ -9,7 +9,7 @@ import './sidebar.scss'
 import { Popover } from 'antd';
 import { useDispatch, useSelector } from "react-redux";
 import { ConfigProvider } from 'antd';
-import { logoutSuccess } from "../../redux/actions/app.action";
+import { changeKeySubMenu, logoutSuccess } from "../../redux/actions/app.action";
 import { useNavigate } from "react-router-dom";
 import axios from '../../utils/axios';
 import { toast } from "react-toastify";
@@ -127,6 +127,7 @@ const Sidebar = () => {
 
     const handleOnSelectItem = (e) => {
         dispatch({ type: STATE.CHANGE_KEY_MENU, payload: e.key });
+        dispatch(changeKeySubMenu(''));
     }
 
 

@@ -11,9 +11,6 @@ const AvatarUser = (props) => {
                     (
                         <Zoom>
                             <Avatar
-                                size={{
-                                    xl: 50,
-                                }}
                                 src={image}
                                 style={{
                                     border: '1px solid #ffffff',

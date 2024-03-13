@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { socket } from '../../utils/io';
 import { toast } from 'react-toastify';
 
-const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip }) => {
+const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe }) => {
     const [profile, setProfile] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [acceptOpenModal, setAcceptOpenModal] = useState(false);
@@ -68,16 +68,18 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         return (
             <React.Fragment>
                 {
-                    needAddFriend === false || needAddFriend === STATE.PENDING ?
-                        <Flex justify='center' gap={10} className={`modal-footer ${needAddFriend === false && 'appear'}`} ref={updateRef}>
-                            <EditOutlined style={{ fontSize: '18px' }} />
-                            <p style={{ fontWeight: 'bold' }}>Cập nhật</p>
-                        </Flex > : (
-                            <div className='modal-footer' onMouseOver={e => handleOnMouse(e)}>
-                                <Button type='default' onClick={() => handleComeBack()}>Thông tin</Button>
-                                <Button type='default' onClick={() => handleAddFriend()}>Thêm bạn</Button>
-                            </div>
-                        )
+                    !itsMe && (
+                        needAddFriend === false || needAddFriend === STATE.PENDING ?
+                            <Flex justify='center' gap={10} className={`modal-footer ${needAddFriend === false && 'appear'}`} ref={updateRef}>
+                                <EditOutlined style={{ fontSize: '18px' }} />
+                                <p style={{ fontWeight: 'bold' }}>Cập nhật</p>
+                            </Flex > : (
+                                <div className='modal-footer' onMouseOver={e => handleOnMouse(e)}>
+                                    <Button type='default' onClick={() => handleComeBack()}>Thông tin</Button>
+                                    <Button type='default' onClick={() => handleAddFriend()}>Thêm bạn</Button>
+                                </div>
+                            )
+                    )
                 }
             </React.Fragment>
         )
@@ -101,6 +103,10 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     useEffect(() => {
         if (friendData && acceptOpenModal) {
             showModal();
+        } else {
+            if (acceptOpenModal) {
+                setAcceptOpenModal(false);
+            }
         }
     }, [acceptOpenModal])
 
@@ -124,7 +130,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 onClick={() => {
                     if (type === 'button') {
                         setTimeout(() => {
-                            if (!friendShipData && myHandleOk) {
+                            if ((!friendShipData && myHandleOk)) {
                                 myHandleOk();
                             }
                             setAcceptOpenModal(true);
@@ -177,7 +183,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                         </div>
                     }
                     {
-                        user?.id !== friendData?.id && (needAddFriend === false || needAddFriend === STATE.PENDING) &&
+                        !itsMe && user?.id !== friendData?.id && (needAddFriend === false || needAddFriend === STATE.PENDING) &&
                         <div className={`add-friends ${needAddFriend === false && 'appear'}`} ref={actionRef}>
                             {
                                 friendShipData?.status === STATE.RESOLVE ?

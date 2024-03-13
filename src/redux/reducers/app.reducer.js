@@ -66,6 +66,14 @@ export default function appReducer(state = initialState, action) {
             stateError.error = true;
             return stateError;
         }
+        case STATE.ACCESS_CHAT: {
+            let stateAccessChat = { ...state };
+            stateAccessChat.subNav = {
+                key: STATE.ACCESS_CHAT,
+                ...action.payload,
+            };
+            return stateAccessChat;
+        }
         default:
             return state
     }

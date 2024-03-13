@@ -4,21 +4,25 @@ import { io } from 'socket.io-client';
 const URL = import.meta.env.VITE_APP_NODE_ENV === 'production' ? undefined : 'http://localhost:8080';
 export const socket = customSocket(io, URL);
 
-
 async function customSocket(io, url) {
     try {
-        var socket = null;
+        let socket = null;
         const result = await new Promise(async (resolve, reject) => {
             if (url) {
-                socket = await io(url, { autoConnect: true, reconnection: false });
-                resolve(socket);
+                try {
+                    socket = await io(url, { autoConnect: true, reconnection: false });
+                    resolve(socket);
+                } catch (error) {
+                    console.error('Lỗi kết nối máy chủ socket:', error);
+                    reject(error); // Báo lỗi cho Promise
+                }
             } else {
                 resolve(io());
             }
-        })
+        });
         return result;
     } catch (error) {
-        console.log('Lỗi kết nối máy chủ socket:', error);
+        console.error('Lỗi tổng thể khi tạo socket:', error);
+        // Hiển thị thông báo lỗi cho người dùng (tùy chọn)
     }
 }
-

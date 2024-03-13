@@ -37,12 +37,6 @@ const HomeLayout = () => {
     })
   }, []);
 
-  useEffect(() => {
-    if (state?.isConnectedSocket === true && onlyOneRef.current === false) {
-      toast.success('Đã đăng nhập thành công');
-      onlyOneRef.current = true;
-    }
-  }, [state?.isConnectedSocket]);
 
 
 
@@ -63,7 +57,7 @@ const HomeLayout = () => {
         </Layout>
         <ToastContainer
           position="top-right"
-          autoClose={2000}
+          autoClose={1000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick

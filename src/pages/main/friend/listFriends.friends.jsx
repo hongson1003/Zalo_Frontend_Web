@@ -7,15 +7,17 @@ const ListFriends = ({ data }) => {
     const [friends, setFriends] = React.useState([]);
     const stateApp = useSelector(state => state.appReducer);
     useEffect(() => {
-        const newData = data.map(item => {
-            let user = null;
-            if (stateApp.userInfo.user.id === item.id)
-                user = item.user2;
-            else
-                user = item.user1;
-            return user;
-        })
-        setFriends(newData);
+        if (data) {
+            const newData = data?.map(item => {
+                let user = null;
+                if (stateApp.userInfo.user.id === item.id)
+                    user = item.user2;
+                else
+                    user = item.user1;
+                return user;
+            })
+            setFriends(newData);
+        }
     }, [data])
 
     return (

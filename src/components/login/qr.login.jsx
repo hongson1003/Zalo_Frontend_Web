@@ -7,7 +7,6 @@ import { socket } from '../../utils/io';
 import { loginStart } from '../../redux/actions/app.action';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
 const LoginQR = () => {
     const [value, setValue] = useState('');
     const onlyRender = useRef(false);
@@ -35,11 +34,6 @@ const LoginQR = () => {
         }
         onlyRender.current = true;
     });
-    useEffect(() => {
-        if (isConnected) {
-            toast.success('Đã kết nối với máy quét');
-        }
-    }, [isConnected]);
     return (
         <Flex
             justify="center"

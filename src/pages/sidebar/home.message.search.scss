@@ -6,10 +6,9 @@
         width: 100%;
         display: flex;
         justify-content: space-around;
-        margin-bottom: 16px;
         padding: 7px 10px;
         .ant-input-group-wrapper {
-            max-width: 74%;
+            max-width: 100%;
             width: 100%;
             display: flex;
             background-color: #eaedf0;
@@ -47,5 +46,11 @@
         .classify {
             min-width: 100px;
         }
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .btn-group {
+        display: none !important;
     }
 }

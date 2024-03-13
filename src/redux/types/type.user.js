@@ -1,5 +1,7 @@
 export const CHAT_STATUS = {
     SELECTED_CHAT: 'SELECTED_CHAT',
+    PRIVATE_CHAT: 'PRIVATE_CHAT',
+    GROUP_CHAT: 'GROUP_CHAT',
 }
 
 export const NOTIFICATIONS = {

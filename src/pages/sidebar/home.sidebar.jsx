@@ -4,14 +4,17 @@ import './home.message.sidebar.scss'
 import { useSelector } from "react-redux";
 import { KEYITEMS } from "../../utils/keyMenuItem";
 import FriendSideBar from "./friend.sidebar";
+import ChatSidebar from "./chat.sidebar";
+
 
 const SidebarHome = () => {
-    const stateUser = useSelector(state => state?.userReducer);
     const stateApp = useSelector(state => state?.appReducer);
     const renderContent = () => {
         switch (stateApp?.nav) {
             case KEYITEMS.PHONEBOOK:
                 return <FriendSideBar />;
+            case KEYITEMS.MESSAGE:
+                return <ChatSidebar />;
             default:
                 return <></>;
         }

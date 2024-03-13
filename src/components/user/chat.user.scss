@@ -1,0 +1,16 @@
+.chat-user-container {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+    cursor: pointer;
+    .right {
+        .name {
+            font-weight: 500;
+        }
+    }
+}
+.active-chat {
+    background-color: #e5efff;
+}
