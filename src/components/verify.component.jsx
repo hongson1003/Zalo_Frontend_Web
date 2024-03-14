@@ -158,79 +158,82 @@ const VerifyComponent = (props) => {
 
 
     return (
-        <div className="verify-container">
-            <h1 className="title">Xác thực tài khoản</h1>
-            {
-                state.userInfo?.avatar &&
-                <>
-                    <img className="avatar" src={state.userInfo.avatar} />
-                    <p style={{ textAlign: 'center', marginTop: '5px', fontWeight: 'bold' }}>{state.userInfo.userName}</p>
-                    {
-                        recaptchaIsResolve === false ?
-                            <p className="notify">Vui lòng xác thực bạn là người thật
-                                <img className="xacminh-img" src="/images/xacminhnguoithat.jpg" />
-                                ...</p> :
-                            <p className="notify">Vui lòng nhập mã OTP để đăng nhập vào máy tính</p>
-                    }
-                </>
-            }
-            {
-                recaptchaIsResolve &&
-                <>
-                    <OtpInput
-                        value={otp}
-                        onChange={(value) => setOtp(value)}
-                        numInputs={6}
-                        renderSeparator={<span>-</span>}
-                        renderInput={(props) => <input {...props} />}
+        <div className="container">
+            <div className="verify-container">
+                <h1 className="title">XÁC THỰC TÀI KHOẢN</h1>
+                {
+                    state.userInfo?.avatar &&
+                    <>
+                        <img className="avatar" src={state.userInfo.avatar} />
+                        <p style={{ textAlign: 'center', marginTop: '5px', fontWeight: 'bold' }}>{state.userInfo.userName}</p>
+                        {
+                            recaptchaIsResolve === false ?
+                                <p className="notify">Vui lòng xác thực bạn là người thật
+                                    <img className="xacminh-img" src="/images/xacminhnguoithat.jpg" />
+                                    ...</p> :
+                                <p className="notify">Vui lòng nhập mã OTP để đăng nhập vào máy tính</p>
+                        }
+                    </>
+                }
+                {
+                    // recaptchaIsResolve &&
+                    <>
+                        <OtpInput
+                            value={otp}
+                            onChange={(value) => setOtp(value)}
+                            numInputs={6}
+                            renderSeparator={<span>-</span>}
+                            renderInput={(props) => <input {...props} />}
 
-                        inputStyle={{
-                            width: 'calc(30px + 3.5vw)',
-                            height: '45px',
-                            fontSize: '20px'
-                        }}
-                        containerStyle={{
-                            minWidth: '400px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            margin: '20px 0px'
-                        }}
-                        shouldAutoFocus={isFocus}
-                        inputType="tel"
-                    />
-                    {
-                        sent &&
-                        (
-                            time === 0 ?
-                                <>
-                                    <ReactLoading type={'cylon'} color={'blue'} />
-                                    <p style={{ textAlign: 'center' }}>Hết thời gian, vui lòng đăng nhập lại</p>
-                                </>
-                                :
-                                <p style={{ textAlign: 'center' }}>{time} s</p>
-                        )
-                    }
-                    <Flex justify="space-around" gap='60px' className="btn-group">
-                        <Button disabled={otp.length !== 6} loading={isLoading} className="verify" type="primary" onClick={() => verifyOtp()}>Verify</Button>
-                    </Flex>
-                </>
-            }
-            <div ref={recaptchaRef} id="recaptcha-container"></div>
+                            inputStyle={{
+                                width: 'calc(30px + 3.5vw)',
+                                height: '45px',
+                                fontSize: '20px'
+                            }}
+                            containerStyle={{
+                                minWidth: '400px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                margin: '20px 0px'
+                            }}
+                            shouldAutoFocus={isFocus}
+                            inputType="tel"
+                        />
+                        {
+                            sent &&
+                            (
+                                time === 0 ?
+                                    <>
+                                        <ReactLoading type={'cylon'} color={'blue'} />
+                                        <p style={{ textAlign: 'center' }}>Hết thời gian, vui lòng đăng nhập lại</p>
+                                    </>
+                                    :
+                                    <p style={{ textAlign: 'center' }}>{time} s</p>
+                            )
+                        }
+                        <Flex justify="space-around" gap='60px' className="btn-group">
+                            <Button disabled={otp.length !== 6} loading={isLoading} className="verify" type="primary" onClick={() => verifyOtp()}>Verify</Button>
+                        </Flex>
+                    </>
+                }
+                <div ref={recaptchaRef} id="recaptcha-container"></div>
 
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-                transition:Bounce
-            />
+                <ToastContainer
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    transition:Bounce
+                />
+            </div>
         </div>
+        
     )
 }
 
