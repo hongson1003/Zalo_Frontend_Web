@@ -161,7 +161,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 }
                 <div className='modal-avatar'>
                     <div className='modal-avatar-info'>
-                        <AvatarUser image={friendData?.avatar} zoom>
+                        <AvatarUser image={friendData?.avatar} zoom size={50}>
                             <div className='camara-container' onClick={handleSetting}>
                                 <InstagramOutlined />
                             </div>

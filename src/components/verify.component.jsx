@@ -79,7 +79,6 @@ const VerifyComponent = (props) => {
         }
     }, [otp])
 
-
     const generateRecaptcha = () => {
         try {
             window.recaptchaVerifier = new RecaptchaVerifier(
@@ -176,7 +175,7 @@ const VerifyComponent = (props) => {
                     </>
                 }
                 {
-                    // recaptchaIsResolve &&
+                    recaptchaIsResolve &&
                     <>
                         <OtpInput
                             value={otp}
@@ -233,7 +232,7 @@ const VerifyComponent = (props) => {
                 />
             </div>
         </div>
-        
+
     )
 }
 

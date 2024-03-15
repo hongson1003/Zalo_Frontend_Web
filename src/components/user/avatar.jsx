@@ -3,7 +3,7 @@ import { Avatar } from 'antd';
 import Zoom from 'react-medium-image-zoom'
 
 const AvatarUser = (props) => {
-    const { image, children, zoom } = props;
+    const { image, children, zoom, size } = props;
     return (
         <span className="avatar-container" style={{ position: 'relative' }}>
             {
@@ -16,13 +16,16 @@ const AvatarUser = (props) => {
                                     border: '1px solid #ffffff',
                                     cursor: 'pointer'
                                 }}
+                                size={{
+                                    xl: size,
+                                }}
                             />
                         </Zoom>
                     ) :
                     (
                         <Avatar
                             size={{
-                                xl: 50,
+                                xl: size,
                             }}
                             src={image}
                             style={{

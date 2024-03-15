@@ -42,7 +42,25 @@ const homeSublayout = () => {
         }
     }, [windowSize, stateApp?.subNav]);
 
+    const handleOnDoubleClick = () => {
+        if (sizes[0] !== '0px') {
+            setSizes(['0px', '100%'])
+        } else {
+            setSizes(['26%', 'auto'])
+        }
+    }
 
+    useEffect(() => {
+        const split = document.getElementsByClassName('split-sash-content')[0];
+        if (split) {
+            split.addEventListener('dblclick', handleOnDoubleClick)
+        }
+        return () => {
+            if (split) {
+                split.removeEventListener('dblclick', handleOnDoubleClick)
+            }
+        }
+    }, [sizes[0]])
 
     const handleOnChange = (size) => {
         // handle resize event
@@ -55,10 +73,9 @@ const homeSublayout = () => {
                 sizes={sizes}
                 onChange={size => handleOnChange(size)}
             >
-                <Pane minSize={200} maxSize={500} className={`${visibleLeft}`}>
+                <Pane maxSize={500} className={`${visibleLeft}`}>
                     <SidebarHome />
                 </Pane>
-
                 <Pane
                     className={`pane-content ${visibleRight}`}>
                     <ContentMain />

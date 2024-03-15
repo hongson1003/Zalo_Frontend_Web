@@ -48,7 +48,7 @@ const ChangeBackgroundModal = ({ chat, children }) => {
         <React.Fragment>
             <span onClick={showModal}>{children}</span>
 
-            <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <Modal title="Chọn hình nền" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <Flex wrap="wrap" justify="center" gap={'10px'} className="background-container">
                     <div className="background-body">
                         {

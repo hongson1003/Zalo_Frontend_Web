@@ -5,6 +5,7 @@ import { CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/type.user";
 const initialState = {
     notificationsFriends: [],
     sendMessageFunc: {},
+    message: null
 }
 
 export default function userReducer(state = initialState, action) {

@@ -16,7 +16,6 @@ const HomeLayout = () => {
   const navigate = useNavigate();
   const state = useSelector(state => state?.appReducer);
   const dispatch = useDispatch();
-  const onlyOneRef = useRef(false);
   // check authentication
   useEffect(() => {
     if (state.isLogin !== STATE.RESOLVE)
@@ -36,9 +35,6 @@ const HomeLayout = () => {
       })
     })
   }, []);
-
-
-
 
 
   return (

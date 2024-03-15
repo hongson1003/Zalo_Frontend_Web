@@ -119,7 +119,7 @@ const Sidebar = () => {
 
 
     const title = (
-        <div>
+        <div style={{ padding: '12px' }}>
             <h3 style={{ marginBottom: '10px' }}>{state?.userInfo?.user?.userName}</h3>
             <hr />
         </div>

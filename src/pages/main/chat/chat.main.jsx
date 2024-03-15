@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import StatusUser from "../../../components/user/status.user";
 import "./chat.main.scss";
 import { MergeCellsOutlined } from "@ant-design/icons";
-import data from '@emoji-mart/data'
+import data from '@emoji-mart/data/sets/14/facebook.json'
+// import data from '../../../mocks/facebook.json';
 import Picker from '@emoji-mart/react'
 import axios from '../../../utils/axios';
 import AvatarUser from "../../../components/user/avatar";
@@ -15,9 +16,17 @@ import ReactLoading from 'react-loading';
 import { STATE } from "../../../redux/types/type.app";
 import TextareaAutosize from 'react-textarea-autosize';
 import StickyPopover from '../../../components/popover/sticky.popover';
-import { MESSAGES } from "../../../redux/types/type.user";
+import { CHAT_STATUS, MESSAGES } from "../../../redux/types/type.user";
 import ChangeBackgroundModal from "../../../components/modal/changeBackground.modal";
+import MessageChat from "./message.chat";
+import { getTimeFromDate } from '../../../utils/handleUltils';
 
+const unClassList = [
+    'group-message',
+    'message',
+    'message-hover-container option-left'
+
+]
 
 const ChatMain = () => {
     const chat = useSelector(state => state.appReducer.subNav);
@@ -27,7 +36,7 @@ const ChatMain = () => {
     const [showEmoij, setShowEmoij] = useState(true);
     const [messages, setMessages] = useState([]);
     const [page, setPage] = useState(1);
-    const [limit] = useState(50);
+    const [limit] = useState(100);
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const scroolRef = useRef(null);
     const receiveOnly = useRef(false);
@@ -98,10 +107,11 @@ const ChatMain = () => {
             </div>
         },
         {
-            key: 'kk',
-            icon: <div className="box-icon" onClick={handleClickMoreInfor}>
-                <MergeCellsOutlined className="icon" />
-            </div>,
+            key: 'foremore',
+            icon:
+                <div className="box-icon" onClick={handleClickMoreInfor}>
+                    <MergeCellsOutlined className="icon" />
+                </div>,
             className: 'info-button'
         },
 
@@ -123,9 +133,9 @@ const ChatMain = () => {
         const ObjectId = objectId();
         const createMessage = {
             _id: ObjectId,
-            chatId: chat._id,
+            chat: chat,
             type,
-            senderId: user.id,
+            sender: user,
             createdAt: new Date(),
             updatedAt: new Date(),
         }
@@ -135,7 +145,11 @@ const ChatMain = () => {
             createMessage.sticker = data;
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
-        const res = await axios.post('/chat/message', createMessage);
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            chatId: chat._id,
+            sender: user.id
+        });
         if (res.errCode === 0) {
             socket.then(socket => {
                 setSent(STATE.RESOLVE);
@@ -150,6 +164,7 @@ const ChatMain = () => {
     }
 
     function handleClickMoreInfor() {
+        console.log('click more info')
         setShow(prev => !prev);
     }
 
@@ -178,7 +193,6 @@ const ChatMain = () => {
     }, [footer])
 
 
-
     let emitFinishTyping = useCallback(_.debounce(() => {
         socket.then(socket => {
             socket.emit('finish-typing', chat._id);
@@ -192,7 +206,6 @@ const ChatMain = () => {
             setText('');
             return;
         }
-
         if (sendTyping.current === false) {
             socket.then(socket => {
                 socket.emit('typing', chat._id);
@@ -207,7 +220,6 @@ const ChatMain = () => {
                 setText(value);
         } else
             setText(value);
-
     }
 
     const handleShowHideEmoij = () => {
@@ -240,180 +252,245 @@ const ChatMain = () => {
         }
     }, [messages, typing, footerHeight])
 
+
+
+    const handleOnClickFooter = () => {
+        textAreaRef.current.focus();
+    }
+
+    // const [rotation, setRotation] = useState(0);
+    // const handleEvent = (e) => {
+    //     if (!unClassList.includes(e.target.className)) {
+    //         const rect = e.target.getBoundingClientRect();
+    //         const centerX = rect.left + rect.width / 2;
+    //         const angle = (e.clientX - centerX) / 10; // Điều chỉnh số 10 để tăng hoặc giảm tốc độ xoay
+    //         setRotation(angle);
+    //     }
+    // }
+
     return (
-        <div className="chat-container">
-            <div className="left chat-item">
-                <header>
-                    <div className="friend-info">
-                        <StatusUser chat={chat} />
-                    </div>
-                    <div className="tools">
-                        <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} className="menu-header" />
-                    </div>
-                </header>
+        <>
+            <div className="chat-container"
+            // onMouseDown={handleEvent}
+            >
+                <div className="left chat-item">
+                    <header>
+                        <div className="friend-info">
+                            <StatusUser chat={chat} />
+                        </div>
+                        <div className="tools">
+                            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} className="menu-header" />
+                        </div>
+                    </header>
 
-                <div className="main-chat-content">
-                    <div className="content-chat-messages" ref={scroolRef}
-                        style={{
-                            height: `calc(100% - ${footerHeight}px)`
-
-                        }}>
-                        {
-                            messages && messages.length > 0 && messages.map((message, index) => {
-                                return (
-                                    <React.Fragment key={message._id}>
-                                        {
-                                            user?.id !== message.senderId ?
-                                                <div className="group-message">
-                                                    {
-                                                        <div className="avatar">
-                                                            {
-                                                                index == 0 ?
-                                                                    <AvatarUser
-                                                                        image={chat?.image}
-                                                                    /> :
-                                                                    (
-                                                                        messages[index - 1].senderId !== messages[index].senderId &&
+                    <div className="main-chat-content">
+                        <div className="content-chat-messages" ref={scroolRef}
+                            style={{
+                                height: `calc(100% - ${footerHeight}px)`
+                            }}>
+                            {
+                                messages && messages.length > 0 && messages.map((message, index) => {
+                                    return (
+                                        <React.Fragment key={message._id}>
+                                            {
+                                                // no current user
+                                                user?.id !== message.sender.id ?
+                                                    <div className="group-message">
+                                                        {
+                                                            <div className="avatar">
+                                                                {
+                                                                    index == 0 ?
                                                                         <AvatarUser
                                                                             image={chat?.image}
-                                                                        />
+                                                                        /> :
+                                                                        (
+                                                                            messages[index - 1].sender.id !== messages[index].sender.id &&
+                                                                            <AvatarUser
+                                                                                image={chat.type === CHAT_STATUS.PRIVATE_CHAT ?
+                                                                                    chat?.user?.avatar : message?.sender?.avatar}
+                                                                            />
 
-                                                                    )
+                                                                        )
+                                                                }
+                                                            </div>
+                                                        }
+                                                        <div
+                                                            className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
+                                                            style={{ backgroundColor: '#ffffff' }}
+                                                        >
+                                                            {
+                                                                messages[index - 1]?.sender?.id !== messages[index].sender.id &&
+                                                                <p className="name">{message?.sender?.userName}</p>
                                                             }
+                                                            {message.type === MESSAGES.TEXT ?
+                                                                <MessageChat isLeft={true}>
+                                                                    {message.content}
+                                                                    {
+                                                                        messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                        <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                    }
+                                                                </MessageChat> : (
+                                                                    message.type === MESSAGES.STICKER &&
+                                                                    <MessageChat isLeft={true}>
+                                                                        <img className="sticker" src={message.sticker} alt="sticker" />
+                                                                        {
+                                                                            messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                            <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                        }
+                                                                    </MessageChat>
+                                                                )}
                                                         </div>
-                                                    }
-                                                    <div
-                                                        className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
-
-                                                    >
-                                                        {message.type === MESSAGES.TEXT ? message.content : (
-                                                            message.type === MESSAGES.STICKER &&
-                                                            <img className="sticker" src={message.sticker} alt="sticker" />
-
-                                                        )}
                                                     </div>
-                                                </div>
-                                                :
+                                                    // current user
+                                                    :
+                                                    <div
+                                                        style={{ alignSelf: 'flex-end', backgroundColor: '#e5efff' }}
+                                                        className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
+                                                    >
+                                                        {message.type === MESSAGES.TEXT ?
+                                                            <MessageChat isLeft={false}>
+                                                                {message.content}
+                                                                {
+                                                                    messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                    <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                }
+                                                            </MessageChat>
+                                                            : (
+                                                                message.type === MESSAGES.STICKER &&
+                                                                <MessageChat isLeft={false}>
+                                                                    <img className="sticker" src={message.sticker} alt="sticker" />
+                                                                    {
+                                                                        messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                        <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                    }
+                                                                </MessageChat>
+                                                            )}
+                                                    </div>
+                                            }
+                                            {
+                                                index == messages.length - 1 && message.sender.id === user.id &&
                                                 <div
                                                     style={{ alignSelf: 'flex-end' }}
-                                                    className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
                                                 >
-                                                    {message.type === MESSAGES.TEXT ? message.content : (
-                                                        message.type === MESSAGES.STICKER &&
-                                                        <img className="sticker" src={message.sticker} alt="sticker" />
-                                                    )}
+                                                    <div className="message-status">
+                                                        {
+                                                            sent === STATE.PENDING ? <span>đã gửi</span> : (
+                                                                sent === STATE.RESOLVE ? <span>Đã nhận</span> : <span>Gửi thất bại</span>
+                                                            )
+                                                        }
+                                                    </div>
+
                                                 </div>
-                                        }
-                                        {
-                                            index == messages.length - 1 && message.senderId === user.id &&
+                                            }
+                                        </React.Fragment>
+                                    )
+                                })
+                            }
+                            {
+                                typing &&
+                                <>
+                                    <ReactLoading type={'bubbles'} color={'grey'} height={'40px'} width={'50px'} />
+                                    <div className="message-status">
+                                        <span>Đang gửi</span>
+                                    </div>
+                                </>
 
-                                            <div
-                                                style={{ alignSelf: 'flex-end' }}
-                                            >
-                                                {
-                                                    sent === STATE.PENDING ? <span>đã gửi</span> : (
-                                                        sent === STATE.RESOLVE ? <span>Đã nhận</span> : <span>Gửi thất bại</span>
-                                                    )
-                                                }
-                                            </div>
-                                        }
-                                    </React.Fragment>
-                                )
-                            })
-                        }
-                        {
-                            typing &&
-                            <>
-                                <ReactLoading type={'bubbles'} color={'grey'} height={'40px'} width={'50px'} />
-                                <span>Đang gửi</span>
-                            </>
+                            }
+                        </div>
 
-                        }
-
-                    </div>
-
-                    {/* Init position */}
-                    <div className="emoij-container">
-                        {
-                            showEmoij &&
-                            <Picker data={data}
-                                onEmojiSelect={handleChooseEmoij}
-                                onClickOutside={(e) => handleOnClickOutSide(e)}
-                            />
-                        }
-
-                    </div>
-
-                    <div className="footer" ref={footer}>
-                        <div className="footer-top footer-item">
-                            <StickyPopover >
-                                <div className="item-icon" onClick={() => handleDispatchSendMessageFunc()}>
-                                    <img src="/images/sticker.png" />
-                                </div>
-                            </StickyPopover>
-
-                            <div className="item-icon">
-                                <i className="fa-regular fa-image"></i>
-                            </div>
-                            <div className="item-icon">
-                                <i className="fa-solid fa-paperclip"></i>
-                            </div>
+                        {/* Init position */}
+                        <div className="emoij-container">
+                            {
+                                showEmoij &&
+                                <Picker
+                                    data={data}
+                                    onEmojiSelect={handleChooseEmoij}
+                                    onClickOutside={(e) => handleOnClickOutSide(e)}
+                                    skin={6}
+                                    isNative
+                                />
+                            }
 
                         </div>
-                        <div className="footer-bottom footer-item">
-                            <TextareaAutosize
-                                value={text} className="input-text"
-                                onChange={e => handleOnChange(e)}
-                                placeholder="Nhập tin nhắn..."
-                                onKeyDown={e => handleOnKeyDown(e)}
-                                autoFocus
-                                spellCheck={false}
-                                onHeightChange={(height, meta) => handleResize(height, meta)}
-                                ref={textAreaRef}
-                            />
 
-                            <div className="text-quick-group">
-                                <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
-                                    <i className="fa-regular fa-face-smile emoijj"></i>
+                        <div className="footer" ref={footer}>
+                            <div className="footer-top footer-item">
+                                <StickyPopover >
+                                    <div className="item-icon" onClick={() => handleDispatchSendMessageFunc()}>
+                                        <img src="/images/sticker.png" />
+                                    </div>
+                                </StickyPopover>
+
+                                <div className="item-icon">
+                                    <i className="fa-regular fa-image"></i>
                                 </div>
-                                <div className="item-icon emoij-like" onClick={() => sendMessage('👍', MESSAGES.TEXT)}>
-                                    <em-emoji id="+1" size="2em" ></em-emoji>
+                                <div className="item-icon">
+                                    <i className="fa-solid fa-paperclip"></i>
+                                </div>
+
+                            </div>
+                            <div className="footer-bottom footer-item" onClick={handleOnClickFooter}>
+                                <TextareaAutosize
+                                    value={text}
+                                    className="input-text"
+                                    onChange={e => handleOnChange(e)}
+                                    placeholder="Nhập tin nhắn..."
+                                    onKeyDown={e => handleOnKeyDown(e)}
+                                    autoFocus
+                                    spellCheck={false}
+                                    onHeightChange={(height, meta) => handleResize(height, meta)}
+                                    ref={textAreaRef}
+                                />
+
+                                <div className="text-quick-group">
+                                    <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
+                                        <i className="fa-regular fa-face-smile emoijj"></i>
+                                    </div>
+                                    <div className="item-icon emoij-like" onClick={() => sendMessage('👍', MESSAGES.TEXT)}>
+                                        <em-emoji id="+1" size="2em" ></em-emoji>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {
-                show &&
-                <div className="right chat-item" ref={moreInfoRef}>
-                    <header>
-                        <h3 className="title">Thông tin trò chuyện</h3>
-                    </header>
-                    <div className="right-body">
-                        <div className="item-avatar">
-                            <AvatarUser image={chat?.image} />
-                            <p className="name">
-                                <span>{chat?.user?.userName}</span>
-                                <span style={{
-                                    padding: '0 5px'
-                                }}>
-                                    <i className="fa-solid fa-pen-to-square edit"></i>
-                                </span>
-                            </p>
-                        </div>
+                {
+                    show &&
+                    <div className="right chat-item" ref={moreInfoRef}>
+                        <header>
+                            <h3 className="title">Thông tin trò chuyện</h3>
+                        </header>
+                        <div className="right-body">
+                            <div className="item-avatar">
+                                <AvatarUser image={chat?.image} size={50} />
+                                <p className="name">
+                                    <span>{chat?.user?.userName || chat?.name}</span>
+                                    <span style={{
+                                        padding: '0 5px'
+                                    }}>
+                                        <i className="fa-solid fa-pen-to-square edit"></i>
+                                    </span>
+                                </p>
+                            </div>
 
-                        <div className="item-change-bg">
-                            <ChangeBackgroundModal>
-                                <Button className="change-background-btn">Đổi màu nền</Button>
-                            </ChangeBackgroundModal>
+                            <div className="item-change-bg">
+                                <ChangeBackgroundModal
+                                    chat={chat}
+                                >
+                                    <Button className="change-background-btn">Đổi hình nền</Button>
+                                </ChangeBackgroundModal>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
 
-        </div >
+            </div >
+            <div
+                className="bg"
+            // style={{ transform: `rotateY(${rotation}deg)` }}
+            ></div>
+        </>
     );
 };
 

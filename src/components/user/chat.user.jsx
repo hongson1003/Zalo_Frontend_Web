@@ -3,6 +3,7 @@ import AvatarUser from './avatar';
 import { useDispatch, useSelector } from "react-redux";
 import './chat.user.scss'
 import { accessChat } from "../../redux/actions/user.action";
+import { CHAT_STATUS } from "../../redux/types/type.user";
 
 const ChatUser = ({ chat, activeKey }) => {
     const [myChat, setMyChat] = useState({});
@@ -19,14 +20,20 @@ const ChatUser = ({ chat, activeKey }) => {
 
     const handleGetChatStandard = (chat) => {
         const participants = chat.participants;
-        const myFriend = participants.find(item => item?.id !== user.id);
-        return {
+        let myFriend = null;
+        if (chat.type === CHAT_STATUS.PRIVATE_CHAT) {
+            myFriend = participants.find(item => item?.id !== user.id);
+        }
+        const newChat = {
             ...chat,
-            image: myFriend?.avatar || chat.groupPhoto,
-            user: myFriend,
+            image: chat.groupPhoto || myFriend?.avatar,
             lastMessage: chat.lastMessage,
             updatedAt: chat.updatedAt,
         }
+        if (myFriend) {
+            newChat.user = myFriend;
+        }
+        return newChat;
     }
 
     const handleOnClick = () => {
@@ -37,7 +44,7 @@ const ChatUser = ({ chat, activeKey }) => {
         <div className={`chat-user-container ${activeKey === subNav?._id && 'active-chat'}`} onClick={() => {
             handleOnClick()
         }}>
-            <AvatarUser {...myChat} />
+            <AvatarUser {...myChat} size={50} />
             <div className="right">
                 <div className="top">
                     <p className="name">{myChat.name || myChat?.user?.userName}</p>

@@ -8,8 +8,6 @@
     align-items: center;
     gap: 10px;
     .avatar-container span {
-        width: 50px !important;
-        height: 50px !important;
         img {
             display: block;
             width: 100%;
@@ -22,7 +20,37 @@
         }
         .connected-time {
             font-size: calc(5px + 0.5vw);
-            color: #333;
+            // color: #333;
+            color: #ffffff;
+        }
+    }
+
+    .avatar-group {
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 50px;
+        height: 100%;
+        img {
+            width: 50px;
+            height: 100%;
+            border-radius: 50%;
+        }
+        .avatar-container {
+            &:nth-child(1) {
+                transform: translate(3.5px, 3.5px);
+            }
+            &:nth-child(2) {
+                transform: translate(-3.5px, 3.5px);
+            }
+            &:nth-child(3) {
+                transform: translate(3.5px, -3.5px);
+            }
+            &:nth-child(4) {
+                transform: translate(-3.5px, -3.5px);
+            }
         }
     }
 }

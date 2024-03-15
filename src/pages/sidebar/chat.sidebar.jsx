@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from '../../utils/axios';
 import ChatUser from "../../components/user/chat.user";
 import { socket } from "../../utils/io";
+import { toast } from "react-toastify";
 
 const limit = 10;
 
@@ -15,7 +16,6 @@ const ChatSidebar = () => {
         if (res.errCode === 0) {
             setChats(res.data);
         } else {
-            setChats('none');
             toast.warn('Có lỗi xảy ra !')
         }
     }
@@ -41,19 +41,21 @@ const ChatSidebar = () => {
     return (
         <div>
             {
-                chats !== 'none' ? chats.map((chat, index) => {
-                    return (
-                        <ChatUser
-                            key={index}
-                            chat={chat}
-                            activeKey={chat._id}
-                        />
+                chats?.length > 0 ?
+                    chats.map((chat, index) => {
+                        return (
+                            <ChatUser
+                                key={index}
+                                chat={chat}
+                                activeKey={chat._id}
+                            />
+                        )
+                    }) :
+                    (
+                        <div>
+                            <h1>Không có cuộc trò chuyện nào</h1>
+                        </div>
                     )
-                }) : (
-                    <div>
-                        <h1>Không có cuộc trò chuyện nào</h1>
-                    </div>
-                )
             }
         </div>
     );
