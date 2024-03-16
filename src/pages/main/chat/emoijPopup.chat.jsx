@@ -29,23 +29,23 @@ const Content = () => {
 };
 
 
-const EmoijPopup = ({ children, placement }) => {
+const EmoijPopup = ({ children, placement, trigger }) => {
     const [open, setOpen] = useState(false);
     const handleOpenChange = (newOpen) => {
         setOpen(newOpen);
     };
     return (
-        <div>
-            <Popover
-                content={Content}
-                trigger="hover"
-                open={open}
-                onOpenChange={handleOpenChange}
-                placement={placement}
-            >
-                <span>{children}</span>
-            </Popover>
-        </div>
+        <Popover
+            content={Content}
+            trigger={trigger}
+            open={open}
+            onOpenChange={handleOpenChange}
+            placement={placement}
+            overlayClassName="popover-emoij"
+            mouseLeaveDelay={0.1}
+        >
+            {children}
+        </Popover>
     )
 }
 

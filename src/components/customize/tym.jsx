@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-// import './test.page.css'
+import './tym.css';
 
-const TestPage = ({ icon }) => {
-    const user = useSelector(state => state.appReducer?.userInfo?.user);
+const Tym = ({ icon }) => {
     const [isClick, setIsClick] = useState(false);
-
     const handleOnClick = () => {
         setIsClick(!isClick);
     }
-
     useEffect(() => {
         if (isClick) {
             setTimeout(() => {
@@ -17,55 +13,54 @@ const TestPage = ({ icon }) => {
             }, 500);
         }
     }, [isClick]);
-
     return (
         <div className="tym-main-container-xyz">
             <div
                 className={`tym-icon-123 ${isClick ? 'active' : ''}`}
                 onClick={() => handleOnClick()}
             >
-                ❤️
+                {icon}
                 <div className="tyms-frame">
                     <div className="tyms-heart">
                         <div className="tyms-heart-inner">
-                            <div>❤️</div>
+                            <div>{icon}</div>
                         </div>
                         <div className="tyms-heart-inner">
                             <div>
-                                <div>❤️</div>
-                                <div>❤️</div>
+                                <div>{icon}</div>
+                                <div>{icon}</div>
                             </div>
                             <div className="tyms-heart-inner">
-                                <div>❤️</div>
-                                <div>❤️</div>
-                            </div>
-                        </div>
-                        <div className="tyms-heart-inner">
-                            <div>
-                                <div>❤️</div>
-                                <div>❤️</div>
-                            </div>
-                            <div className="tyms-heart-inner">
-                                <div>❤️</div>
-                                <div>❤️</div>
-                            </div>
-                            <div className="tyms-heart-inner">
-                                <div>❤️</div>
-                                <div>❤️</div>
-                            </div>
-                            <div>
-                                <div>❤️</div>
-                                <div>❤️</div>
+                                <div>{icon}</div>
+                                <div>{icon}</div>
                             </div>
                         </div>
                         <div className="tyms-heart-inner">
                             <div>
-                                <div>❤️</div>
-                                <div>❤️</div>
+                                <div>{icon}</div>
+                                <div>{icon}</div>
+                            </div>
+                            <div className="tyms-heart-inner">
+                                <div>{icon}</div>
+                                <div>{icon}</div>
+                            </div>
+                            <div className="tyms-heart-inner">
+                                <div>{icon}</div>
+                                <div>{icon}</div>
                             </div>
                             <div>
-                                <div>❤️</div>
-                                <div>❤️</div>
+                                <div>{icon}</div>
+                                <div>{icon}</div>
+                            </div>
+                        </div>
+                        <div className="tyms-heart-inner">
+                            <div>
+                                <div>{icon}</div>
+                                <div>{icon}</div>
+                            </div>
+                            <div>
+                                <div>{icon}</div>
+                                <div>{icon}</div>
                             </div>
                         </div>
                     </div>
@@ -75,4 +70,4 @@ const TestPage = ({ icon }) => {
     )
 }
 
-export default TestPage;
+export default Tym;

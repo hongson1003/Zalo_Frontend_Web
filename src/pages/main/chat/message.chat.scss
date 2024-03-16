@@ -29,7 +29,7 @@
         transform: translateY(-100%);
         width: 100px;
         height: 50px;
-        z-index: 10;
+        z-index: 4;
         display: none;
         .options-content {
             position: absolute;
@@ -51,19 +51,15 @@
         }
     }
     .frame-tym {
+        display: none;
         position: absolute;
         width: 300px;
         height: 40%;
         bottom: 0;
         right: -150px;
-        // &:hover {
-        //     .frame-tym {
-        //         display: flex;
-        //     }
-        // }
-        // &.right-to-left {
-        //     right: 150px;
-        // }
+        &.show-frame-tym {
+            display: block;
+        }
         .tym-message {
             position: absolute;
             width: 22px;
@@ -78,7 +74,7 @@
             box-shadow: 2px 2px 1px 1px #00000040;
             cursor: pointer;
             background-color: #ffffff;
-            // display: none;
+            z-index: 5;
             .reaction-icon {
                 font-size: 16px;
             }

@@ -1,0 +1,153 @@
+Date : 2024-03-16 14:59:44
+Directory : d:\CongNgheMoi\Zalo_ReactJS_Frontend
+Total : 94 files,  14124 codes, 118 comments, 544 blanks, all 14786 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| JSON           |          3 |      9,101 |          0 |          2 |      9,103 |
+| JavaScript JSX |         41 |      3,001 |         49 |        344 |      3,394 |
+| SCSS           |         29 |      1,287 |         14 |         68 |      1,369 |
+| JavaScript     |         17 |        597 |         55 |        110 |        762 |
+| CSS            |          2 |        124 |          0 |         15 |        139 |
+| HTML           |          1 |         13 |          0 |          4 |         17 |
+| Markdown       |          1 |          1 |          0 |          1 |          2 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                   | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                      |         94 |     14,124 |        118 |        544 |     14,786 |
+| . (Files)                                                                              |          5 |      9,127 |          0 |          8 |      9,135 |
+| public                                                                                 |          1 |        208 |         43 |         53 |        304 |
+| src                                                                                    |         88 |      4,789 |         75 |        483 |      5,347 |
+| src (Files)                                                                            |          3 |        107 |          1 |         16 |        124 |
+| src\components                                                                         |         34 |      2,081 |         28 |        207 |      2,316 |
+| src\components (Files)                                                                 |          4 |        468 |         12 |         47 |        527 |
+| src\components\customize                                                               |          2 |        133 |          0 |          9 |        142 |
+| src\components\login                                                                   |          6 |        212 |          7 |         21 |        240 |
+| src\components\modal                                                                   |          9 |        663 |          6 |         76 |        745 |
+| src\components\navigator                                                               |          4 |        216 |          1 |         24 |        241 |
+| src\components\popover                                                                 |          1 |         48 |          0 |          7 |         55 |
+| src\components\route                                                                   |          1 |         10 |          0 |          1 |         11 |
+| src\components\user                                                                    |          7 |        331 |          2 |         22 |        355 |
+| src\layouts                                                                            |          5 |        166 |          4 |         18 |        188 |
+| src\mocks                                                                              |          1 |         19 |          0 |          0 |         19 |
+| src\pages                                                                              |         30 |      2,058 |         30 |        186 |      2,274 |
+| src\pages (Files)                                                                      |          5 |        194 |          0 |         22 |        216 |
+| src\pages\auth                                                                         |          2 |         81 |          3 |         11 |         95 |
+| src\pages\main                                                                         |         17 |      1,514 |         26 |        120 |      1,660 |
+| src\pages\main (Files)                                                                 |          3 |        254 |          3 |         14 |        271 |
+| src\pages\main\chat                                                                    |          6 |      1,026 |         23 |         78 |      1,127 |
+| src\pages\main\friend                                                                  |          8 |        234 |          0 |         28 |        262 |
+| src\pages\sidebar                                                                      |          6 |        269 |          1 |         33 |        303 |
+| src\redux                                                                              |          8 |        238 |          0 |         32 |        270 |
+| src\redux (Files)                                                                      |          2 |         22 |          0 |          6 |         28 |
+| src\redux\actions                                                                      |          2 |         53 |          0 |          9 |         62 |
+| src\redux\reducers                                                                     |          2 |        104 |          0 |         10 |        114 |
+| src\redux\types                                                                        |          2 |         59 |          0 |          7 |         66 |
+| src\utils                                                                              |          7 |        120 |         12 |         24 |        156 |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                               | language       | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\.eslintrc.cjs                                     | JavaScript     |         31 |          0 |          1 |         32 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\README.md                                         | Markdown       |          1 |          0 |          1 |          2 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\index.html                                        | HTML           |         13 |          0 |          4 |         17 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\package-lock.json                                 | JSON           |      9,017 |          0 |          1 |      9,018 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\package.json                                      | JSON           |         65 |          0 |          1 |         66 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\public\mockServiceWorker.js                       | JavaScript     |        208 |         43 |         53 |        304 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\tym.css                  | CSS            |         62 |          0 |          7 |         69 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\tym.jsx                  | JavaScript JSX |         71 |          0 |          2 |         73 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\login.jsx                    | JavaScript JSX |         30 |          1 |          7 |         38 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\login.scss                   | SCSS           |         24 |          0 |          1 |         25 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\phone.login.jsx              | JavaScript JSX |         65 |          0 |          8 |         73 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\phone.login.scss             | SCSS           |         13 |          0 |          1 |         14 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\qr.login.jsx                 | JavaScript JSX |         67 |          6 |          3 |         76 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\qr.login.scss                | SCSS           |         13 |          0 |          1 |         14 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\addFriend.modal.jsx          | JavaScript JSX |         86 |          4 |         12 |        102 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\addFriend.modal.scss         | SCSS           |          8 |          0 |          1 |          9 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\changeBackground.modal.jsx   | JavaScript JSX |         57 |          0 |         14 |         71 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\changeBackground.modal.scss  | SCSS           |         30 |          1 |          1 |         32 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\forgotPassword.modal.jsx     | JavaScript JSX |         73 |          0 |         14 |         87 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\infoGroup.modal.jsx          | JavaScript JSX |         38 |          0 |          7 |         45 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\infoGroup.modal.scss         | SCSS           |          4 |          0 |          1 |          5 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\inforUser.modal.jsx          | JavaScript JSX |        216 |          1 |         19 |        236 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\inforUser.modal.scss         | SCSS           |        151 |          0 |          7 |        158 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\sidebar.jsx              | JavaScript JSX |        145 |          1 |         17 |        163 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\sidebar.scss             | SCSS           |         41 |          0 |          4 |         45 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\wrapperItem.sidebar.jsx  | JavaScript JSX |         11 |          0 |          2 |         13 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\wrapperItem.sidebar.scss | SCSS           |         19 |          0 |          1 |         20 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\sticky.popover.jsx         | JavaScript JSX |         48 |          0 |          7 |         55 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\resetPassword.component.jsx        | JavaScript JSX |        135 |          0 |         15 |        150 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\resetPassword.component.scss       | SCSS           |         15 |          0 |          1 |         16 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\route\privateRoute.jsx             | JavaScript JSX |         10 |          0 |          1 |         11 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\avatar.jsx                    | JavaScript JSX |         40 |          0 |          3 |         43 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\chat.user.jsx                 | JavaScript JSX |         54 |          0 |          6 |         60 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\chat.user.scss                | SCSS           |         16 |          0 |          1 |         17 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\invited.user.jsx              | JavaScript JSX |         47 |          0 |          6 |         53 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\invited.user.scss             | SCSS           |         47 |          0 |          1 |         48 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\status.user.jsx               | JavaScript JSX |         73 |          1 |          3 |         77 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\status.user.scss              | SCSS           |         54 |          1 |          2 |         57 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\verify.component.jsx               | JavaScript JSX |        212 |          8 |         19 |        239 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\verify.component.scss              | SCSS           |        106 |          4 |         12 |        122 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\index.scss                                    | SCSS           |         29 |          0 |          3 |         32 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeLayout.jsx                        | JavaScript JSX |         64 |          3 |          7 |         74 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeLayout.scss                       | SCSS           |          5 |          0 |          1 |          6 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeSubLayout.jsx                     | JavaScript JSX |         80 |          1 |          7 |         88 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeSubLayout.scss                    | SCSS           |          7 |          0 |          1 |          8 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\outsideLayout.jsx                     | JavaScript JSX |         10 |          0 |          2 |         12 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\main.jsx                                      | JavaScript JSX |         19 |          0 |          7 |         26 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\mocks\users.json                              | JSON           |         19 |          0 |          0 |         19 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\auth\auth.loginPage.jsx                 | JavaScript JSX |         45 |          1 |          7 |         53 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\auth\auth.loginPage.scss                | SCSS           |         36 |          2 |          4 |         42 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\error.page.jsx                          | JavaScript JSX |         30 |          0 |          4 |         34 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\chat.main.jsx                 | JavaScript JSX |        433 |         17 |         47 |        497 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\chat.main.scss                | SCSS           |        292 |          3 |          7 |        302 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\emoijPopup.chat.jsx           | JavaScript JSX |         46 |          0 |          6 |         52 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\emoijPopup.chat.scss          | SCSS           |         17 |          2 |          1 |         20 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\message.chat.jsx              | JavaScript JSX |        122 |          1 |         12 |        135 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\message.chat.scss             | SCSS           |        116 |          0 |          5 |        121 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\content.main.jsx                   | JavaScript JSX |         73 |          0 |          8 |         81 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\group.friend.jsx            | JavaScript JSX |         15 |          0 |          2 |         17 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\group.friend.scss           | SCSS           |          4 |          0 |          1 |          5 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\invited.friend.jsx          | JavaScript JSX |         62 |          0 |         10 |         72 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\invited.friend.scss         | SCSS           |         41 |          0 |          2 |         43 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\list.friend.jsx             | JavaScript JSX |         47 |          0 |          8 |         55 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\list.friend.scss            | SCSS           |         21 |          0 |          1 |         22 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\listFriends.friends.jsx     | JavaScript JSX |         32 |          0 |          3 |         35 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\listFriends.friends.scss    | SCSS           |         12 |          0 |          1 |         13 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\main.welcome.jsx                   | JavaScript JSX |         85 |          3 |          5 |         93 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\main.welcome.scss                  | SCSS           |         96 |          0 |          1 |         97 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\notFound.page.jsx                       | JavaScript JSX |         21 |          0 |          2 |         23 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\notFound.page.scss                      | SCSS           |          8 |          0 |          2 |         10 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\chat.sidebar.jsx                | JavaScript JSX |         58 |          0 |          6 |         64 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\friend.sidebar.jsx              | JavaScript JSX |         64 |          0 |          9 |         73 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.message.search.jsx         | JavaScript JSX |         58 |          0 |         11 |         69 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.message.search.scss        | SCSS           |         54 |          1 |          2 |         57 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.message.sidebar.scss       | SCSS           |          8 |          0 |          1 |          9 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.sidebar.jsx                | JavaScript JSX |         27 |          0 |          4 |         31 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\test.page.css                           | CSS            |         62 |          0 |          8 |         70 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\test.page.jsx                           | JavaScript JSX |         73 |          0 |          6 |         79 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\actions\app.action.js                   | JavaScript     |         39 |          0 |          8 |         47 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\actions\user.action.js                  | JavaScript     |         14 |          0 |          1 |         15 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\reducers\app.reducer.js                 | JavaScript     |         75 |          0 |          5 |         80 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\reducers\user.reducer.js                | JavaScript     |         29 |          0 |          5 |         34 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\rootReducer.js                          | JavaScript     |          7 |          0 |          2 |          9 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\store.js                                | JavaScript     |         15 |          0 |          4 |         19 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\types\type.app.js                       | JavaScript     |         29 |          0 |          5 |         34 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\types\type.user.js                      | JavaScript     |         30 |          0 |          2 |         32 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\route.jsx                                     | JavaScript JSX |         59 |          1 |          6 |         66 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\axios.js                                | JavaScript     |         23 |          8 |          9 |         40 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\checkAuth.js                            | JavaScript     |         16 |          0 |          3 |         19 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\checkFriend.js                          | JavaScript     |          9 |          0 |          2 |         11 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\firebase.js                             | JavaScript     |         13 |          2 |          7 |         22 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\handleUltils.js                         | JavaScript     |         21 |          0 |          1 |         22 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\io.js                                   | JavaScript     |         24 |          2 |          2 |         28 |
+| d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\keyMenuItem.js                          | JavaScript     |         14 |          0 |          0 |         14 |
+| Total                                                                                  |                |     14,124 |        118 |        544 |     14,786 |
++----------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

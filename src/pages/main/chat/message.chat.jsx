@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import './message.chat.scss';
 import { Popover } from 'antd';
 import EmoijPopup from "./emoijPopup.chat";
-
+import Tym from "../../../components/customize/tym";
+import _ from 'lodash';
 const content = ({ optionsRef }) => {
     const contentRef = useRef(null);
     const items = [
@@ -73,21 +74,39 @@ const content = ({ optionsRef }) => {
 const MessageChat = ({ children, isLeft }) => {
     const optionsRef = useRef(null);
     const messageHoverContainerRef = useRef(null);
+    const frameTymRef = useRef(null);
+    const [trigger, setTrigger] = useState('hover');
 
     useEffect(() => {
-        if (messageHoverContainerRef.current) {
+        if (messageHoverContainerRef.current && frameTymRef.current) {
             messageHoverContainerRef.current.addEventListener('mouseover', () => {
                 optionsRef.current.classList.add('show-options');
             })
-            messageHoverContainerRef.current.addEventListener('mouseleave', (e) => {
+            messageHoverContainerRef.current.addEventListener('mouseleave', () => {
                 optionsRef.current.classList.remove('show-options');
+            })
+            messageHoverContainerRef.current.addEventListener('mouseover', () => {
+                frameTymRef.current.classList.add('show-frame-tym');
+            })
+            messageHoverContainerRef.current.addEventListener('mouseleave', (e) => {
+                if (!(e.toElement.className === 'emoij-popup-container' || e.toElement.className === 'reaction' || e.toElement.className === 'tym-message' || e.toElement.className === 'tym-icon-123 active' || e.toElement.className === 'tym-icon-123' || e.toElement.className === 'tym-main-container-xyz' || e.toElement.className === 'tyms-frame' || e.toElement.className === 'tyms-heart')) {
+                    frameTymRef.current.classList.remove('show-frame-tym');
+                }
             })
         }
     }, [])
 
     const handleTymMessage = () => {
-        console.log('tym')
+        setTrigger('contextMenu');
+        setHoverTrigger();
     }
+
+    const setHoverTrigger = useCallback(_.debounce(() => {
+        setTrigger('hover');
+    }, 500));
+
+
+
 
     return (
         <React.Fragment>
@@ -117,13 +136,13 @@ const MessageChat = ({ children, isLeft }) => {
 
                     </div>
                 </div>
-                <div className="frame-tym">
-                    <div className="tym-message" onClick={handleTymMessage}>
-                        <EmoijPopup placement={isLeft ? 'top' : 'topRight'}>
-                            <i className="fa-regular fa-thumbs-up reaction-icon"></i>
-                        </EmoijPopup>
-
-                    </div>
+                <div className="frame-tym" ref={frameTymRef}>
+                    <EmoijPopup placement={isLeft ? 'top' : 'topRight'} trigger={trigger}>
+                        <div className="tym-message" onClick={handleTymMessage}>
+                            {/* <i className="fa-regular fa-thumbs-up reaction-icon"></i> */}
+                            <Tym icon={'❤️'} />
+                        </div>
+                    </EmoijPopup>
                 </div>
 
             </span>
