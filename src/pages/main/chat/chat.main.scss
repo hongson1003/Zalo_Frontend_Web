@@ -95,7 +95,7 @@
             .content-chat-messages {
                 display: flex;
                 flex-direction: column;
-                padding: 10px;
+                padding: 20px 10px;
                 gap: 8px;
                 overflow-y: auto;
                 overflow-x: hidden;
@@ -115,6 +115,8 @@
                     word-wrap: break-word;
                     white-space: pre-wrap; /* Đảm bảo dòng mới được hiển thị */
                     color: #333;
+                    box-shadow: -1px 1px 1px 1px #00000040;
+
                     .sticker {
                         width: 150px;
                         height: 150px;
@@ -122,7 +124,8 @@
                     .name {
                         font-weight: 590;
                         color: #888;
-                        padding: 10px 15px 0;
+                        padding: 5px 10px 0;
+                        font-size: 12px;
                     }
                 }
                 .de-bg {
@@ -259,6 +262,11 @@
             }
         }
     }
+    // .sending {
+    //     position: absolute;
+    //     bottom: 120px;
+    //     left: 10;
+    // }
 }
 
 .bg {
@@ -266,7 +274,7 @@
     width: 100%;
     height: 100%;
     // background-image: url("https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2022/02/hinh-nen-vu-tru-4k-cho-may-tinh.jpg?fit\\\\u003d780%2C439\\\\u0026ssl\\\\u003d1");
-    background-image: url("https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/hinh-nen-may-tinh-dep-a-40-1.jpg");
+    background-image: url("https://giaydantuong.edu.vn/wp-content/uploads/2023/05/hinh-anh-trai-tim-doi-dep-1.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

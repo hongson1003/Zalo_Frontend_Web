@@ -70,6 +70,7 @@ const ChatMain = () => {
                     setTyping(false);
                 });
                 socket.on('receive-message', data => {
+                    console.log('receive-message', data)
                     setMessages(prev => [...prev, data]);
                 })
             })
@@ -85,6 +86,11 @@ const ChatMain = () => {
         else {
             setMessages([])
         }
+    }
+
+    const handleModifyMessage = (message) => {
+        const newMessage = messages.find(item => item._id === message._id);
+        console.log('newMessage', newMessage);
     }
 
     const items = [
@@ -164,7 +170,6 @@ const ChatMain = () => {
     }
 
     function handleClickMoreInfor() {
-        console.log('click more info')
         setShow(prev => !prev);
     }
 
@@ -323,7 +328,7 @@ const ChatMain = () => {
                                                                 <p className="name">{message?.sender?.userName}</p>
                                                             }
                                                             {message.type === MESSAGES.TEXT ?
-                                                                <MessageChat isLeft={true}>
+                                                                <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
                                                                     {message.content}
                                                                     {
                                                                         messages[index + 1]?.sender?.id !== messages[index].sender.id &&
@@ -331,7 +336,7 @@ const ChatMain = () => {
                                                                     }
                                                                 </MessageChat> : (
                                                                     message.type === MESSAGES.STICKER &&
-                                                                    <MessageChat isLeft={true}>
+                                                                    <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
                                                                         <img className="sticker" src={message.sticker} alt="sticker" />
                                                                         {
                                                                             messages[index + 1]?.sender?.id !== messages[index].sender.id &&
@@ -348,7 +353,7 @@ const ChatMain = () => {
                                                         className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
                                                     >
                                                         {message.type === MESSAGES.TEXT ?
-                                                            <MessageChat isLeft={false}>
+                                                            <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
                                                                 {message.content}
                                                                 {
                                                                     messages[index + 1]?.sender?.id !== messages[index].sender.id &&
@@ -357,7 +362,7 @@ const ChatMain = () => {
                                                             </MessageChat>
                                                             : (
                                                                 message.type === MESSAGES.STICKER &&
-                                                                <MessageChat isLeft={false}>
+                                                                <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
                                                                     <img className="sticker" src={message.sticker} alt="sticker" />
                                                                     {
                                                                         messages[index + 1]?.sender?.id !== messages[index].sender.id &&
@@ -386,16 +391,18 @@ const ChatMain = () => {
                                     )
                                 })
                             }
-                            {
-                                typing &&
-                                <>
-                                    <ReactLoading type={'bubbles'} color={'grey'} height={'40px'} width={'50px'} />
-                                    <div className="message-status">
-                                        <span>Đang gửi</span>
-                                    </div>
-                                </>
+                            <div className="sending">
+                                {
+                                    typing &&
+                                    <>
+                                        <ReactLoading type={'bubbles'} color={'grey'} height={'40px'} width={'50px'} />
+                                        <div className="message-status">
+                                            <span>Đang gửi</span>
+                                        </div>
+                                    </>
 
-                            }
+                                }
+                            </div>
                         </div>
 
                         {/* Init position */}
@@ -446,8 +453,8 @@ const ChatMain = () => {
                                     <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
                                         <i className="fa-regular fa-face-smile emoijj"></i>
                                     </div>
-                                    <div className="item-icon emoij-like" onClick={() => sendMessage('👍', MESSAGES.TEXT)}>
-                                        <em-emoji id="+1" size="2em" ></em-emoji>
+                                    <div className="item-icon emoij-like" onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
+                                        👌
                                     </div>
                                 </div>
                             </div>

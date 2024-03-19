@@ -4,6 +4,7 @@ import { Popover } from 'antd';
 import EmoijPopup from "./emoijPopup.chat";
 import Tym from "../../../components/customize/tym";
 import _ from 'lodash';
+import { useSelector } from "react-redux";
 const content = ({ optionsRef }) => {
     const contentRef = useRef(null);
     const items = [
@@ -70,12 +71,13 @@ const content = ({ optionsRef }) => {
     )
 }
 
-
-const MessageChat = ({ children, isLeft }) => {
+const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
     const optionsRef = useRef(null);
     const messageHoverContainerRef = useRef(null);
     const frameTymRef = useRef(null);
     const [trigger, setTrigger] = useState('hover');
+    const [selectedReaction, setSelectedReaction] = useState('👌');
+    const user = useSelector(state => state.appReducer?.userInfo?.user);
 
     useEffect(() => {
         if (messageHoverContainerRef.current && frameTymRef.current) {
@@ -89,23 +91,39 @@ const MessageChat = ({ children, isLeft }) => {
                 frameTymRef.current.classList.add('show-frame-tym');
             })
             messageHoverContainerRef.current.addEventListener('mouseleave', (e) => {
-                if (!(e.toElement.className === 'emoij-popup-container' || e.toElement.className === 'reaction' || e.toElement.className === 'tym-message' || e.toElement.className === 'tym-icon-123 active' || e.toElement.className === 'tym-icon-123' || e.toElement.className === 'tym-main-container-xyz' || e.toElement.className === 'tyms-frame' || e.toElement.className === 'tyms-heart')) {
+                if (!(e.toElement?.className === 'emoij-popup-container' || e.toElement?.className === 'reaction' || e.toElement?.className === 'tym-message' || e.toElement?.className === 'tym-icon-123 active' || e.toElement?.className === 'tym-icon-123' || e.toElement?.className === 'tym-main-container-xyz' || e.toElement?.className === 'tyms-frame' || e.toElement?.className === 'tyms-heart')) {
                     frameTymRef.current.classList.remove('show-frame-tym');
                 }
             })
         }
     }, [])
 
-    const handleTymMessage = () => {
+    const handleTymMessage = (icon) => {
         setTrigger('contextMenu');
         setHoverTrigger();
+        const newMessage = { ...message };
+        const arrayReaction = newMessage?.reactions || [];
+        const reactionExists = arrayReaction.find(reaction => (reaction.userId === user.id) && reaction.icon === icon);
+        if (!reactionExists) {
+            arrayReaction.push({
+                userId: user.id,
+                icon: icon,
+                count: 1
+            })
+        } else {
+            arrayReaction.forEach(reaction => {
+                if (reaction.userId === user.id && reaction.icon === icon) {
+                    reaction.count += 1;
+                }
+            })
+        }
+        newMessage.reactions = arrayReaction;
+        handleModifyMessage(newMessage);
     }
 
     const setHoverTrigger = useCallback(_.debounce(() => {
         setTrigger('hover');
     }, 500));
-
-
 
 
     return (
@@ -136,11 +154,34 @@ const MessageChat = ({ children, isLeft }) => {
 
                     </div>
                 </div>
+
+                {
+                    message?.reactions?.length > 0 &&
+                    <div className="reactions">
+                        {
+                            message?.reactions.map((reaction, index) => {
+                                if (index < 3) {
+                                    return (
+                                        <span className="reaction-item" key={reaction.userId + reaction.icon}>{reaction?.icon}</span>
+                                    )
+                                }
+                            })
+                        }
+                        {
+                            message?.reactions?.length > 0 && <span>{
+                                message?.reactions?.reduce((partialSum, a) => {
+                                    return partialSum + a.count;
+                                }, 0)
+                            }</span>
+                        }
+                    </div>
+                }
+
                 <div className="frame-tym" ref={frameTymRef}>
-                    <EmoijPopup placement={isLeft ? 'top' : 'topRight'} trigger={trigger}>
-                        <div className="tym-message" onClick={handleTymMessage}>
+                    <EmoijPopup placement={isLeft ? 'top' : 'topRight'} trigger={trigger} setSelectedReaction={setSelectedReaction} handleTymMessage={handleTymMessage}>
+                        <div className="tym-message" onClick={() => handleTymMessage(selectedReaction.trim())}>
                             {/* <i className="fa-regular fa-thumbs-up reaction-icon"></i> */}
-                            <Tym icon={'❤️'} />
+                            <Tym icon={selectedReaction} />
                         </div>
                     </EmoijPopup>
                 </div>

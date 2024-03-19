@@ -1,9 +1,10 @@
 .message-hover-container {
     position: relative;
     display: block;
-    padding: 10px 15px;
+    padding: 10px 10px;
     .time {
         font-size: 10px;
+        margin-top: 10px;
     }
     &.option-right {
         & .options {
@@ -50,13 +51,30 @@
             display: block;
         }
     }
+    .reactions {
+        position: absolute;
+        bottom: -12px;
+        right: 25px;
+        height: 25px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        background-color: #ffffff;
+        padding: 5px 10px;
+        box-shadow: 1px 1px 2px 2px #00000040;
+        .reaction-item {
+            cursor: pointer;
+            font-size: 14px;
+        }
+    }
     .frame-tym {
         display: none;
         position: absolute;
         width: 300px;
         height: 40%;
         bottom: 0;
-        right: -150px;
+        right: -140px;
         &.show-frame-tym {
             display: block;
         }

@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Popover } from 'antd';
 import './emoijPopup.chat.scss';
 
-const Content = () => {
+const Content = ({ setSelectedReaction, handleTymMessage }) => {
+
+
     const reactions = [
         { name: 'like', icon: '👍' },
         { name: 'tym', icon: '❤️' },
@@ -13,7 +15,8 @@ const Content = () => {
     ];
 
     const handleGetReaction = (reaction) => {
-        console.log(reaction.icon);
+        setSelectedReaction(reaction.icon);
+        handleTymMessage(String(reaction.icon).trim());
     }
 
     return (
@@ -29,20 +32,20 @@ const Content = () => {
 };
 
 
-const EmoijPopup = ({ children, placement, trigger }) => {
+const EmoijPopup = ({ children, placement, trigger, setSelectedReaction, handleTymMessage }) => {
     const [open, setOpen] = useState(false);
     const handleOpenChange = (newOpen) => {
         setOpen(newOpen);
     };
     return (
         <Popover
-            content={Content}
+            content={React.createElement(Content, { setSelectedReaction, handleTymMessage })}
             trigger={trigger}
             open={open}
             onOpenChange={handleOpenChange}
             placement={placement}
             overlayClassName="popover-emoij"
-            mouseLeaveDelay={0.1}
+            mouseLeaveDelay={0.2}
         >
             {children}
         </Popover>
