@@ -1,47 +1,96 @@
-import React, { useEffect, useState } from "react";
-import { Popover } from 'antd';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Popover, message } from 'antd';
 import './emoijPopup.chat.scss';
+import _ from 'lodash';
+import Tym from "../../../components/customize/tym";
+import axios from '../../../utils/axios';
 
-const Content = ({ setSelectedReaction, handleTymMessage }) => {
-
-
+const Content = ({ setSelectedReaction, handleTymMessage, setOpen, message, handleModifyMessage }) => {
+    const emoijContainerRef = useRef(null);
     const reactions = [
         { name: 'like', icon: '👍' },
         { name: 'tym', icon: '❤️' },
         { name: 'haha', icon: '😂' },
         { name: 'bốc cứt', icon: '💩' }, // Thay thế "bỡ ngỡ" bằng biểu tượng "bốc cứt"
         { name: 'khóc', icon: '😢' },
-        { name: 'tức giận', icon: '😡' }
+        { name: 'tức giận', icon: '😡' },
+        { name: 'Clear', icon: '✖' }
     ];
 
     const handleGetReaction = (reaction) => {
         setSelectedReaction(reaction.icon);
         handleTymMessage(String(reaction.icon).trim());
+        setOpen(false);
     }
 
+    useEffect(() => {
+        if (emoijContainerRef.current) {
+            emoijContainerRef.current.addEventListener('mouseleave', () => {
+                setOpen(false);
+            });
+        }
+    }, []);
+
+    const handleClearReaction = async () => {
+        if (!message || message.reactions.length === 0) return;
+        const res = await axios.put('/chat/feeling', {
+            messageId: message._id,
+        })
+        const messageData = res.data;
+        if (res.errCode === 0) {
+            handleModifyMessage({
+                _id: messageData._id,
+                reactions: messageData.reactions,
+            });
+        }
+    }
+
+
     return (
-        <div className="emoij-popup-container">
-            {reactions.map((reaction, index) => (
-                <span
-                    key={index} className="reaction"
-                    onClick={() => handleGetReaction(reaction)}
-                >{reaction.icon}</span>
-            ))}
+        <div className="emoij-popup-container" ref={emoijContainerRef}>
+            {reactions.map((reaction, index) => {
+                if (reactions?.length - 1 !== index) {
+                    return (
+                        <Tym
+                            key={reaction.name}
+                            icon={<span
+                                key={index} className="reaction"
+                                onClick={() => handleGetReaction(reaction)}
+                            >{reaction.icon}</span>}
+                        />
+
+                    )
+                } else {
+                    return (
+                        <span
+                            key={reaction.name}
+                            className="reaction"
+                            onClick={() => handleClearReaction()}
+                        >{reaction.icon}</span>
+                    )
+                }
+            })}
         </div>
     );
 };
 
 
-const EmoijPopup = ({ children, placement, trigger, setSelectedReaction, handleTymMessage }) => {
+const EmoijPopup = ({
+    children, placement, setSelectedReaction,
+    handleTymMessage, allowOpen, message, handleModifyMessage
+}) => {
     const [open, setOpen] = useState(false);
     const handleOpenChange = (newOpen) => {
-        setOpen(newOpen);
+        if (allowOpen && newOpen) {
+            setOpen(newOpen);
+        }
     };
+
     return (
         <Popover
-            content={React.createElement(Content, { setSelectedReaction, handleTymMessage })}
-            trigger={trigger}
-            open={open}
+            content={React.createElement(Content, { setSelectedReaction, handleTymMessage, setOpen, message, handleModifyMessage })}
+            trigger={'hover'}
+            open={open && allowOpen}
             onOpenChange={handleOpenChange}
             placement={placement}
             overlayClassName="popover-emoij"

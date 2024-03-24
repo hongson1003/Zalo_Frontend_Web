@@ -105,9 +105,9 @@ const Sidebar = () => {
                 >
                     <Button block>Hồ sơ của bạn</Button>
                 </InforUserModal>
-                <Button style={{ marginBottom: '10px' }} block>Cài đặt</Button>
+                <Button block>Cài đặt</Button>
                 <hr />
-                <div style={{ marginTop: '10px' }}>
+                <div>
                     <Button block
                         onClick={handleLogout}
                     >Đăng xuất
@@ -119,8 +119,8 @@ const Sidebar = () => {
 
 
     const title = (
-        <div style={{ padding: '12px' }}>
-            <h3 style={{ marginBottom: '10px' }}>{state?.userInfo?.user?.userName}</h3>
+        <div style={{ padding: '8px 12px 0px' }}>
+            <h3 style={{ marginBottom: '5px' }}>{state?.userInfo?.user?.userName}</h3>
             <hr />
         </div>
     )
@@ -138,11 +138,13 @@ const Sidebar = () => {
                 title={title}
                 placement="rightBottom"
                 trigger={"click"}
+                style={{ marginBottom: '0' }}
             >
                 <div className="base-avatar">
                     <div>
                         <AvatarUser
                             image={state?.userInfo?.user?.avatar}
+                            size={50}
                         />
                     </div>
                 </div>

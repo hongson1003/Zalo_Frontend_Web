@@ -46,7 +46,7 @@
 
 .active .tyms-heart {
     display: flex;
-    animation: scaleHeart 0.5s ease-out  forwards;
+    animation: scaleHeart 1s ease-out  forwards;
 }
 
 .tyms-heart-inner:last-child{
@@ -59,8 +59,7 @@
       }
     100% {
         transform: scale(1.8);
-        opacity: 0.3;
+        opacity: 0.5;
         display: none;
-    
     } 
 }

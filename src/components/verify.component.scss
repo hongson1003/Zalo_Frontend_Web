@@ -1,122 +1,121 @@
 .container {
-    height: 100vh;
-    width: 100%;
-    background-image: url('../../public/images/bglogin.png');
+  height: 100vh;
+  width: 100%;
+  background-image: url("../../public/images/bglogin.png");
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .verify-container {
+    min-height: 60%;
+    width: 50%;
+    padding: 50px 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    .verify-container {
-        height: 70vh;
-        width: 50%;
-        padding-top: 50px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: rgba(241, 241, 241, .5);
-        border-radius: 10%;
-        .title {
-            text-align: center;
-            font-family: 'Roboto';
-            font-size: calc(10px + 2vw);
-            margin: 10px 0;
-            color: #007bff;
-            font-style: italic;
-          }
-          
-        .footer {
-            p {
-                font-weight: bold;
-                font-style: italic;
-                font-size: calc(10px + 0.8vw);
-                text-align: center;
-                max-width: 80%;
-                margin: auto;
-                margin-top: 30px;
-            }
-        }
-        .btn-group {
-            margin: 20px 0;
-            .verify {
-                width: 100px;
-                height: 40px;
-            }
-        }
-        .avatar {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-        }
-        .notify {
-            margin: 15px 0;
-            font-size: calc(12px + 0.4vw);
-            font-style: italic;
-            color: #888;
-        }
-        .xacminh-img {
-            width: 20px;
-            height: 20px;
-        }
-        // Customize the ReactLoading component
-      .react-loading {
-        margin: 20px auto;
+    background-color: rgba(241, 241, 241, 0.5);
+    border-radius: 10%;
+    .title {
+      text-align: center;
+      font-family: "Roboto";
+      font-size: calc(10px + 2vw);
+      margin: 10px 0;
+      color: #007bff;
+      font-style: italic;
+    }
+
+    .footer {
+      p {
+        font-weight: bold;
+        font-style: italic;
+        font-size: calc(10px + 0.8vw);
+        text-align: center;
+        max-width: 80%;
+        margin: auto;
+        margin-top: 30px;
       }
-    
-      // Customize the OtpInput component
-      .otp-input {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-    
-        input {
-          width: calc(30px + 3.5vw);
-          height: 45px;
-          font-size: 20px;
-          text-align: center;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          margin: 0 5px;
-    
-          &:focus {
-            outline: none;
-            border-color: blue;
-          }
-        }
-    
-        span {
-          font-size: 20px;
-          line-height: 45px;
-          margin: 0 5px;
-        }
+    }
+    .btn-group {
+      margin: 20px 0;
+      .verify {
+        width: 100px;
+        height: 40px;
       }
-    
-      // Customize the ToastContainer
-      .Toastify__toast-container {
-        margin-top: 20px;
-        z-index: 9999; // Ensure the ToastContainer appears above other elements
-      }
-    
-      // Customize the Toast
-      .Toastify__toast {
-        font-size: 14px;
-        padding: 10px 20px;
+    }
+    .avatar {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+    }
+    .notify {
+      margin: 15px 0;
+      font-size: calc(12px + 0.4vw);
+      font-style: italic;
+      color: #888;
+    }
+    .xacminh-img {
+      width: 20px;
+      height: 20px;
+    }
+    // Customize the ReactLoading component
+    .react-loading {
+      margin: 20px auto;
+    }
+
+    // Customize the OtpInput component
+    .otp-input {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+
+      input {
+        width: calc(30px + 3.5vw);
+        height: 45px;
+        font-size: 20px;
+        text-align: center;
+        border: 1px solid #ccc;
         border-radius: 5px;
-    
-        &--info {
-          background-color: #3498db;
+        margin: 0 5px;
+
+        &:focus {
+          outline: none;
+          border-color: blue;
         }
-    
-        &--success {
-          background-color: #2ecc71;
-        }
-    
-        &--warning {
-          background-color: #f39c12;
-        }
-    
-        &--error {
-          background-color: #e74c3c;
-        }
+      }
+
+      span {
+        font-size: 20px;
+        line-height: 45px;
+        margin: 0 5px;
+      }
     }
+
+    // Customize the ToastContainer
+    .Toastify__toast-container {
+      margin-top: 20px;
+      z-index: 9999; // Ensure the ToastContainer appears above other elements
     }
-    
+
+    // Customize the Toast
+    .Toastify__toast {
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 5px;
+
+      &--info {
+        background-color: #3498db;
+      }
+
+      &--success {
+        background-color: #2ecc71;
+      }
+
+      &--warning {
+        background-color: #f39c12;
+      }
+
+      &--error {
+        background-color: #e74c3c;
+      }
+    }
+  }
 }

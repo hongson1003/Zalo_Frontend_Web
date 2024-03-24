@@ -20,13 +20,8 @@ import { CHAT_STATUS, MESSAGES } from "../../../redux/types/type.user";
 import ChangeBackgroundModal from "../../../components/modal/changeBackground.modal";
 import MessageChat from "./message.chat";
 import { getTimeFromDate } from '../../../utils/handleUltils';
+import { useNavigate } from "react-router-dom";
 
-const unClassList = [
-    'group-message',
-    'message',
-    'message-hover-container option-left'
-
-]
 
 const ChatMain = () => {
     const chat = useSelector(state => state.appReducer.subNav);
@@ -48,13 +43,19 @@ const ChatMain = () => {
     const textAreaRef = useRef(null);
     const dispatch = useDispatch();
     const dispatchRef = useRef(false);
-
+    const navigate = useNavigate();
     // Menu
     const [current, setCurrent] = useState('');
     const onClick = (e) => {
         setCurrent(e.key);
     };
     // End Menu
+    useEffect(() => {
+        if (!user) {
+            navigate('/login');
+        }
+        setShowEmoij(false);
+    }, [user])
 
     useEffect(() => {
         fetchMessagePaginate();
@@ -89,9 +90,21 @@ const ChatMain = () => {
     }
 
     const handleModifyMessage = (message) => {
-        const newMessage = messages.find(item => item._id === message._id);
-        console.log('newMessage', newMessage);
+        setMessages(prev => {
+            const index = prev.findIndex(item => item._id === message._id);
+            if (index !== -1) {
+                prev[index] = {
+                    ...prev[index],
+                    ...message
+                };
+            }
+            return [...prev];
+        });
     }
+
+    useEffect(() => {
+        console.log('messages', messages)
+    }, [messages])
 
     const items = [
         {
@@ -255,7 +268,12 @@ const ChatMain = () => {
         if (scroolRef.current) {
             scroolRef.current.scrollTop = scroolRef.current.scrollHeight - 10;
         }
-    }, [messages, typing, footerHeight])
+    }, [typing, footerHeight])
+
+    useEffect(() => {
+        scroolRef.current.scrollTop = scroolRef.current.scrollHeight - 10;
+    }, [messages.length])
+
 
 
 
@@ -373,7 +391,7 @@ const ChatMain = () => {
                                                     </div>
                                             }
                                             {
-                                                index == messages.length - 1 && message.sender.id === user.id &&
+                                                index == messages.length - 1 && message?.sender?.id === user?.id &&
                                                 <div
                                                     style={{ alignSelf: 'flex-end' }}
                                                 >

@@ -32,10 +32,14 @@ export default function appReducer(state = initialState, action) {
         }
 
         case LOGOUT_STATUS.LOGOUT_SUCCESS: {
-            let stateLogoutSuccess = { ...state };
-            stateLogoutSuccess.userInfo = null;
-            stateLogoutSuccess.isLogin = STATE.REJECT;
-            return stateLogoutSuccess;
+            const resetState = {
+                isLogin: STATE.PENDING,
+                userInfo: null,
+                nav: KEYITEMS.MESSAGE,
+                subNav: null,
+                error: false,
+            }
+            return resetState;
         }
         case LOGOUT_STATUS.LOGOUT_FAIL: {
             let stateLogoutSuccess = { ...state };

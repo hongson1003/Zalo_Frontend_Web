@@ -14,10 +14,10 @@
         .reaction {
             cursor: pointer;
             font-size: 15px;
-            // -webkit-user-select: none; /* Safari */
-            // -moz-user-select: none; /* Firefox */
-            // -ms-user-select: none; /* IE 10+ */
-            // user-select: none; /* Các trình duyệt hiện đại */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Các trình duyệt hiện đại */
             // &:active {
             //     pointer-events: none;
             // }

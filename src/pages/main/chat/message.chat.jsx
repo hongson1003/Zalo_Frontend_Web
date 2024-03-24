@@ -5,6 +5,8 @@ import EmoijPopup from "./emoijPopup.chat";
 import Tym from "../../../components/customize/tym";
 import _ from 'lodash';
 import { useSelector } from "react-redux";
+import axios from '../../../utils/axios';
+
 const content = ({ optionsRef }) => {
     const contentRef = useRef(null);
     const items = [
@@ -50,7 +52,7 @@ const content = ({ optionsRef }) => {
             contentRef.current.addEventListener('mouseover', () => {
                 optionsRef.current.classList.add('show-options');
             })
-            contentRef.current.addEventListener('mouseleave', (e) => {
+            contentRef.current.addEventListener('mouseleave', () => {
                 optionsRef.current.classList.remove('show-options');
             })
         }
@@ -75,32 +77,66 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
     const optionsRef = useRef(null);
     const messageHoverContainerRef = useRef(null);
     const frameTymRef = useRef(null);
-    const [trigger, setTrigger] = useState('hover');
     const [selectedReaction, setSelectedReaction] = useState('👌');
     const user = useSelector(state => state.appReducer?.userInfo?.user);
+    const [allowOpen, setAllowOpen] = useState(true);
+    const [enableMouseOver, setEnableMouseOver] = useState(true);
 
     useEffect(() => {
-        if (messageHoverContainerRef.current && frameTymRef.current) {
-            messageHoverContainerRef.current.addEventListener('mouseover', () => {
-                optionsRef.current.classList.add('show-options');
-            })
-            messageHoverContainerRef.current.addEventListener('mouseleave', () => {
-                optionsRef.current.classList.remove('show-options');
-            })
-            messageHoverContainerRef.current.addEventListener('mouseover', () => {
-                frameTymRef.current.classList.add('show-frame-tym');
-            })
-            messageHoverContainerRef.current.addEventListener('mouseleave', (e) => {
-                if (!(e.toElement?.className === 'emoij-popup-container' || e.toElement?.className === 'reaction' || e.toElement?.className === 'tym-message' || e.toElement?.className === 'tym-icon-123 active' || e.toElement?.className === 'tym-icon-123' || e.toElement?.className === 'tym-main-container-xyz' || e.toElement?.className === 'tyms-frame' || e.toElement?.className === 'tyms-heart')) {
-                    frameTymRef.current.classList.remove('show-frame-tym');
-                }
-            })
+        const addShowOptions = () => {
+            optionsRef.current.classList.add('show-options');
         }
-    }, [])
+        const removeShowOptions = () => {
+            optionsRef.current.classList.remove('show-options');
+        }
 
-    const handleTymMessage = (icon) => {
-        setTrigger('contextMenu');
-        setHoverTrigger();
+        const addShowFrameTym = () => {
+            frameTymRef.current.classList.add('show-frame-tym');
+            if (enableMouseOver) {
+                setAllowOpen(true);
+            }
+        };
+        const removeShowFrameTym = (e) => {
+            if (!(e.toElement?.className === 'emoij-popup-container' || e.toElement?.className === 'reaction' || e.toElement?.className === 'tym-message' || e.toElement?.className === 'tym-icon-123 active' || e.toElement?.className === 'tym-icon-123' || e.toElement?.className === 'tym-main-container-xyz' || e.toElement?.className === 'tyms-frame' || e.toElement?.className === 'tyms-heart')) {
+                frameTymRef.current.classList.remove('show-frame-tym');
+                setAllowOpen(false);
+            }
+        };
+
+        if (messageHoverContainerRef.current && frameTymRef.current) {
+            messageHoverContainerRef.current.addEventListener('mouseover', addShowOptions);
+            messageHoverContainerRef.current.addEventListener('mouseleave', removeShowOptions);
+            messageHoverContainerRef.current.addEventListener('mouseover', addShowFrameTym);
+            messageHoverContainerRef.current.addEventListener('mouseleave', removeShowFrameTym);
+        }
+        return () => {
+            if (messageHoverContainerRef.current && frameTymRef.current) {
+                messageHoverContainerRef.current.removeEventListener('mouseover', addShowOptions);
+                messageHoverContainerRef.current.removeEventListener('mouseleave', removeShowOptions);
+                messageHoverContainerRef.current.removeEventListener('mouseover', addShowFrameTym);
+                messageHoverContainerRef.current.removeEventListener('mouseleave', removeShowFrameTym);
+            }
+        }
+    }, [enableMouseOver]);
+
+    const handleAllowOpen = useCallback(_.debounce((value) => {
+        setAllowOpen(value);
+        setEnableMouseOver(value);
+    }, 500), []);
+
+    const handleSendReaction = async (messageId, userId, icon) => {
+        const res = await axios.post('/chat/feeling', {
+            messageId,
+            userId,
+            icon
+        })
+        console.log(res);
+    }
+
+    const handleTymMessage = async (icon) => {
+        setAllowOpen(false);
+        setEnableMouseOver(false);
+        handleAllowOpen(true);
         const newMessage = { ...message };
         const arrayReaction = newMessage?.reactions || [];
         const reactionExists = arrayReaction.find(reaction => (reaction.userId === user.id) && reaction.icon === icon);
@@ -119,11 +155,9 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
         }
         newMessage.reactions = arrayReaction;
         handleModifyMessage(newMessage);
+        await handleSendReaction(newMessage._id, user.id, icon);
     }
 
-    const setHoverTrigger = useCallback(_.debounce(() => {
-        setTrigger('hover');
-    }, 500));
 
 
     return (
@@ -178,7 +212,14 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
                 }
 
                 <div className="frame-tym" ref={frameTymRef}>
-                    <EmoijPopup placement={isLeft ? 'top' : 'topRight'} trigger={trigger} setSelectedReaction={setSelectedReaction} handleTymMessage={handleTymMessage}>
+                    <EmoijPopup
+                        placement={isLeft ? 'top' : 'topRight'}
+                        setSelectedReaction={setSelectedReaction}
+                        handleTymMessage={handleTymMessage}
+                        allowOpen={allowOpen}
+                        message={message}
+                        handleModifyMessage={handleModifyMessage}
+                    >
                         <div className="tym-message" onClick={() => handleTymMessage(selectedReaction.trim())}>
                             {/* <i className="fa-regular fa-thumbs-up reaction-icon"></i> */}
                             <Tym icon={selectedReaction} />
