@@ -52,9 +52,10 @@ const ResetPassword = () => {
 
     return (
         <div className="reset-container">
-            <h1 className="title">Reset Password</h1>
+            <h1 className="title">Đặt lại mật khẩu</h1>
             <Form
                 name="basic"
+                className="reset-form"
                 labelCol={{
                     span: 8,
                 }}
@@ -72,7 +73,7 @@ const ResetPassword = () => {
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
             >
-                <Form.Item
+                <Form.Item className="form-item"
                     label="Số điện thoại"
                     rules={[
                         {
@@ -88,8 +89,8 @@ const ResetPassword = () => {
                     />
                 </Form.Item>
 
-                <Form.Item
-                    label="New Password"
+                <Form.Item className="form-item"
+                    label="Nhập mật khẩu mới"
                     name="newPassword"
                     rules={[
                         {
@@ -102,8 +103,8 @@ const ResetPassword = () => {
                 </Form.Item>
 
 
-                <Form.Item
-                    label="Confirm New Password"
+                <Form.Item className="form-item"
+                    label="Xác nhận mật khẩu mới"
                     name="confirmPassword"
                     rules={[
                         {
@@ -116,14 +117,14 @@ const ResetPassword = () => {
                 </Form.Item>
 
 
-                <Form.Item
+                <Form.Item className="form-item"
                     wrapperCol={{
                         offset: 8,
                         span: 16,
                     }}
                 >
                     <Button type="primary" htmlType="submit" loading={isLoading}>
-                        Reset Password
+                        Hoàn thành
                     </Button>
                 </Form.Item>
             </Form>
