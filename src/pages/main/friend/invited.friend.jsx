@@ -9,19 +9,21 @@ import { notificationsFriends } from '../../../redux/actions/user.action';
 
 const headerData = items[2];
 
-
 const InvitedFriend = () => {
     const stateApp = useSelector(state => state?.appReducer);
     const stateUser = useSelector(state => state?.userReducer);
     const dispatch = useDispatch();
 
+
     useEffect(() => {
+        console.log(stateUser)
         const ids = stateUser.notificationsFriends.map(item => item?.id);
         handleReadNotifications(ids);
     }, [])
 
     const handleReadNotifications = async (ids) => {
         await axios.post('/users/notifications/friendShip', { ids });
+        stateUser.fetchNotificationsFunc();
     }
 
     const fetchInvitedFriends = async () => {

@@ -4,14 +4,15 @@ import ChatUser from "../../components/user/chat.user";
 import { socket } from "../../utils/io";
 import { toast } from "react-toastify";
 import { STATE } from "../../redux/types/type.app";
+import { useSelector } from "react-redux";
 
 const limit = 10;
 
 const ChatSidebar = () => {
     const [chats, setChats] = useState([]);
     const [page, setPage] = useState(1);
-    const onlyRef = useRef(false);
     const [status, setStatus] = useState(STATE.PENDING);
+    const subNav = useSelector(state => state.appReducer.subNav);
 
     const fetchChats = async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
@@ -25,11 +26,8 @@ const ChatSidebar = () => {
     }
 
     useEffect(() => {
-        if (onlyRef.current === false) {
-            fetchChats();
-            onlyRef.current = true;
-        }
-    }, [])
+        fetchChats();
+    }, [subNav])
     useEffect(() => {
         if (chats && chats.length > 0) {
             chats.forEach(item => {

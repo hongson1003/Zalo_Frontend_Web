@@ -13,3 +13,10 @@ export function accessChat(chat) {
         payload: chat
     }
 }
+
+export function fetchNotificationsfunc(func) {
+    return {
+        type: NOTIFICATIONS.FETCH_NOTIFICATIONS_FUNC,
+        payload: func
+    }
+}

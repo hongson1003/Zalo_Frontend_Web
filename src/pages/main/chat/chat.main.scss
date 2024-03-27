@@ -4,7 +4,6 @@
     display: flex;
     color: #ffffff;
     z-index: 2;
-
     header {
         width: 100%;
         max-height: 65px;
@@ -92,6 +91,8 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            padding-bottom: 30px;
+
             .content-chat-messages {
                 display: flex;
                 flex-direction: column;
@@ -147,8 +148,8 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                max-height: 200px;
-                height: auto;
+                min-height: 90px;
+                height: min-content;
                 width: 100%;
                 display: flex;
                 flex-direction: column;
@@ -194,15 +195,14 @@
             .footer-top {
                 display: flex;
                 align-items: center;
-                padding: 10px 15px;
+                padding: 5px 15px;
                 gap: 25px;
-                height: 35%;
             }
             .footer-bottom {
                 display: flex;
                 align-items: center;
                 flex: 1;
-                padding: 10px;
+                padding: 5px 10px;
                 .like {
                     color: #f7c864;
                     font-size: 25px;
@@ -226,6 +226,7 @@
     }
     .right {
         flex: 2;
+        height: 100%;
         .title {
             font-size: calc(12px + 0.3vw);
         }
@@ -262,11 +263,11 @@
             }
         }
     }
-    // .sending {
-    //     position: absolute;
-    //     bottom: 120px;
-    //     left: 10;
-    // }
+    .sending {
+        position: absolute;
+        bottom: 120px;
+        left: 10;
+    }
 }
 
 .bg {

@@ -27,6 +27,12 @@ export default function userReducer(state = initialState, action) {
             return stateSendMessageFunc;
         }
 
+        case NOTIFICATIONS.FETCH_NOTIFICATIONS_FUNC: {
+            let stateFetchNotificationsFunc = { ...state };
+            stateFetchNotificationsFunc.fetchNotificationsFunc = action.payload;
+            return stateFetchNotificationsFunc;
+        }
+
 
         default:
             return state

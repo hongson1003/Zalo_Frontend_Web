@@ -22,8 +22,6 @@ const items1 = [
     },
 ]
 
-
-
 const { Search } = Input;
 
 const SearchMessage = () => {
@@ -34,7 +32,6 @@ const SearchMessage = () => {
     const onClick = (e) => {
         setCurrent(e.key);
     };
-
 
 
     return (

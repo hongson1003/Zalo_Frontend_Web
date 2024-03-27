@@ -5,9 +5,12 @@ import './invited.user.scss';
 import moment from "moment";
 import InforUserModal from "../modal/inforUser.modal";
 import axios from '../../utils/axios';
+import { useSelector } from "react-redux";
 
 const InvitedUser = ({ user, content, date, fetchInvitedFriends }) => {
     const [friendShipData, setFriendShipData] = useState(null);
+    const userReducer = useSelector(state => state.userReducer);
+
     const handleOk = async () => {
         const res = await axios.get(`users/friendShip?userId=${user.id}`)
         setFriendShipData(res.data);

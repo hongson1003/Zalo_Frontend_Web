@@ -131,7 +131,8 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             "participants": [user?.id, friendData?.id],
             "status": true
         });
-        if (res.errCode == 0) {
+        console.log(res)
+        if (res.errCode == 0 || res.errCode === 2) {
             dispatch(accessChat(res.data));
             handleCancel();
         }

@@ -5,7 +5,6 @@ import './addFriend.modal.scss';
 import axios from '../../utils/axios';
 import InforUserModal from "./inforUser.modal";
 import { useSelector } from "react-redux";
-import { getFriendState } from "../../utils/checkFriend";
 import { toast } from "react-toastify";
 
 
@@ -13,11 +12,14 @@ const AddFriendModal = ({ children }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [friendData, setFriendData] = useState(null);
-    const user = useSelector(state => state?.appReducer?.userInfo?.user);
     const [friendShipData, setFriendShipData] = useState(null);
 
     const showModal = () => {
         setIsModalOpen(true);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
     };
 
     const handleOk = async () => {
@@ -30,6 +32,8 @@ const AddFriendModal = ({ children }) => {
         if (res.errCode === 0) {
             setFriendData(res.data);
             fetchFriendShip(res?.data?.id);
+            setPhoneNumber('');
+            handleCancel();
             return true;
         } else {
             toast.error('Không tìm thấy người dùng');
@@ -43,11 +47,6 @@ const AddFriendModal = ({ children }) => {
             setFriendShipData(res.data);
         }
     }
-
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
 
     useEffect(() => {
         if (friendData) {

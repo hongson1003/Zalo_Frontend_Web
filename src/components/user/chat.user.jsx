@@ -15,7 +15,6 @@ const ChatUser = ({ chat, activeKey }) => {
         dispatch(accessChat(chat));
     }
 
-
     return (
         <div className={`chat-user-container ${activeKey === subNav?._id && 'active-chat'}`} onClick={() => {
             handleOnClick()

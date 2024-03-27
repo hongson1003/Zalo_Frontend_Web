@@ -315,7 +315,11 @@ const ChatMain = () => {
                                             {
                                                 // no current user
                                                 user?.id !== message.sender.id ?
-                                                    <div className="group-message">
+                                                    <div className="group-message"
+                                                        style={{
+                                                            marginBottom: message?.reactions?.length > 0 ? '10px' : '0px'
+                                                        }}
+                                                    >
                                                         {
                                                             <div className="avatar">
                                                                 {
@@ -364,7 +368,11 @@ const ChatMain = () => {
                                                     // current user
                                                     :
                                                     <div
-                                                        style={{ alignSelf: 'flex-end', backgroundColor: '#e5efff' }}
+                                                        style={{
+                                                            alignSelf: 'flex-end',
+                                                            backgroundColor: '#e5efff',
+                                                            marginBottom: message?.reactions?.length > 0 ? '10px' : '0px'
+                                                        }}
                                                         className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
                                                     >
                                                         {message.type === MESSAGES.TEXT ?
@@ -490,7 +498,7 @@ const ChatMain = () => {
                         <div className="right-body">
                             <div className="item-avatar">
                                 {
-                                    chat?.type === STATE.PRIVATE_CHAT ? (
+                                    chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
                                         <AvatarUser
                                             image={getFriend(user, chat.participants)?.avatar}
                                             size={50}
@@ -518,7 +526,7 @@ const ChatMain = () => {
                                     )
                                 }
                                 <p className="name">
-                                    <span>{chat?.user?.userName || chat?.name}</span>
+                                    <span>{chat?.name || getFriend(user, chat.participants)?.userName}</span>
                                     <span style={{
                                         padding: '0 5px'
                                     }}>

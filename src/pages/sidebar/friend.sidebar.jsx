@@ -62,9 +62,7 @@ const FriendSideBar = () => {
             selectedKeys={[current]}
             mode="vertical"
             items={items}
-            style={{
-                fontSize: 'calc(8px + 0.5vw)',
-            }}
+            style={{ fontSize: 'calc(8px + 0.5vw)' }}
 
         />
     )

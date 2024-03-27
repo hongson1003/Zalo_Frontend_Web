@@ -17,7 +17,7 @@ import InforUserModal from "../modal/inforUser.modal";
 import WrapperItemSidebar from "./wrapperItem.sidebar";
 import { socket } from '../../utils/io';
 import { STATE } from "../../redux/types/type.app";
-import { notificationsFriends } from "../../redux/actions/user.action";
+import { notificationsFriends, fetchNotificationsfunc } from "../../redux/actions/user.action";
 
 const friends = () => {
     const user = useSelector(state => state?.appReducer?.userInfo?.user);
@@ -48,6 +48,7 @@ const friends = () => {
                     fetchNotifications();
                 })
             })
+            dispatch(fetchNotificationsfunc(fetchNotifications));
         }
         fetchNotifications();
         onlyRef.current = true;

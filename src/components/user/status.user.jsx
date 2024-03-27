@@ -17,7 +17,7 @@ const StatusUser = ({ chat }) => {
             {
                 chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
                     <InforUserModal
-                        friendData={user}
+                        friendData={getFriend(user, chat.participants)}
                         type={'button'}
                         itsMe
                     >
@@ -30,8 +30,8 @@ const StatusUser = ({ chat }) => {
                     <InfoGroupModal>
                         <div className="avatar-group" >
                             {
-                                chat?.image ? (
-                                    <img src={chat?.image} alt="avatar" />
+                                chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
+                                    <img src={getFriend(user, chat.participants)?.avatar} alt="avatar" />
                                 ) : (
                                     chat?.participants?.length > 0 &&
                                     chat?.participants?.map(item => {
@@ -59,7 +59,7 @@ const StatusUser = ({ chat }) => {
                         </>
                     ) : (
                         <>
-                            <p className="username">{user?.userName}</p>
+                            <p className="username">{getFriend(user, chat?.participants)?.userName}</p>
                             <p className="connected-time">Truy cập 57 phút trước</p>
                         </>
                     )

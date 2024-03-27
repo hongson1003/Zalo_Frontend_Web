@@ -8,6 +8,8 @@ import { MESSAGES } from "../../redux/types/type.user";
 const content = ({ handleClose }) => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const userState = useSelector(state => state.userReducer);
+
+
     const handleStickerClick = async (stickerData) => {
         const { url } = stickerData;
         const { sendMessageFunc } = userState;
