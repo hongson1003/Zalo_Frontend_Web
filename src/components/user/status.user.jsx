@@ -3,17 +3,14 @@ import AvatarUser from './avatar';
 import "./status.user.scss";
 import InforUserModal from "../modal/inforUser.modal";
 import { CHAT_STATUS } from "../../redux/types/type.user";
-import InfoGroupModal from "../modal/infoGroup.modal";
+import InfoGroupModal from "../modal/infoChat.modal";
+import { getFriend } from "../../utils/handleChat";
+import { useSelector } from "react-redux";
+
 const StatusUser = ({ chat }) => {
-    const [user, setUser] = useState({});
+    const user = useSelector(state => state.appReducer.userInfo.user);
     useEffect(() => {
-        if (chat?.type === CHAT_STATUS.PRIVATE_CHAT) {
-            setUser(chat.user);
-        } else if (chat?.type === CHAT_STATUS.GROUP_CHAT) {
-            // console.log('group chat', chat)
-        } else {
-            setUser(null);
-        }
+
     }, [chat])
     return (
         <div className="status-user-container">
@@ -25,7 +22,7 @@ const StatusUser = ({ chat }) => {
                         itsMe
                     >
                         <AvatarUser
-                            image={chat.image}
+                            image={getFriend(user, chat.participants)?.avatar}
                             size={50}
                         />
                     </InforUserModal>

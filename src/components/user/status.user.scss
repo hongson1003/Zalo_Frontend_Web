@@ -24,33 +24,34 @@
             color: #ffffff;
         }
     }
+}
 
-    .avatar-group {
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        width: 50px;
+.avatar-group {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 50px;
+    height: 100%;
+    img {
+        width: 70px;
         height: 100%;
-        img {
-            width: 50px;
-            height: 100%;
-            border-radius: 50%;
+        border-radius: 50%;
+    }
+    .avatar-container {
+        width: 25px;
+        &:nth-child(1) {
+            transform: translate(3.5px, 3.5px) scale(1.25);
         }
-        .avatar-container {
-            &:nth-child(1) {
-                transform: translate(3.5px, 3.5px);
-            }
-            &:nth-child(2) {
-                transform: translate(-3.5px, 3.5px);
-            }
-            &:nth-child(3) {
-                transform: translate(3.5px, -3.5px);
-            }
-            &:nth-child(4) {
-                transform: translate(-3.5px, -3.5px);
-            }
+        &:nth-child(2) {
+            transform: translate(-3.5px, 3.5px) scale(1.25);
+        }
+        &:nth-child(3) {
+            transform: translate(3.5px, -3.5px) scale(1.25);
+        }
+        &:nth-child(4) {
+            transform: translate(-3.5px, -3.5px) scale(1.25);
         }
     }
 }

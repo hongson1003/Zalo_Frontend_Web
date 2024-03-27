@@ -130,7 +130,6 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
             userId,
             icon
         })
-        console.log(res);
     }
 
     const handleTymMessage = async (icon) => {

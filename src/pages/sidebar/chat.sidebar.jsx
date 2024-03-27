@@ -3,6 +3,7 @@ import axios from '../../utils/axios';
 import ChatUser from "../../components/user/chat.user";
 import { socket } from "../../utils/io";
 import { toast } from "react-toastify";
+import { STATE } from "../../redux/types/type.app";
 
 const limit = 10;
 
@@ -10,13 +11,16 @@ const ChatSidebar = () => {
     const [chats, setChats] = useState([]);
     const [page, setPage] = useState(1);
     const onlyRef = useRef(false);
+    const [status, setStatus] = useState(STATE.PENDING);
 
     const fetchChats = async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
         if (res.errCode === 0) {
             setChats(res.data);
+            setStatus(STATE.RESOLVE);
         } else {
             toast.warn('Có lỗi xảy ra !')
+            setStatus(STATE.REJECT);
         }
     }
 
@@ -41,21 +45,23 @@ const ChatSidebar = () => {
     return (
         <div>
             {
-                chats?.length > 0 ?
-                    chats.map((chat, index) => {
-                        return (
-                            <ChatUser
-                                key={index}
-                                chat={chat}
-                                activeKey={chat._id}
-                            />
-                        )
-                    }) :
-                    (
-                        <div>
-                            <h1>Không có cuộc trò chuyện nào</h1>
-                        </div>
+                chats?.length > 0 && status === STATE.RESOLVE &&
+                chats.map((chat, index) => {
+                    return (
+                        <ChatUser
+                            key={index}
+                            chat={chat}
+                            activeKey={chat._id}
+                        />
                     )
+                })
+            }
+            {
+                status === STATE.REJECT && (
+                    <div>
+                        <p>Không có cuộc trò chuyện nào</p>
+                    </div>
+                )
             }
         </div>
     );

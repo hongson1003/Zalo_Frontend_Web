@@ -9,9 +9,10 @@ import 'react-medium-image-zoom/dist/styles.css'
 import moment from 'moment';
 import Zoom from 'react-medium-image-zoom'
 import { STATE } from '../../redux/types/type.app';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { socket } from '../../utils/io';
 import { toast } from 'react-toastify';
+import { accessChat } from '../../redux/actions/user.action';
 
 const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe }) => {
     const [profile, setProfile] = useState(null);
@@ -23,6 +24,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const actionRef = useRef(null);
     const updateRef = useRef(null);
     const [description, setDescription] = useState('');
+    const dispatch = useDispatch();
 
     useEffect(() => {
         setDescription(`Xin chào, tôi là ${friendData?.userName}`);
@@ -123,6 +125,19 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         setNeedAddFriend(false);
     }
 
+    const handleJoinChat = async () => {
+        const res = await axios.post('/chat/access', {
+            "type": "PRIVATE_CHAT",
+            "participants": [user?.id, friendData?.id],
+            "status": true
+        });
+        if (res.errCode == 0) {
+            dispatch(accessChat(res.data));
+            handleCancel();
+        }
+    }
+
+
 
     return (
         <>
@@ -199,7 +214,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                             )
                                     )
                             }
-                            <Button type='default'>Nhắn tin</Button>
+                            <Button type='default' onClick={handleJoinChat}>Nhắn tin</Button>
                         </div>
                     }
                 </div>

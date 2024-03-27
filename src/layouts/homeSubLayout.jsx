@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 const homeSublayout = () => {
     const [sizes, setSizes] = useState([
-        '26%',
+        '22%',
         'auto',
     ]);
     const [visibleLeft, setVisibleLeft] = useState('d-show');
@@ -37,7 +37,7 @@ const homeSublayout = () => {
         } else {
             if (windowSize[0] > 800) {
                 setVisibleRight('d-show')
-                setSizes(['26%', 'auto'])
+                setSizes(['22%', 'auto'])
             }
         }
     }, [windowSize, stateApp?.subNav]);

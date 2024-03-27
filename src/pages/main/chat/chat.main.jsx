@@ -21,6 +21,7 @@ import ChangeBackgroundModal from "../../../components/modal/changeBackground.mo
 import MessageChat from "./message.chat";
 import { getTimeFromDate } from '../../../utils/handleUltils';
 import { useNavigate } from "react-router-dom";
+import { getFriend } from "../../../utils/handleChat";
 
 
 const ChatMain = () => {
@@ -71,7 +72,6 @@ const ChatMain = () => {
                     setTyping(false);
                 });
                 socket.on('receive-message', data => {
-                    console.log('receive-message', data)
                     setMessages(prev => [...prev, data]);
                 })
             })
@@ -102,9 +102,6 @@ const ChatMain = () => {
         });
     }
 
-    useEffect(() => {
-        console.log('messages', messages)
-    }, [messages])
 
     const items = [
         {
@@ -324,13 +321,13 @@ const ChatMain = () => {
                                                                 {
                                                                     index == 0 ?
                                                                         <AvatarUser
-                                                                            image={chat?.image}
+                                                                            image={getFriend(user, chat.participants)?.avatar}
                                                                         /> :
                                                                         (
                                                                             messages[index - 1].sender.id !== messages[index].sender.id &&
                                                                             <AvatarUser
                                                                                 image={chat.type === CHAT_STATUS.PRIVATE_CHAT ?
-                                                                                    chat?.user?.avatar : message?.sender?.avatar}
+                                                                                    getFriend(user, chat.participants)?.avatar : chat.groupPhoto}
                                                                             />
 
                                                                         )
@@ -484,11 +481,42 @@ const ChatMain = () => {
                     show &&
                     <div className="right chat-item" ref={moreInfoRef}>
                         <header>
-                            <h3 className="title">Thông tin trò chuyện</h3>
+                            {
+                                chat?.type === CHAT_STATUS.PRIVATE_CHAT ?
+                                    <h3 className="title">Thông tin trò chuyện</h3> :
+                                    <h3 className="title">Thông tin nhóm</h3>
+                            }
                         </header>
                         <div className="right-body">
                             <div className="item-avatar">
-                                <AvatarUser image={chat?.image} size={50} />
+                                {
+                                    chat?.type === STATE.PRIVATE_CHAT ? (
+                                        <AvatarUser
+                                            image={getFriend(user, chat.participants)?.avatar}
+                                            size={50}
+                                        />
+                                    ) : (
+                                        <div className="avatar-group" >
+                                            {
+                                                chat?.image ? (
+                                                    <img src={chat?.image} alt="avatar" />
+                                                ) : (
+                                                    chat?.participants?.length > 0 &&
+                                                    chat?.participants?.map(item => {
+                                                        return (
+                                                            <React.Fragment key={item.id}>
+                                                                <AvatarUser
+                                                                    image={item.avatar}
+                                                                    size={25}
+                                                                />
+                                                            </React.Fragment>
+                                                        )
+                                                    })
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                }
                                 <p className="name">
                                     <span>{chat?.user?.userName || chat?.name}</span>
                                     <span style={{

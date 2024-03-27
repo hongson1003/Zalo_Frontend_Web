@@ -4,11 +4,10 @@ import { useState } from 'react';
 import './inforUser.modal.scss';
 import axios from '../../utils/axios';
 import 'react-medium-image-zoom/dist/styles.css';
-import './infoGroup.modal.scss';
+import './infoChat.modal.scss';
 
 const InforUserModal = ({ children }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -19,7 +18,6 @@ const InforUserModal = ({ children }) => {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-
 
     return (
         <>

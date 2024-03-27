@@ -38,6 +38,7 @@ const Content = ({ setSelectedReaction, handleTymMessage, setOpen, message, hand
         })
         const messageData = res.data;
         if (res.errCode === 0) {
+            setOpen(false);
             handleModifyMessage({
                 _id: messageData._id,
                 reactions: messageData.reactions,
@@ -58,7 +59,6 @@ const Content = ({ setSelectedReaction, handleTymMessage, setOpen, message, hand
                                 onClick={() => handleGetReaction(reaction)}
                             >{reaction.icon}</span>}
                         />
-
                     )
                 } else {
                     return (
