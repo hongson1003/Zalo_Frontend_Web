@@ -20,6 +20,7 @@
     "@fortawesome/fontawesome-free": "^6.5.1",
     "antd": "^5.12.5",
     "axios": "^0.27.2",
+    "cloudinary-react": "^1.8.1",
     "emoji-mart": "^5.5.2",
     "firebase": "^9.18.0",
     "moment": "^2.30.1",

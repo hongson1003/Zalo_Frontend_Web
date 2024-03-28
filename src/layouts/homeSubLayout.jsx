@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 const homeSublayout = () => {
     const [sizes, setSizes] = useState([
-        '22%',
+        '25%',
         'auto',
     ]);
     const [visibleLeft, setVisibleLeft] = useState('d-show');
@@ -26,10 +26,10 @@ const homeSublayout = () => {
     }, []);
 
     useEffect(() => {
-        if (windowSize[0] < 700 && windowSize[0]) {
+        if (windowSize[0] < 750 && windowSize[0]) {
             if (!stateApp?.subNav) {
                 setVisibleRight('d-none')
-                setSizes(['100%', 0])
+                setSizes(['100%', '0.75%'])
             } else {
                 setVisibleRight('d-show')
                 setSizes(['0px', '100%'])
@@ -37,7 +37,7 @@ const homeSublayout = () => {
         } else {
             if (windowSize[0] > 800) {
                 setVisibleRight('d-show')
-                setSizes(['22%', 'auto'])
+                setSizes(['25%', 'auto'])
             }
         }
     }, [windowSize, stateApp?.subNav]);
@@ -66,6 +66,25 @@ const homeSublayout = () => {
         // handle resize event
         setSizes(size);
     }
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            const key = event.key;
+            if (key === 'f') {
+                if (sizes[0] !== '0px') {
+                    setSizes(['0px', '100%'])
+                    setVisibleLeft('d-none')
+                } else {
+                    setSizes(['26%', 'auto'])
+                    setVisibleLeft('d-show')
+                }
+            }
+        }
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [visibleLeft])
     return (
         <div className="homeSublayout">
             <SplitPane
@@ -73,15 +92,16 @@ const homeSublayout = () => {
                 sizes={sizes}
                 onChange={size => handleOnChange(size)}
             >
-                <Pane maxSize={500} className={`${visibleLeft}`}>
+                <Pane className={`${visibleLeft}`} minSize={280}>
                     <SidebarHome />
                 </Pane>
                 <Pane
-                    className={`pane-content ${visibleRight}`}>
+                    className={`pane-content ${visibleRight}`}
+                >
                     <ContentMain />
                 </Pane>
             </SplitPane>
-        </div>
+        </div >
     )
 }
 

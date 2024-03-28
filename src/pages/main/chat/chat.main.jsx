@@ -50,6 +50,20 @@ const ChatMain = () => {
     const onClick = (e) => {
         setCurrent(e.key);
     };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            const key = event.key;
+            if (key === 'm') {
+                handleClickMoreInfor();;
+            }
+        }
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [])
+
     // End Menu
     useEffect(() => {
         if (!user) {
@@ -205,7 +219,7 @@ const ChatMain = () => {
         if (footer.current?.clientHeight) {
             setFooterHeight(footer.current?.clientHeight);
         }
-    }, [footer])
+    }, [footer.current?.clientHeight])
 
 
     let emitFinishTyping = useCallback(_.debounce(() => {
@@ -403,7 +417,10 @@ const ChatMain = () => {
                                                     <div className="message-status">
                                                         {
                                                             sent === STATE.PENDING ? <span>đã gửi</span> : (
-                                                                sent === STATE.RESOLVE ? <span>Đã nhận</span> : <span>Gửi thất bại</span>
+                                                                sent === STATE.RESOLVE ? <span>
+                                                                    <i className="fa-solid fa-check-double"></i>
+                                                                    &nbsp;
+                                                                    Đã nhận</span> : <span>Gửi thất bại</span>
                                                             )
                                                         }
                                                     </div>

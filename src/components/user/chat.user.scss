@@ -14,3 +14,15 @@
 .active-chat {
     background-color: #e5efff;
 }
+
+.avatar-group {
+    width: 50px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    .avatar-container {
+        width: calc(50px / 2);
+        transform: scale(1.1);
+    }
+}

@@ -27,7 +27,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        setDescription(`Xin chào, tôi là ${friendData?.userName}`);
+        setDescription(`Xin chào, tôi là ${user?.userName}`);
     }, [friendData])
 
     const showModal = () => {
@@ -228,7 +228,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                         <div className='info-detail'>
                             <div className='info-item'>
                                 <p className='item-label'>Giới tính:</p>
-                                <p className='item-value'>{profile?.gender ? 'Nam' : 'Nữ'}</p>
+                                <p className='item-value'>{profile?.gender == 0 ? 'Nam' : 'Nữ'}</p>
                             </div>
                             <div className='info-item'>
                                 <p className='item-label'>Ngày sinh:</p>

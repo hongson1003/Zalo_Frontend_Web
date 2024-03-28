@@ -6,11 +6,10 @@ import { toast } from "react-toastify";
 import { STATE } from "../../redux/types/type.app";
 import { useSelector } from "react-redux";
 
-const limit = 10;
-
 const ChatSidebar = () => {
     const [chats, setChats] = useState([]);
     const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
     const [status, setStatus] = useState(STATE.PENDING);
     const subNav = useSelector(state => state.appReducer.subNav);
 

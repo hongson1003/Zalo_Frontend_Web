@@ -27,8 +27,10 @@ const ChatUser = ({ chat, activeKey }) => {
                 ) : (
                     <div className="avatar-group" >
                         {
-                            chat?.image ? (
-                                <img src={chat?.image} alt="avatar" />
+                            chat?.groupPhoto ? (
+                                <AvatarUser
+                                    image={chat?.groupPhoto}
+                                    size={50} />
                             ) : (
                                 chat?.participants?.length > 0 &&
                                 chat?.participants?.map(item => {
@@ -49,7 +51,11 @@ const ChatUser = ({ chat, activeKey }) => {
 
             <div className="right">
                 <div className="top">
-                    <p className="name">{getFriend(user, chat.participants)?.userName}</p>
+                    {
+                        chat?.type === CHAT_STATUS.PRIVATE_CHAT ?
+                            <p className="name">{getFriend(user, chat.participants)?.userName}</p> :
+                            <p className="name">{chat?.name}</p>
+                    }
                 </div>
                 <div className="bottom">
                     <p>{'Hi chào cậu'}</p>

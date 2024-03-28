@@ -3,15 +3,13 @@ import AvatarUser from './avatar';
 import "./status.user.scss";
 import InforUserModal from "../modal/inforUser.modal";
 import { CHAT_STATUS } from "../../redux/types/type.user";
-import InfoGroupModal from "../modal/infoChat.modal";
+import InfoGroupModal from "../modal/infoGroup.modal";
 import { getFriend } from "../../utils/handleChat";
 import { useSelector } from "react-redux";
 
 const StatusUser = ({ chat }) => {
     const user = useSelector(state => state.appReducer.userInfo.user);
-    useEffect(() => {
 
-    }, [chat])
     return (
         <div className="status-user-container">
             {
@@ -28,25 +26,30 @@ const StatusUser = ({ chat }) => {
                     </InforUserModal>
                 ) : (
                     <InfoGroupModal>
-                        <div className="avatar-group" >
-                            {
-                                chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
-                                    <img src={getFriend(user, chat.participants)?.avatar} alt="avatar" />
-                                ) : (
-                                    chat?.participants?.length > 0 &&
-                                    chat?.participants?.map(item => {
-                                        return (
-                                            <React.Fragment key={item.id}>
-                                                <AvatarUser
-                                                    image={item.avatar}
-                                                    size={25}
-                                                />
-                                            </React.Fragment>
-                                        )
-                                    })
-                                )
-                            }
-                        </div>
+                        {
+                            chat?.groupPhoto ? (
+                                <AvatarUser
+                                    image={chat?.groupPhoto}
+                                    size={50}
+                                />
+                            ) : (
+                                <div className="avatar-group" >
+                                    {
+                                        chat?.participants?.length > 0 &&
+                                        chat?.participants?.map(item => {
+                                            return (
+                                                <React.Fragment key={item.id}>
+                                                    <AvatarUser
+                                                        image={item.avatar}
+                                                        size={25}
+                                                    />
+                                                </React.Fragment>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            )
+                        }
                     </InfoGroupModal>
                 )
             }

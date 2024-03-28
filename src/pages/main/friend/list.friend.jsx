@@ -7,9 +7,7 @@ import axios from '../../../utils/axios';
 import { toast } from "react-toastify";
 const headerData = items[0];
 
-
 const limit = 10;
-
 
 const ListFriend = () => {
     const [friends, setFriends] = React.useState([]);

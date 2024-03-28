@@ -4,11 +4,10 @@ import './home.message.search.scss';
 import { UserAddOutlined, UsergroupAddOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { Menu } from 'antd'
-import { DownOutlined, SmileOutlined } from '@ant-design/icons';
-import { Dropdown, Space } from 'antd';
 import AddFriendModal from '../../components/modal/addFriend.modal';
 import { KEYITEMS } from "../../utils/keyMenuItem";
 import { useSelector } from "react-redux";
+import NewGroupChatModal from "../../components/modal/newGroupChat.modal";
 
 
 const items1 = [
@@ -33,7 +32,6 @@ const SearchMessage = () => {
         setCurrent(e.key);
     };
 
-
     return (
         <div className="sidebar-nav">
             <div className="sidebar-nav-search">
@@ -43,9 +41,14 @@ const SearchMessage = () => {
                 />
                 <div className="btn-group">
                     <AddFriendModal>
-                        <Button style={{ border: 'none', boxShadow: 'none' }} icon={<UserAddOutlined />}></Button>
+                        <Button style={{ border: 'none', boxShadow: 'none', width: '20%' }} icon={<UserAddOutlined />}></Button>
                     </AddFriendModal>
-                    <Button style={{ border: 'none', boxShadow: 'none' }} icon={<UsergroupAddOutlined />}></Button>
+                    <NewGroupChatModal>
+                        <Button
+                            style={{ border: 'none', boxShadow: 'none', width: '20%' }}
+                            icon={<UsergroupAddOutlined />}
+                        ></Button>
+                    </NewGroupChatModal>
                 </div>
             </div>
             {

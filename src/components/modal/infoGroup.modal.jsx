@@ -4,7 +4,7 @@ import { useState } from 'react';
 import './inforUser.modal.scss';
 import axios from '../../utils/axios';
 import 'react-medium-image-zoom/dist/styles.css';
-import './infoChat.modal.scss';
+import './infoGroup.modal.scss';
 
 const InforUserModal = ({ children }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
