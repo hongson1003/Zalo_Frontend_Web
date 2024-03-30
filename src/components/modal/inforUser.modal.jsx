@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { socket } from '../../utils/io';
 import { toast } from 'react-toastify';
 import { accessChat } from '../../redux/actions/user.action';
+import ChooseImageModal from './chooseImage.modal';
 
 const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe }) => {
     const [profile, setProfile] = useState(null);
@@ -25,6 +26,8 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const updateRef = useRef(null);
     const [description, setDescription] = useState('');
     const dispatch = useDispatch();
+    const [avatar, setAvatar] = useState(null);
+    const [image, setImage] = useState(null);
 
     useEffect(() => {
         setDescription(`Xin chào, tôi là ${user?.userName}`);
@@ -52,9 +55,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         }
     }, [friendData]);
 
-    const handleSetting = () => {
-        console.log('setting')
-    };
 
 
     const handleOnMouse = (e) => {
@@ -62,6 +62,11 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         if (element.className === 'modal-footer') {
             element.style.backgroundColor = '#ffffff';
         }
+    }
+
+    const handleChangeAvatar = (avatar, image) => {
+        setAvatar(avatar);
+        setImage(image);
     }
 
 
@@ -131,7 +136,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             "participants": [user?.id, friendData?.id],
             "status": true
         });
-        console.log(res)
         if (res.errCode == 0 || res.errCode === 2) {
             dispatch(accessChat(res.data));
             handleCancel();
@@ -178,9 +182,21 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 <div className='modal-avatar'>
                     <div className='modal-avatar-info'>
                         <AvatarUser image={friendData?.avatar} zoom size={50}>
-                            <div className='camara-container' onClick={handleSetting}>
-                                <InstagramOutlined />
-                            </div>
+
+                            {itsMe &&
+                                <ChooseImageModal
+                                    type='avatar'
+                                    handleChangeAvatar={handleChangeAvatar}
+                                    avatar={avatar}
+                                    image={image}
+                                >
+                                    <div className='camara-container'>
+                                        <InstagramOutlined />
+                                    </div>
+                                </ChooseImageModal>
+
+                            }
+
                         </AvatarUser>
                         <div className='top-10px'>
                             <span style={{ fontWeight: 'bold', marginRight: '5px' }}>{friendData?.userName}</span>

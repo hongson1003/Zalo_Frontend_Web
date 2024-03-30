@@ -74,7 +74,6 @@ const items = [MessageOutlined, friends, CheckSquareOutlined, AntCloudOutlined].
 
 const Sidebar = () => {
     const state = useSelector(state => state?.appReducer);
-
     const dispatch = useDispatch();
     const navigator = useNavigate();
 
@@ -103,13 +102,17 @@ const Sidebar = () => {
                 <InforUserModal
                     friendData={state?.userInfo?.user}
                     type={'button'}
+                    itsMe
                 >
-                    <Button block>Hồ sơ của bạn</Button>
+                    <Button className="user-item" block>Hồ sơ của bạn</Button>
                 </InforUserModal>
-                <Button block>Cài đặt</Button>
+                <Button className="user-item"
+                    block>Cài đặt</Button>
                 <hr />
                 <div>
-                    <Button block
+                    <Button
+                        className="user-item"
+                        block
                         onClick={handleLogout}
                     >Đăng xuất
                     </Button>

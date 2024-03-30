@@ -5,12 +5,12 @@ import { Radio, Drawer, Input, theme } from 'antd';
 import axios from '../../utils/axios';
 import AvatarUser from '../user/avatar';
 import { getFriend } from '../../utils/handleChat';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getDetailListMembers } from '../../utils/handleChat';
-import ChooseGroupPhotoModal from './chooseGroupPhoto.modal';
+import ChooseImageModal from './chooseImage.modal';
 import { toast } from 'react-toastify';
 import { CHAT_STATUS } from '../../redux/types/type.user';
-
+import { accessChat } from '../../redux/actions/user.action';
 
 const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
 
@@ -28,6 +28,17 @@ const NewGroupChatModal = ({ children }) => {
     const [groupPhoto, setGroupPhoto] = useState(null);
     const [file, setFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [collections, setCollections] = useState([]);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const fetchGroupPhotos = async () => {
+            const response = await fetch("/groupPhoto/data.json");
+            const images = await response.json();
+            setCollections(images);
+        }
+        fetchGroupPhotos();
+    }, []);
 
     const showDrawer = () => {
         setOpen(true);
@@ -51,19 +62,6 @@ const NewGroupChatModal = ({ children }) => {
     };
     const handleOk = async () => {
         try {
-            let imageUrl = '';
-            setIsLoading(true);
-            if (!file) {
-                imageUrl = groupPhoto;
-            } else {
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-                    method: 'POST',
-                    body: file,
-                });
-                const res = await response.json();
-                imageUrl = res.url;
-            }
-            // get res.url và lưu vào csdl
             const members = [];
             list.forEach(item => {
                 if (item.checked) {
@@ -79,15 +77,35 @@ const NewGroupChatModal = ({ children }) => {
             //         return item.user1Id === user.id ? item.user2 : item.user1;
             //     }
             // })
+            if (!name.trim()) {
+                toast.warning('Nhập tên nhóm chat');
+                return;
+            }
+            let imageUrl = '';
+            setIsLoading(true);
+            if (!file) {
+                imageUrl = groupPhoto;
+            } else {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+                    method: 'POST',
+                    body: file,
+                });
+                const res = await response.json();
+                imageUrl = res.url;
+            }
+            // get res.url và lưu vào csdl
             const payload = {
                 name: name,
                 type: CHAT_STATUS.GROUP_CHAT,
                 groupPhoto: imageUrl,
                 participants: members,
             };
-            const resCreateGroup = await axios.post('/chat/group', payload);
+            const resCreateGroupRes = await axios.post('/chat/group', payload);
             setIsLoading(false);
-            console.log(resCreateGroup)
+            if (resCreateGroupRes.errCode === 0) {
+                setIsModalOpen(false);
+                dispatch(accessChat(resCreateGroupRes.data));
+            }
         } catch (error) {
             setIsLoading(false);
             toast.error('Upload ảnh thất bại');
@@ -152,9 +170,10 @@ const NewGroupChatModal = ({ children }) => {
                 footer={renderFooter}
             >
                 <div className='group-chat-name'>
-                    <ChooseGroupPhotoModal
+                    <ChooseImageModal
                         setGroupPhoto={setGroupPhoto}
                         setFile={setFile}
+                        data={collections}
                     >
                         <div className='element-modal-groupPhoto'>
                             {
@@ -163,7 +182,7 @@ const NewGroupChatModal = ({ children }) => {
                                     <img className='groupPhoto' src={groupPhoto} />
                             }
                         </div>
-                    </ChooseGroupPhotoModal>
+                    </ChooseImageModal>
                     <div className='element-input'>
                         <Input
                             value={name}

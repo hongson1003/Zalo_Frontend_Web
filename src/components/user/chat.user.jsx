@@ -38,7 +38,9 @@ const ChatUser = ({ chat, activeKey }) => {
                                         <React.Fragment key={item.id}>
                                             <AvatarUser
                                                 image={item.avatar}
-                                                size={25}
+                                                style={{
+                                                    width: '50%'
+                                                }}
                                             />
                                         </React.Fragment>
                                     )

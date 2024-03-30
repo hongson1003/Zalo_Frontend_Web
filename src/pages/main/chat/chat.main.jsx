@@ -22,13 +22,13 @@ import MessageChat from "./message.chat";
 import { getTimeFromDate } from '../../../utils/handleUltils';
 import { useNavigate } from "react-router-dom";
 import { getFriend } from "../../../utils/handleChat";
+import { COLOR_BACKGROUND } from '../../../type/rootCss.type';
 
 
 const ChatMain = () => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
     const [show, setShow] = useState(true);
-    const [text, setText] = useState('');
     const [showEmoij, setShowEmoij] = useState(true);
     const [messages, setMessages] = useState([]);
     const [page, setPage] = useState(1);
@@ -47,14 +47,34 @@ const ChatMain = () => {
     const navigate = useNavigate();
     // Menu
     const [current, setCurrent] = useState('');
+    const [headerColor, setHeaderColor] = useState(COLOR_BACKGROUND.BLACK);
+    const [messageColor, setMessageColor] = useState(COLOR_BACKGROUND.BLACK);
+    const [backgroundUrl, setBackgroundUrl] = useState('');
+
+    useEffect(() => {
+        if (chat?.background) {
+            setBackgroundUrl(chat.background.url);
+            setHeaderColor(chat.background.headerColor);
+            setMessageColor(chat.background.messageColor);
+        } else {
+            setBackgroundUrl('');
+            setHeaderColor(COLOR_BACKGROUND.BLACK);
+            setMessageColor(COLOR_BACKGROUND.BLACK);
+        }
+    }, [chat]);
+
+
+
+
     const onClick = (e) => {
         setCurrent(e.key);
     };
 
     useEffect(() => {
-        const handleKeyDown = (e) => {
+        const handleKeyDown = (event) => {
             const key = event.key;
-            if (key === 'm') {
+            if (key === 'm' && event.ctrlKey) {
+                event.preventDefault();
                 handleClickMoreInfor();;
             }
         }
@@ -197,15 +217,6 @@ const ChatMain = () => {
         setShow(prev => !prev);
     }
 
-    const handleOnKeyDown = (e) => {
-        if (e.key === 'Enter' && e.shiftKey === true) {
-            return;
-        } else if (e.key === 'Enter') {
-            sendMessage(text, MESSAGES.TEXT);
-            setText('');
-        }
-    }
-
 
     const handleResize = (size, meta) => {
         textAreaRef.current.style.height = 'auto !important';
@@ -223,36 +234,40 @@ const ChatMain = () => {
 
 
     let emitFinishTyping = useCallback(_.debounce(() => {
-        socket.then(socket => {
-            socket.emit('finish-typing', chat._id);
-            sendTyping.current = false;
-        })
+        if (sendTyping.current === true) {
+            socket.then(socket => {
+                socket.emit('finish-typing', chat._id);
+                sendTyping.current = false;
+            })
+        }
     }, 700), []);
 
-    const handleOnChange = (e) => {
-        const value = e.target.value;
-        if (value === '\n') {
-            setText('');
-            return;
-        }
+    let startTyping = useCallback(() => {
         if (sendTyping.current === false) {
             socket.then(socket => {
                 socket.emit('typing', chat._id);
             })
             sendTyping.current = true;
         }
-        emitFinishTyping();
-        if (text?.length === 0) {
-            if (value >= 'a' && value <= 'z') {
-                setText(value.toUpperCase());
-            } else
-                setText(value);
-        } else
-            setText(value);
-    }
+    }, []);
 
+    const handleOnChange = (e) => {
+        if (sendTyping.current === false) {
+            startTyping();
+        }
+        emitFinishTyping();
+    }
     const handleShowHideEmoij = () => {
         setShowEmoij(prev => !prev);
+    }
+
+    const handleOnKeyDown = (e) => {
+        const value = textAreaRef.current.value;
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage(value, MESSAGES.TEXT);
+            textAreaRef.current.value = '';
+        }
     }
 
     const handleOnClickOutSide = (e) => {
@@ -292,6 +307,18 @@ const ChatMain = () => {
         textAreaRef.current.focus();
     }
 
+    const handleChangeBackground = (background) => {
+        if (background) {
+            setBackgroundUrl(background.url);
+            setHeaderColor(COLOR_BACKGROUND[background.headerColor]);
+            setMessageColor(COLOR_BACKGROUND[background.messageColor]);
+        } else {
+            setBackgroundUrl('');
+            setHeaderColor(COLOR_BACKGROUND.BLACK);
+            setMessageColor(COLOR_BACKGROUND.BLACK);
+        }
+    }
+
     // const [rotation, setRotation] = useState(0);
     // const handleEvent = (e) => {
     //     if (!unClassList.includes(e.target.className)) {
@@ -302,25 +329,33 @@ const ChatMain = () => {
     //     }
     // }
 
+
     return (
         <>
             <div className="chat-container"
             // onMouseDown={handleEvent}
             >
                 <div className="left chat-item">
-                    <header>
+                    <header style={{ color: headerColor }}>
                         <div className="friend-info">
                             <StatusUser chat={chat} />
                         </div>
-                        <div className="tools">
-                            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} className="menu-header" />
+                        <div className="tools" style={{ color: headerColor }}>
+                            <Menu
+                                onClick={onClick}
+                                selectedKeys={[current]}
+                                mode="horizontal" items={items}
+                                className="menu-header"
+                                style={{ color: headerColor }}
+                            />
                         </div>
                     </header>
 
                     <div className="main-chat-content">
                         <div className="content-chat-messages" ref={scroolRef}
                             style={{
-                                height: `calc(100% - ${footerHeight}px)`
+                                height: `calc(100% - ${footerHeight}px)`,
+                                color: messageColor
                             }}>
                             {
                                 messages && messages.length > 0 && messages.map((message, index) => {
@@ -331,7 +366,7 @@ const ChatMain = () => {
                                                 user?.id !== message.sender.id ?
                                                     <div className="group-message"
                                                         style={{
-                                                            marginBottom: message?.reactions?.length > 0 ? '10px' : '0px'
+                                                            marginBottom: message?.reactions?.length > 0 ? '10px' : '0px',
                                                         }}
                                                     >
                                                         {
@@ -414,7 +449,10 @@ const ChatMain = () => {
                                                 <div
                                                     style={{ alignSelf: 'flex-end' }}
                                                 >
-                                                    <div className="message-status">
+                                                    <div
+                                                        className="message-status"
+                                                        style={{ color: headerColor }}
+                                                    >
                                                         {
                                                             sent === STATE.PENDING ? <span>đã gửi</span> : (
                                                                 sent === STATE.RESOLVE ? <span>
@@ -431,19 +469,23 @@ const ChatMain = () => {
                                     )
                                 })
                             }
-                            <div className="sending">
-                                {
-                                    typing &&
-                                    <>
-                                        <ReactLoading type={'bubbles'} color={'grey'} height={'40px'} width={'50px'} />
-                                        <div className="message-status">
-                                            <span>Đang gửi</span>
-                                        </div>
-                                    </>
 
-                                }
-                            </div>
                         </div>
+
+                        {
+                            typing &&
+                            <div className="sending">
+                                <div className="message-status">
+                                    <span>{getFriend(user, chat.participants)?.userName} đang gửi tin nhắn</span>
+                                </div>
+                                <ReactLoading
+                                    type={'bubbles'}
+                                    color={'grey'}
+                                    className="sending-loading"
+                                />
+                            </div>
+                        }
+
 
                         {/* Init position */}
                         <div className="emoij-container">
@@ -478,7 +520,6 @@ const ChatMain = () => {
                             </div>
                             <div className="footer-bottom footer-item" onClick={handleOnClickFooter}>
                                 <TextareaAutosize
-                                    value={text}
                                     className="input-text"
                                     onChange={e => handleOnChange(e)}
                                     placeholder="Nhập tin nhắn..."
@@ -487,6 +528,7 @@ const ChatMain = () => {
                                     spellCheck={false}
                                     onHeightChange={(height, meta) => handleResize(height, meta)}
                                     ref={textAreaRef}
+                                    type="text"
                                 />
 
                                 <div className="text-quick-group">
@@ -505,14 +547,14 @@ const ChatMain = () => {
                 {
                     show &&
                     <div className="right chat-item" ref={moreInfoRef}>
-                        <header>
+                        <header style={{ color: headerColor }}>
                             {
                                 chat?.type === CHAT_STATUS.PRIVATE_CHAT ?
                                     <h3 className="title">Thông tin trò chuyện</h3> :
                                     <h3 className="title">Thông tin nhóm</h3>
                             }
                         </header>
-                        <div className="right-body">
+                        <div className="right-body" style={{ color: headerColor }}>
                             <div className="item-avatar">
                                 {
                                     chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
@@ -555,6 +597,7 @@ const ChatMain = () => {
                             <div className="item-change-bg">
                                 <ChangeBackgroundModal
                                     chat={chat}
+                                    handleChangeBackground={handleChangeBackground}
                                 >
                                     <Button className="change-background-btn">Đổi hình nền</Button>
                                 </ChangeBackgroundModal>
@@ -566,7 +609,7 @@ const ChatMain = () => {
             </div >
             <div
                 className="bg"
-            // style={{ transform: `rotateY(${rotation}deg)` }}
+                style={{ backgroundImage: `url(${backgroundUrl})` }}
             ></div>
         </>
     );

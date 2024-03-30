@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import { Avatar } from 'antd';
 import Zoom from 'react-medium-image-zoom'
-
 const AvatarUser = (props) => {
-    const { image, children, zoom, size } = props;
+    const { image, children, zoom, size, style } = props;
     return (
-        <span className="avatar-container" style={{ position: 'relative' }}>
+        <span className="avatar-container" style={{ position: 'relative', ...style }}>
             {
                 zoom === true ?
                     (
@@ -14,7 +13,7 @@ const AvatarUser = (props) => {
                                 src={image}
                                 style={{
                                     border: '1px solid #ffffff',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
                                 }}
                                 size={{
                                     xl: size,

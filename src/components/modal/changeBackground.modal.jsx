@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import './changeBackground.modal.scss';
 
 
-const ChangeBackgroundModal = ({ chat, children }) => {
+const ChangeBackgroundModal = ({ chat, children, handleChangeBackground }) => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [page, setPage] = useState(1);
@@ -17,7 +17,23 @@ const ChangeBackgroundModal = ({ chat, children }) => {
         setIsModalOpen(true);
     };
 
+    const setBackgroundForChat = async (chatId, backgroundId) => {
+        const response = await axios.put(`/chat/background`, { chatId, backgroundId });
+        if (response.errCode === 0) {
+            handleChangeBackground(response.data.background);
+        }
+    }
+
     const handleOk = () => {
+        // Xử lý logic nè
+        const chatId = chat._id;
+        const backgroundId = selectedBackground._id;
+        if (backgroundId === 'none-bg') {
+            setBackgroundForChat(chatId, null);
+            setIsModalOpen(false);
+            return;
+        }
+        setBackgroundForChat(chatId, backgroundId);
         setIsModalOpen(false);
     };
 
@@ -33,8 +49,6 @@ const ChangeBackgroundModal = ({ chat, children }) => {
         const response = await axios.get(`/chat/background/pagination?page=${page}&limit=${limit}`);
         if (response.errCode === 0) {
             setBackgrounds(response.data);
-        } else {
-            toast.warn(response.message);
         }
     }
 
@@ -51,12 +65,24 @@ const ChangeBackgroundModal = ({ chat, children }) => {
             <Modal title="Chọn hình nền" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <Flex wrap="wrap" justify="center" gap={'10px'} className="background-container">
                     <div className="background-body">
+                        <div
+                            key={'none-bg'}
+                            className={selectedBackground && selectedBackground._id === 'none-bg' ?
+                                'background-item selected' : 'background-item'}
+                            onClick={() => handleSelectBackground({
+                                _id: 'none-bg'
+                            })}>
+                            <i className="fa-solid fa-ban"></i>
+                        </div>
                         {
                             backgrounds && backgrounds.length > 0 && backgrounds.map((background, index) => {
                                 return (
-                                    <div key={background._id} className={selectedBackground && selectedBackground._id === background._id ? 'background-item selected' : 'background-item'}
+                                    <div
+                                        key={background._id}
+                                        className={selectedBackground && selectedBackground._id === background._id ?
+                                            'background-item selected' : 'background-item'}
                                         onClick={() => handleSelectBackground(background)}>
-                                        <img src={background.backgroundUrl} alt={background.name} style={{ width: '65px', height: '65px' }} />
+                                        <img src={background.url} alt={background.name} style={{ width: '65px', height: '65px' }} />
                                     </div>
                                 )
                             })

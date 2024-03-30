@@ -26,6 +26,7 @@ const homeSublayout = () => {
     }, []);
 
     useEffect(() => {
+        setVisibleLeft('d-show')
         if (windowSize[0] < 750 && windowSize[0]) {
             if (!stateApp?.subNav) {
                 setVisibleRight('d-none')
@@ -70,7 +71,8 @@ const homeSublayout = () => {
     useEffect(() => {
         const handleKeyDown = (event) => {
             const key = event.key;
-            if (key === 'f') {
+            if (key === 'f' && event.ctrlKey) {
+                event.preventDefault();
                 if (sizes[0] !== '0px') {
                     setSizes(['0px', '100%'])
                     setVisibleLeft('d-none')
@@ -97,6 +99,7 @@ const homeSublayout = () => {
                 </Pane>
                 <Pane
                     className={`pane-content ${visibleRight}`}
+                    minSize={400}
                 >
                     <ContentMain />
                 </Pane>

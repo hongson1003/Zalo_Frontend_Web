@@ -3,10 +3,27 @@
         margin: auto;
         display: flex;
         flex-wrap: wrap;
-        gap: 7px;
+        gap: 10px;
         padding: 5px;
         .background-item {
             cursor: pointer;
+            border-radius: 50%;
+            width: 65px;
+            height: 65px;
+            img {
+                border-radius: 50%;
+                height: 100%;
+                object-fit: cover;
+            }
+            i {
+                font-size: 60px;
+                height: 100%;
+                margin: auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #888;
+            }
         }
         .selected {
             // border: 2px solid blue;
@@ -15,8 +32,8 @@
             &::after {
                 content: "✓";
                 position: absolute;
-                bottom: -10px;
-                right: -10px;
+                bottom: -5px;
+                right: -5px;
                 background-color: yellowgreen;
                 border-radius: 50%;
                 width: 20px;

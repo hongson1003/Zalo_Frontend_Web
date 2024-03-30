@@ -1,9 +1,15 @@
+:root {
+    --blue: #1e90ff;
+    --white: #ffffff;
+    --black: #333;
+}
 .chat-container {
     width: 100%;
     height: 100%;
     display: flex;
     color: #ffffff;
     z-index: 2;
+
     header {
         width: 100%;
         max-height: 65px;
@@ -19,10 +25,10 @@
             background-color: transparent;
             li {
                 i {
-                    color: #ffffff;
+                    // color: #ffffff;
                 }
                 svg {
-                    color: #ffffff;
+                    // color: #ffffff;
                 }
             }
         }
@@ -34,7 +40,7 @@
     .left {
         flex: 5;
         header {
-            color: #ffffff;
+            // color: #ffffff;
             border-right: 1px solid rgba(0, 0, 0, 0.05);
         }
         .friend-info {
@@ -72,7 +78,7 @@
                         .icon {
                             font-size: calc(6px + 1vw);
                             // color: rgb(33, 29, 29);
-                            color: #ffffff;
+                            // color: #ffffff;
                             cursor: pointer;
                             font-weight: 600;
                         }
@@ -107,35 +113,31 @@
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    background-color: #86827a;
+                    background-color: #b5b0a1;
                     padding: 1px 5px;
                     border-radius: 15px;
                     font-size: 13px;
                 }
                 .message {
-                    // background-color: #e5efff;
                     border-radius: 5px;
-                    box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);
                     max-width: 60%;
                     word-wrap: break-word;
                     white-space: pre-wrap; /* Đảm bảo dòng mới được hiển thị */
-                    color: #333;
-                    box-shadow: -1px 1px 1px 1px #00000040;
-
+                    box-shadow: -0.8px 0.8px 0.5px 0.5px #e2d7d7;
                     .sticker {
                         width: 150px;
                         height: 150px;
                     }
                     .name {
                         font-weight: 590;
-                        color: #888;
+                        // color: #888;
                         padding: 5px 10px 0;
                         font-size: 12px;
                     }
                 }
                 .de-bg {
                     background-color: transparent;
-                    box-shadow: none;
+                    // box-shadow: none;
                 }
                 .group-message {
                     display: inline-flex;
@@ -269,8 +271,29 @@
     }
     .sending {
         position: absolute;
-        bottom: 120px;
-        left: 10;
+        bottom: 90px;
+        display: flex !important;
+        align-items: center;
+        background-color: #ffffff;
+        left: 0;
+        padding: 0px 5px;
+        border: 1px solid #e0e0e0;
+        .sending-loading {
+            width: 30px !important;
+            height: 25px !important;
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .message-status {
+            height: 20px;
+            font-size: 10px !important;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     }
 }
 
@@ -278,8 +301,6 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    // background-image: url("https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2022/02/hinh-nen-vu-tru-4k-cho-may-tinh.jpg?fit\\\\u003d780%2C439\\\\u0026ssl\\\\u003d1");
-    background-image: url("https://giaydantuong.edu.vn/wp-content/uploads/2023/05/hinh-anh-trai-tim-doi-dep-1.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
