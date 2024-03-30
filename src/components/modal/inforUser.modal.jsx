@@ -28,6 +28,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const dispatch = useDispatch();
     const [avatar, setAvatar] = useState(null);
     const [image, setImage] = useState(null);
+    const [editing, setEditing] = useState(STATE.PENDING);
 
     useEffect(() => {
         setDescription(`Xin chào, tôi là ${user?.userName}`);
@@ -42,6 +43,8 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const handleCancel = () => {
         setIsModalOpen(false);
         setAcceptOpenModal(false);
+        setEditing(STATE.PENDING);
+        setNeedAddFriend(STATE.PENDING);
     };
 
     const fetchInfoUser = async (userId) => {
@@ -69,24 +72,57 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         setImage(image);
     }
 
+    const handleOpenUpdate = () => {
+        modalContentRef.current.className = 'modal-content dissapear';
+        if (updateRef.current) {
+            updateRef.current.className = 'modal-footer dissapear';
+        }
+        setTimeout(() => {
+            setEditing(true);
+        }, 500)
+    }
 
+    const handleUpdate = () => {
+        // gọi api update
+
+        setEditing(STATE.PENDING);
+    }
 
     const renderFooter = () => {
         return (
             <React.Fragment>
                 {
-                    !itsMe && (
-                        needAddFriend === false || needAddFriend === STATE.PENDING ?
-                            <Flex justify='center' gap={10} className={`modal-footer ${needAddFriend === false && 'appear'}`} ref={updateRef}>
-                                <EditOutlined style={{ fontSize: '18px' }} />
-                                <p style={{ fontWeight: 'bold' }}>Cập nhật</p>
-                            </Flex > : (
-                                <div className='modal-footer' onMouseOver={e => handleOnMouse(e)}>
-                                    <Button type='default' onClick={() => handleComeBack()}>Thông tin</Button>
-                                    <Button type='default' onClick={() => handleAddFriend()}>Thêm bạn</Button>
-                                </div>
+                    needAddFriend === false || needAddFriend === STATE.PENDING ?
+                        (
+                            itsMe &&
+                            (
+                                editing === false || editing === STATE.PENDING ?
+                                    <Flex
+                                        justify='center'
+                                        gap={10}
+                                        className={`modal-footer ${editing === false && 'appear'}`}
+                                        ref={updateRef}
+                                        onClick={handleOpenUpdate}
+                                    >
+                                        <EditOutlined style={{ fontSize: '18px' }} />
+                                        <p style={{ fontWeight: 'bold' }}>Cập nhật</p>
+                                    </Flex > :
+                                    <Flex
+                                        justify='center'
+                                        gap={10}
+                                        className={`modal-footer ${true && 'appear'}`}
+                                        ref={updateRef}
+                                    >
+                                        <Button type='default' onClick={handleComeBack}>Hủy</Button>
+                                        <Button type='primary' onClick={handleUpdate}>Cập nhật</Button>
+                                    </Flex >
                             )
-                    )
+                        ) : (
+                            <div className={`modal-footer ${needAddFriend && 'appear'}`} onMouseOver={e => handleOnMouse(e)}>
+                                <Button type='default' onClick={handleComeBack}>Thông tin</Button>
+                                <Button type='default' onClick={handleAddFriend}>Thêm bạn</Button>
+                            </div>
+                        )
                 }
             </React.Fragment>
         )
@@ -120,14 +156,17 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const handleNeedAddFriend = () => {
         modalContentRef.current.className = 'modal-content dissapear';
         actionRef.current.className = 'add-friends dissapear';
-        updateRef.current.className = 'modal-footer dissapear';
+        if (updateRef.current) {
+            updateRef.current.className = 'modal-footer dissapear';
+        }
         setTimeout(() => {
             setNeedAddFriend(true);
         }, 500)
     }
 
     const handleComeBack = () => {
-        setNeedAddFriend(false);
+        setNeedAddFriend(STATE.PENDING);
+        setEditing(STATE.PENDING);
     }
 
     const handleJoinChat = async () => {
@@ -141,8 +180,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             handleCancel();
         }
     }
-
-
 
     return (
         <>
@@ -194,7 +231,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                         <InstagramOutlined />
                                     </div>
                                 </ChooseImageModal>
-
                             }
 
                         </AvatarUser>
@@ -211,9 +247,18 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
                                 spellCheck={false}
-                            ></textarea>
+                            >
+                            </textarea>
 
                         </div>
+                    }
+                    {/* Sửa thông tin nè */}
+                    {
+                        editing === true && (
+                            <div className='editing-content'>
+                                Editting
+                            </div>
+                        )
                     }
                     {
                         !itsMe && user?.id !== friendData?.id && (needAddFriend === false || needAddFriend === STATE.PENDING) &&
@@ -236,8 +281,10 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                     }
                 </div>
                 {
-                    (needAddFriend === false || needAddFriend === STATE.PENDING) &&
-                    <div className={`modal-content ${needAddFriend === false && 'appear'}`} ref={modalContentRef}>
+                    (needAddFriend === STATE.PENDING && editing === STATE.PENDING) &&
+                    <div
+                        className={`modal-content ${needAddFriend === false || editing === false && 'appear'}`}
+                        ref={modalContentRef}>
                         <div className='title'>
                             <p>Thông tin cá nhân</p>
                         </div>

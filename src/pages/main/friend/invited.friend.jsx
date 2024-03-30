@@ -16,7 +16,6 @@ const InvitedFriend = () => {
 
 
     useEffect(() => {
-        console.log(stateUser)
         const ids = stateUser.notificationsFriends.map(item => item?.id);
         handleReadNotifications(ids);
     }, [])
