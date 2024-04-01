@@ -60,6 +60,47 @@
                 font-family: Verdana, Geneva, Tahoma, sans-serif;
             }
         }
+        .editing-content {
+            flex-direction: column;
+            .name-info-item{
+                margin-top: 1vh;
+                p {
+                    font-size: small;
+                    color: #888;
+                    margin-left: 0.5vh;
+                }
+                input {
+                    height: 4vh;
+                    width: 100%;
+                    padding-left: 5%;
+                    border-color: #bebbbb;
+                    border-radius: 5px;
+                }
+            }
+            .info-title {
+                margin-top: 1vh;
+                font-size: larger;
+                font-weight: bold;
+                color: #888;
+            }
+            .gender-info-item{
+                margin-top: 1vh;
+                align-items: center;
+            }
+            .dob-info-item{
+                margin-top: 1vh;
+                p {
+                    font-size: small;
+                    color: #888;
+                    margin-left: 0.5vh;
+                }
+            }
+        }
+        .update-button {
+            border-radius: 10%;
+            background-color: #3474e2;
+            color: white;
+        }
         .modal-footer {
             cursor: pointer;
             padding: 10px;
