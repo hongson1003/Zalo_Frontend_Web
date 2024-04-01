@@ -61,8 +61,8 @@ const InforUserModal = ({ children }) => {
                                 return (
                                     <div className='member' key={item.id}>
                                         <AvatarUser
-                                            image={friendData?.avatar}
-                                            name={friendData?.userName}
+                                            image={item?.avatar}
+                                            name={item?.userName}
                                             zoom size={50}
                                         />
                                     </div>
