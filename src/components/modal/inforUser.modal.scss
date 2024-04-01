@@ -105,8 +105,8 @@
 }
 
 .camara-container {
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     background-color: #eaedf0;
     position: absolute;
     right: 0;
@@ -149,9 +149,9 @@
 }
 
 .appear {
-    animation: appear 0.7s ease-out forwards;
+    animation: appear 0.3s ease-out forwards;
 }
 
 .dissapear {
-    animation: disappear 0.6s ease-out forwards;
+    animation: disappear 0.3s ease-out forwards;
 }

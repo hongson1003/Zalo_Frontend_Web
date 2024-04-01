@@ -20,7 +20,6 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
 
     const handleOk = async () => {
         const base64 = await convertBase64(image);
-        console.log(base64)
         uploadAvatar(base64);
         setIsModalOpen(false);
     };
@@ -44,7 +43,6 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
 
     const uploadAvatar = async (base64) => {
         const res = await axios.put('/users/avatar', { avatar: base64 });
-        console.log(res.data)
     }
 
     const handleChooseGroupPhoto = (url) => {

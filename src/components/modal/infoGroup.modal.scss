@@ -1,7 +1,47 @@
-.infor-user-modal {
-    height: 100%;
-    display: block;
+.info-group-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    .header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        .groupPhoto {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #000;
+            i {
+                cursor: pointer;
+            }
+        }
+    }
+
+    .send-message {
+        max-height: 80px;
+        padding: 10px 2px;
+        border-bottom: 5px solid #eaedf0;
+        .send-btn {
+            width: 100%;
+            background-color: #eaedf0;
+            color: #000;
+        }
+    }
+
+    .members {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        height: 100%;
+        .member {
+            border-radius: 50%;
+            overflow: hidden;
+        }
+    }
 }

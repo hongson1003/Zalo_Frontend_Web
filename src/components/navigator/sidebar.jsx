@@ -50,7 +50,8 @@ const friends = () => {
             })
             dispatch(fetchNotificationsfunc(fetchNotifications));
         }
-        fetchNotifications();
+        if (user)
+            fetchNotifications();
         onlyRef.current = true;
     }, [])
 
@@ -149,6 +150,7 @@ const Sidebar = () => {
                         <AvatarUser
                             image={state?.userInfo?.user?.avatar}
                             size={50}
+                            name={state?.userInfo?.user?.userName}
                         />
                     </div>
                 </div>

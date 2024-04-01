@@ -11,6 +11,7 @@ import { loginSuccess } from '../redux/actions/app.action';
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
 import { STATE } from "../redux/types/type.app";
+import AvatarUser from '../components/user/avatar';
 
 
 const VerifyComponent = (props) => {
@@ -163,7 +164,14 @@ const VerifyComponent = (props) => {
                 {
                     state.userInfo?.avatar &&
                     <>
-                        <img className="avatar" src={state.userInfo.avatar} />
+                        {console.log('avatar', state.userInfo?.avatar)}
+                        <AvatarUser
+                            image={state?.userInfo?.avatar}
+                            name={state?.userInfo?.userName}
+                            zoom
+                            size={70}
+                        />
+
                         <p style={{ textAlign: 'center', marginTop: '5px', fontWeight: 'bold' }}>{state.userInfo.userName}</p>
                         {
                             recaptchaIsResolve === false ?

@@ -35,6 +35,7 @@ const StatusUser = ({ chat }) => {
                         <AvatarUser
                             image={getFriend(user, chat.participants)?.avatar}
                             size={50}
+                            name={getFriend(user, chat.participants)?.userName}
                         />
                     </InforUserModal>
                 ) : (

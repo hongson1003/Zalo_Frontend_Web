@@ -79,7 +79,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         }
         setTimeout(() => {
             setEditing(true);
-        }, 500)
+        }, 300)
     }
 
     const handleUpdate = () => {
@@ -161,7 +161,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         }
         setTimeout(() => {
             setNeedAddFriend(true);
-        }, 500)
+        }, 300)
     }
 
     const handleComeBack = () => {
@@ -218,7 +218,11 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 }
                 <div className='modal-avatar'>
                     <div className='modal-avatar-info'>
-                        <AvatarUser image={friendData?.avatar} zoom size={50}>
+                        <AvatarUser
+                            image={friendData?.avatar}
+                            name={friendData?.userName}
+                            zoom size={50}
+                        >
 
                             {itsMe &&
                                 <ChooseImageModal

@@ -23,7 +23,9 @@ const ChatUser = ({ chat, activeKey }) => {
                 chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
                     <AvatarUser
                         image={getFriend(user, chat.participants)?.avatar}
-                        size={50} />
+                        size={50}
+                        name={getFriend(user, chat.participants)?.userName}
+                    />
                 ) : (
                     <div className="avatar-group" >
                         {
