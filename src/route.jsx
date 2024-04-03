@@ -10,7 +10,7 @@ import OutsideLayout from './layouts/outsideLayout';
 import ErrorPage from './pages/error.page';
 import NotFound from './pages/notFound.page';
 import TestPage from './pages/test.page';
-import UpdateInfo from './components/user/updateInfo';
+
 
 
 const routes = [
@@ -59,12 +59,7 @@ const routes = [
     {
         path: '/test',
         element: <TestPage />
-    },
-    {
-        path: '/updateInfo',
-        element: <UpdateInfo />
-    },
-
+    }
 ];
 
 export const router = createBrowserRouter(routes);
