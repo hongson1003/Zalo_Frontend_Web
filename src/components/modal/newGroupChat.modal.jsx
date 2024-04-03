@@ -37,7 +37,9 @@ const NewGroupChatModal = ({ children }) => {
             const images = await response.json();
             setCollections(images);
         }
-        fetchGroupPhotos();
+        if (user) {
+            fetchGroupPhotos();
+        }
     }, []);
 
     const showDrawer = () => {
@@ -142,7 +144,9 @@ const NewGroupChatModal = ({ children }) => {
     }
 
     useEffect(() => {
-        fetchFriends();
+        if (user) {
+            fetchFriends();
+        }
     }, [])
 
 

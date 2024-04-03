@@ -78,6 +78,16 @@ export default function appReducer(state = initialState, action) {
             };
             return stateAccessChat;
         }
+        case STATE.EDIT_USER: {
+            let stateEditUser = { ...state };
+            stateEditUser.userInfo = {
+                user: {
+                    ...state.userInfo.user,
+                    ...action.payload
+                },
+            };
+            return stateEditUser;
+        }
         default:
             return state
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Button, Flex, Modal } from 'antd';
+import { Button, Flex, Modal, Input } from 'antd';
 import { useState } from 'react';
 import './inforUser.modal.scss';
 import axios from '../../utils/axios';
@@ -14,7 +14,10 @@ import { socket } from '../../utils/io';
 import { toast } from 'react-toastify';
 import { accessChat } from '../../redux/actions/user.action';
 import ChooseImageModal from './chooseImage.modal';
-import {DatePicker, Radio} from 'antd'
+import { DatePicker, Radio } from 'antd'
+import dayjs from 'dayjs';
+import { editUser } from '../../redux/actions/app.action';
+
 
 const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe }) => {
     const [profile, setProfile] = useState(null);
@@ -30,15 +33,16 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const [avatar, setAvatar] = useState(null);
     const [image, setImage] = useState(null);
     const [editing, setEditing] = useState(STATE.PENDING);
-    
+    const dateFormat = 'YYYY/MM/DD';
+
     //Handle date
-    const [newInfo, setInfo]= useState({
+    const [newInfo, setInfo] = useState({
         name: user?.userName,
-        gender: profile?.gender == 0 ? 'Nam' : 'Nữ',
-        dob: profile?.birthdate
+        gender: 0,
+        dob: dayjs(new Date(), dateFormat)
     })
-    const onDateChange=(date, dateString) => {
-        console.log(date, dateString);
+
+    const onDateChange = (date, dateString) => {
         const newDayInfo = { ...newInfo };
         newDayInfo.dob = date;
         setInfo(newDayInfo);
@@ -59,11 +63,25 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         setAcceptOpenModal(false);
         setEditing(STATE.PENDING);
         setNeedAddFriend(STATE.PENDING);
+        if (editing) {
+            setInfo({
+                name: user?.userName,
+                dob: profile?.birthdate && dayjs(profile?.birthdate, dateFormat),
+                gender: profile?.gender,
+            })
+        }
     };
 
     const fetchInfoUser = async (userId) => {
         let res = await axios.get(`/users/profile?userId=${userId}`)
-        setProfile(res.data);
+        if (res.errCode === 0) {
+            setInfo(pre => ({
+                ...pre,
+                gender: profile?.gender,
+                dob: res.data?.birthdate && dayjs(res.data.birthdate)
+            }))
+            setProfile(res.data);
+        }
     }
 
     useEffect(() => {
@@ -71,8 +89,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             fetchInfoUser(friendData?.id);
         }
     }, [friendData]);
-
-
 
     const handleOnMouse = (e) => {
         const element = e.target;
@@ -96,26 +112,21 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         }, 300)
     }
 
-    const handleUpdate = async() => {
-        // gọi api update
-        //console.log(newInfo);
-        // const parts = newInfo.dob.split('-');
-        // const day = parseInt(parts[0], 10);
-        // const month = parseInt(parts[1], 10) - 1; 
-        // const year = parseInt(parts[2], 10);
-
-        // const newDob = new Date(year, month, day);
-        //id, userName, gender, birthdate
+    const handleUpdate = async () => {
         const data = {
             id: user?.id,
             userName: newInfo.name,
             gender: newInfo.gender,
             birthdate: newInfo.dob
         }
-        console.log(data);
         const res = await axios.put('/users/updateInfor', data);
         if (res.errCode === 0) {
             toast.success('Cập nhật thông tin thành công');
+            dispatch(editUser({
+                ...user,
+                userName: data?.userName,
+            }));
+            fetchInfoUser(user?.id);
         } else
             toast.error(res.message);
         setEditing(STATE.PENDING);
@@ -147,7 +158,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                         ref={updateRef}
                                     >
                                         <Button type='default' onClick={handleComeBack}>Hủy</Button>
-                                        <Button type='default' className='update-button'  onClick={handleUpdate}>Cập nhật</Button>
+                                        <Button type='default' className='update-button' onClick={handleUpdate}>Cập nhật</Button>
                                     </Flex >
                             )
                         ) : (
@@ -174,8 +185,9 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         } else {
             toast.warn(res.message);
         }
-
     }
+
+
     useEffect(() => {
         if (friendData && acceptOpenModal) {
             showModal();
@@ -199,7 +211,16 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
 
     const handleComeBack = () => {
         setNeedAddFriend(STATE.PENDING);
-        setEditing(STATE.PENDING);
+        setInfo({
+            name: user?.userName,
+            dob: profile?.birthdate && dayjs(profile?.birthdate, dateFormat),
+            gender: profile?.gender,
+        })
+        if (editing) {
+            setEditing(STATE.PENDING);
+
+        }
+
     }
 
     const handleJoinChat = async () => {
@@ -213,6 +234,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             handleCancel();
         }
     }
+
 
     return (
         <>
@@ -238,10 +260,17 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                     }
                 }}
             >{children}</span >
-            <Modal title="Thông tin tài khoản" open={isModalOpen}
-                onOk={handleOk} onCancel={handleCancel} width={400} centered
-                footer={renderFooter} style={{ borderRadius: "12px", overflow: "auto", padding: "0px" }}
+            <Modal
+                title="Thông tin tài khoản"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={400}
+                centered
+                footer={renderFooter}
+                style={{ borderRadius: "12px", overflow: "auto", padding: "0px" }}
                 className='modal-infor-user'
+                forceRender
             >
                 {
                     friendData &&
@@ -272,8 +301,10 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
 
                         </AvatarUser>
                         <div className='top-10px'>
-                            <span style={{ fontWeight: 'bold', marginRight: '5px' }}>{friendData?.userName}</span>
-                            <EditOutlined style={{ fontSize: '18px', cursor: 'pointer' }} />
+                            <span style={{ fontWeight: 'bold', marginRight: '5px' }}>{!itsMe ? friendData?.userName : user?.userName}</span>
+                            <EditOutlined style={{ fontSize: '18px', cursor: 'pointer' }}
+                                onClick={handleOpenUpdate}
+                            />
                         </div>
                     </div>
                     {
@@ -295,30 +326,35 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                             <div className='editing-content'>
                                 <div className='name-info-item'>
                                     <p className='item-label'>Tên hiển thị:</p>
-                                    <input className='new-name' type='text' placeholder={user?.userName} onChange={(evt)=>{
-                                         const newNameInfo = { ...newInfo };
-                                         newNameInfo.name = evt.target.value;
-                                         setInfo(newNameInfo);
-                                    }}/>
+                                    <Input className='new-name'
+                                        type='text'
+                                        value={newInfo.name}
+                                        onChange={(evt) => {
+                                            const newNameInfo = { ...newInfo };
+                                            newNameInfo.name = evt.target.value;
+                                            setInfo(newNameInfo);
+                                        }}
+                                        spellCheck={false}
+                                    />
                                 </div>
                                 <p className='info-title'>Thông tin cá nhân</p>
                                 <div className='gender-info-item'>
-                                    <Radio.Group defaultValue={profile?.gender == 1 ? 'Nam' : 'Nữ'} onChange={(evt)=>{
-                                         const newGenderInfo = { ...newInfo };
-                                         newGenderInfo.gender = evt.target.value == 'Nam' ? 1 : 0;
-                                         setInfo(newGenderInfo);
+                                    <Radio.Group defaultValue={profile?.gender} onChange={(evt) => {
+                                        const newGenderInfo = { ...newInfo };
+                                        newGenderInfo.gender = +evt.target.value;
+                                        setInfo(newGenderInfo);
                                     }}>
-                                        <Radio value="Nam">Nam</Radio>
-                                        <Radio value="Nữ">Nữ</Radio>
+                                        <Radio value={0}>Nam</Radio>
+                                        <Radio value={1}>Nữ</Radio>
                                     </Radio.Group>
                                 </div>
                                 <div className='dob-info-item'>
                                     <p className='item-label'>Ngày sinh:</p>
-                                    <DatePicker 
-                                    className='birthday' 
-                                    format='DD-MM-YYYY' 
-                                    defaultValue={moment(profile?.birthdate)} 
-                                    onChange={onDateChange}
+                                    <DatePicker
+                                        className='birthday'
+                                        format='DD-MM-YYYY'
+                                        onChange={onDateChange}
+                                        value={newInfo.dob && dayjs(newInfo.dob, dateFormat)}
                                     />
                                 </div>
                             </div>
@@ -353,13 +389,13 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                             <p>Thông tin cá nhân</p>
                         </div>
                         <div className='info-detail'>
-                                <div className='info-item'>
-                                    <p className='item-label'>Giới tính:</p>
-                                    <p className='item-value'>{profile?.gender == 0 ? 'Nam' : 'Nữ'}</p>
-                                </div>
+                            <div className='info-item'>
+                                <p className='item-label'>Giới tính:</p>
+                                <p className='item-value'>{([0, 1].includes(profile?.gender)) ? (profile?.gender === 0 ? 'Nam' : 'Nữ') : '---'}</p>
+                            </div>
                             <div className='info-item'>
                                 <p className='item-label'>Ngày sinh:</p>
-                                <p className='item-value'>{moment(profile?.birthdate).format('DD/MM/yyyy')}</p>
+                                <p className='item-value'>{profile?.birthdate ? moment(profile?.birthdate).format('DD/MM/yyyy') : '---'}</p>
                             </div>
                             <div className='info-item'>
                                 <p className='item-label'>Số điện thoại:</p>

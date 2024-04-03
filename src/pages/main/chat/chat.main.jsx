@@ -279,7 +279,9 @@ const ChatMain = () => {
     }
 
     const handleChooseEmoij = (e) => {
-        setText(prev => prev + e.native);
+        if (textAreaRef.current) {
+            textAreaRef.current.value += e.native;
+        }
     }
 
 
@@ -476,7 +478,7 @@ const ChatMain = () => {
                             typing &&
                             <div className="sending">
                                 <div className="message-status">
-                                    <span>{getFriend(user, chat.participants)?.userName} đang gửi tin nhắn</span>
+                                    <span><span className="message-status-user">{getFriend(user, chat.participants)?.userName}</span> đang gửi tin nhắn</span>
                                 </div>
                                 <ReactLoading
                                     type={'bubbles'}

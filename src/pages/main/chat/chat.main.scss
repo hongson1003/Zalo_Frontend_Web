@@ -292,6 +292,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            span {
+                color: #333;
+                &.message-status-user {
+                    font-size: 10px;
+                }
+            }
         }
     }
 }

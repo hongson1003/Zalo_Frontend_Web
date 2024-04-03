@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Menu, Button } from "antd";
 import AvatarUser from "../user/avatar";
 import { ITEMS, KEYITEMS } from "../../utils/keyMenuItem";
@@ -18,6 +18,7 @@ import WrapperItemSidebar from "./wrapperItem.sidebar";
 import { socket } from '../../utils/io';
 import { STATE } from "../../redux/types/type.app";
 import { notificationsFriends, fetchNotificationsfunc } from "../../redux/actions/user.action";
+import SettingModal from "../modal/setting.modal";
 
 const friends = () => {
     const user = useSelector(state => state?.appReducer?.userInfo?.user);
@@ -74,6 +75,7 @@ const items = [MessageOutlined, friends, CheckSquareOutlined, AntCloudOutlined].
 );
 
 const Sidebar = () => {
+
     const state = useSelector(state => state?.appReducer);
     const dispatch = useDispatch();
     const navigator = useNavigate();
@@ -89,17 +91,9 @@ const Sidebar = () => {
     }
 
 
-    const content = (
-        <div className="content-popover">
-            <ConfigProvider
-                theme={{
-                    token: {
-                        // Seed Token
-                        colorPrimary: '#333',
-                        borderRadius: 2,
-                    },
-                }}
-            >
+    const content = useMemo(() => {
+        return (
+            <div className="content-popover">
                 <InforUserModal
                     friendData={state?.userInfo?.user}
                     type={'button'}
@@ -107,8 +101,11 @@ const Sidebar = () => {
                 >
                     <Button className="user-item" block>Hồ sơ của bạn</Button>
                 </InforUserModal>
-                <Button className="user-item"
-                    block>Cài đặt</Button>
+                <SettingModal>
+                    <Button className="user-item"
+                        block>Cài đặt
+                    </Button>
+                </SettingModal>
                 <hr />
                 <div>
                     <Button
@@ -118,17 +115,17 @@ const Sidebar = () => {
                     >Đăng xuất
                     </Button>
                 </div>
-            </ConfigProvider>
-        </div>
-    );
+            </div>
+        )
+    }, [state]);
 
 
-    const title = (
+    const title = useMemo(() => (
         <div style={{ padding: '8px 12px 0px' }}>
             <h3 style={{ marginBottom: '5px' }}>{state?.userInfo?.user?.userName}</h3>
             <hr />
         </div>
-    )
+    ), [state]);
 
     const handleOnSelectItem = (e) => {
         dispatch({ type: STATE.CHANGE_KEY_MENU, payload: e.key });
@@ -144,6 +141,7 @@ const Sidebar = () => {
                 placement="rightBottom"
                 trigger={"click"}
                 style={{ marginBottom: '0' }}
+                forceRender
             >
                 <div className="base-avatar">
                     <div>

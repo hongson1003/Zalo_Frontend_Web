@@ -13,7 +13,6 @@ import axios from '../../utils/axios';
 const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handleChangeAvatar, avatar, image }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-
     const showModal = () => {
         setIsModalOpen(true);
     };
