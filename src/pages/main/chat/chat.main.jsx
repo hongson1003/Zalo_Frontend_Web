@@ -24,15 +24,13 @@ import { useNavigate } from "react-router-dom";
 import { getFriend } from "../../../utils/handleChat";
 import { COLOR_BACKGROUND } from '../../../type/rootCss.type';
 
-
 const ChatMain = () => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
     const [show, setShow] = useState(true);
     const [showEmoij, setShowEmoij] = useState(true);
     const [messages, setMessages] = useState([]);
-    const [page, setPage] = useState(1);
-    const [limit] = useState(100);
+    const [limit, setLimit] = useState(60);
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const scroolRef = useRef(null);
     const receiveOnly = useRef(false);
@@ -45,12 +43,17 @@ const ChatMain = () => {
     const dispatch = useDispatch();
     const dispatchRef = useRef(false);
     const navigate = useNavigate();
+    const [isLoadingFetch, setIsLoadingFetch] = useState(false);
     // Menu
     const [current, setCurrent] = useState('');
     const [headerColor, setHeaderColor] = useState(COLOR_BACKGROUND.BLACK);
     const [messageColor, setMessageColor] = useState(COLOR_BACKGROUND.BLACK);
     const [backgroundUrl, setBackgroundUrl] = useState('');
-
+    const scroolFirst = useRef(false);
+    const scroolToTopRef = useRef(false);
+    const heightScroolTopRef = useRef(0);
+    const [hasText, setHasText] = useState(false);
+    // background
     useEffect(() => {
         if (chat?.background) {
             setBackgroundUrl(chat.background.url);
@@ -61,15 +64,10 @@ const ChatMain = () => {
             setHeaderColor(COLOR_BACKGROUND.BLACK);
             setMessageColor(COLOR_BACKGROUND.BLACK);
         }
+        scroolFirst.current = false;
     }, [chat]);
 
-
-
-
-    const onClick = (e) => {
-        setCurrent(e.key);
-    };
-
+    // handle keydown
     useEffect(() => {
         const handleKeyDown = (event) => {
             const key = event.key;
@@ -84,7 +82,7 @@ const ChatMain = () => {
         }
     }, [])
 
-    // End Menu
+    // Emoij
     useEffect(() => {
         if (!user) {
             navigate('/login');
@@ -92,10 +90,16 @@ const ChatMain = () => {
         setShowEmoij(false);
     }, [user])
 
+    // fetch mount
     useEffect(() => {
-        fetchMessagePaginate();
-    }, [chat])
+        if (user && chat) {
+            (async () => {
+                fetchMessagePaginate();
+            })()
+        }
+    }, [chat, limit])
 
+    // socket
     useEffect(() => {
         if (receiveOnly.current === false) {
             socket.then(socket => {
@@ -113,11 +117,92 @@ const ChatMain = () => {
         }
     }, [])
 
+    // footer
+    useEffect(() => {
+        if (footer.current?.clientHeight) {
+            setFooterHeight(footer.current?.clientHeight);
+        }
+    }, [footer.current?.clientHeight])
+
+    // set size cho scrool
+    useEffect(() => {
+        if (scroolRef.current) {
+            scroolRef.current.scrollTop = scroolRef.current.scrollHeight - 10;
+        }
+    }, [typing, footerHeight])
+
+    // first load message and scrool to bottom
+    useEffect(() => {
+        if (scroolRef.current && scroolFirst.current === false && messages.length > 0) {
+            scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
+            scroolFirst.current = true;
+        }
+    }, [messages.length]);
+
+    useEffect(() => {
+        if (scroolFirst.current === true && scroolToTopRef.current === false) {
+            scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
+        }
+    }, [messages.length])
+
+    useEffect(() => {
+        if (isLoadingFetch) {
+            setIsLoadingFetch(false);
+            scroolToTopRef.current = false;
+        }
+    }, [messages.length]);
+
+    // xử lý khi full tin nhắn
+    useEffect(() => {
+        const checkFullMessage = async () => {
+            setIsLoadingFetch(false);
+        }
+        const lock = setTimeout(() => {
+            checkFullMessage();
+        }, 1000);
+        return () => {
+            clearTimeout(lock);
+        }
+    }, [isLoadingFetch, messages.length])
+
+    useEffect(() => {
+        if (scroolRef.current?.scrollTop && heightScroolTopRef.current < scroolRef.current.scrollTop) {
+            heightScroolTopRef.current = scroolRef.current.scrollHeight;
+        }
+    }, [scroolRef.current?.scrollTop]);
+
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (scroolRef.current.scrollTop < heightScroolTopRef.current / 2 && scroolToTopRef.current === false) {
+                scroolToTopRef.current = true;
+                setIsLoadingFetch(true);
+                setLimit(prev => prev + 60);
+            }
+        }
+        if (scroolRef.current) {
+            scroolRef.current.addEventListener("scroll", handleScroll);
+        }
+
+        return () => {
+            if (scroolRef.current) {
+                scroolRef.current.removeEventListener("scroll", handleScroll);
+            }
+        }
+    }, [scroolRef.current]);
+
+
+
+    const onClick = (e) => {
+        setCurrent(e.key);
+    };
+
 
     const fetchMessagePaginate = async () => {
-        const res = await axios.get(`/chat/message/pagination?chatId=${chat._id}&page=${page}&limit=${limit}`)
-        if (res.errCode === 0)
-            setMessages(res.data);
+        const res = await axios.get(`/chat/message/pagination?chatId=${chat._id}&limit=${limit}`)
+        if (res.errCode === 0) {
+            setMessages(res?.data);
+        }
         else {
             setMessages([])
         }
@@ -180,6 +265,9 @@ const ChatMain = () => {
         if (!data) {
             return;
         }
+        if (textAreaRef.current) {
+            textAreaRef.current.value = '';
+        }
         const ObjectId = objectId();
         const createMessage = {
             _id: ObjectId,
@@ -206,7 +294,7 @@ const ChatMain = () => {
                 socket.emit('send-message', res.data);
                 socket.emit('finish-typing', chat._id);
             })
-            fetchMessagePaginate();
+            // fetchMessagePaginate();
         } else {
             setSent(STATE.REJECT);
             toast.warn('Không thể gửi tin nhắn, ' + res.message);
@@ -224,13 +312,6 @@ const ChatMain = () => {
             setFooterHeight(footer.current?.clientHeight);
         }
     };
-
-
-    useEffect(() => {
-        if (footer.current?.clientHeight) {
-            setFooterHeight(footer.current?.clientHeight);
-        }
-    }, [footer.current?.clientHeight])
 
 
     let emitFinishTyping = useCallback(_.debounce(() => {
@@ -252,6 +333,11 @@ const ChatMain = () => {
     }, []);
 
     const handleOnChange = (e) => {
+        if (e.target.value) {
+            setHasText(true);
+        } else {
+            setHasText(false);
+        }
         if (sendTyping.current === false) {
             startTyping();
         }
@@ -267,6 +353,7 @@ const ChatMain = () => {
             e.preventDefault();
             sendMessage(value, MESSAGES.TEXT);
             textAreaRef.current.value = '';
+            setHasText(false);
         }
     }
 
@@ -279,7 +366,9 @@ const ChatMain = () => {
     }
 
     const handleChooseEmoij = (e) => {
-        setText(prev => prev + e.native);
+        if (textAreaRef.current) {
+            textAreaRef.current.value += e.native;
+        }
     }
 
 
@@ -289,19 +378,6 @@ const ChatMain = () => {
             dispatchRef.current = true;
         }
     }
-
-    useEffect(() => {
-        if (scroolRef.current) {
-            scroolRef.current.scrollTop = scroolRef.current.scrollHeight - 10;
-        }
-    }, [typing, footerHeight])
-
-    useEffect(() => {
-        scroolRef.current.scrollTop = scroolRef.current.scrollHeight - 10;
-    }, [messages.length])
-
-
-
 
     const handleOnClickFooter = () => {
         textAreaRef.current.focus();
@@ -329,6 +405,11 @@ const ChatMain = () => {
     //     }
     // }
 
+    const handleOnChangeMessageImage = (e) => {
+        const file = e.target.files[0];
+        console.log(file);
+    }
+
 
     return (
         <>
@@ -337,6 +418,16 @@ const ChatMain = () => {
             >
                 <div className="left chat-item">
                     <header style={{ color: headerColor }}>
+                        {
+                            isLoadingFetch &&
+                            <ReactLoading
+                                type={'spokes'}
+                                color={'#006CE5'}
+                                width={30}
+                                height={30}
+                                className={'chat-main-loading'}
+                            />
+                        }
                         <div className="friend-info">
                             <StatusUser chat={chat} />
                         </div>
@@ -476,7 +567,7 @@ const ChatMain = () => {
                             typing &&
                             <div className="sending">
                                 <div className="message-status">
-                                    <span>{getFriend(user, chat.participants)?.userName} đang gửi tin nhắn</span>
+                                    <span><span className="message-status-user">{getFriend(user, chat.participants)?.userName}</span> đang gửi tin nhắn</span>
                                 </div>
                                 <ReactLoading
                                     type={'bubbles'}
@@ -509,10 +600,18 @@ const ChatMain = () => {
                                         <img src="/images/sticker.png" />
                                     </div>
                                 </StickyPopover>
+                                <label htmlFor="message-inpt-image">
+                                    <div className="item-icon">
+                                        <i className="fa-regular fa-image"></i>
+                                    </div>
+                                </label>
+                                <input
+                                    type="file"
+                                    id="message-inpt-image" hidden
+                                    accept="image/png, image/gif, image/jpeg"
+                                    onChange={e => handleOnChangeMessageImage(e)}
+                                />
 
-                                <div className="item-icon">
-                                    <i className="fa-regular fa-image"></i>
-                                </div>
                                 <div className="item-icon">
                                     <i className="fa-solid fa-paperclip"></i>
                                 </div>
@@ -535,8 +634,16 @@ const ChatMain = () => {
                                     <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
                                         <i className="fa-regular fa-face-smile emoijj"></i>
                                     </div>
-                                    <div className="item-icon emoij-like" onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
-                                        👌
+                                    <div className="item-icon emoij-like">
+                                        {
+                                            !hasText ?
+                                                <div onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
+                                                    👌
+                                                </div> :
+                                                <div onClick={() => sendMessage(textAreaRef.current?.value, MESSAGES.TEXT)}>
+                                                    <i className="fa-regular fa-paper-plane"></i>
+                                                </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -566,21 +673,22 @@ const ChatMain = () => {
                                     ) : (
                                         <div className="avatar-group" >
                                             {
-                                                chat?.image ? (
-                                                    <img src={chat?.image} alt="avatar" />
-                                                ) : (
-                                                    chat?.participants?.length > 0 &&
-                                                    chat?.participants?.map(item => {
-                                                        return (
-                                                            <React.Fragment key={item.id}>
-                                                                <AvatarUser
-                                                                    image={item.avatar}
-                                                                    size={25}
-                                                                />
-                                                            </React.Fragment>
-                                                        )
-                                                    })
-                                                )
+                                                chat?.image ?
+                                                    (
+                                                        <img src={chat?.image} alt="avatar" />
+                                                    ) : (
+                                                        chat?.participants?.length > 0 &&
+                                                        chat?.participants?.map(item => {
+                                                            return (
+                                                                <React.Fragment key={item.id}>
+                                                                    <AvatarUser
+                                                                        image={item.avatar}
+                                                                        size={25}
+                                                                    />
+                                                                </React.Fragment>
+                                                            )
+                                                        })
+                                                    )
                                             }
                                         </div>
 
@@ -605,6 +713,7 @@ const ChatMain = () => {
                                 </ChangeBackgroundModal>
                             </div>
 
+<<<<<<< HEAD
                             <div className="hyphen"></div>
 
                             <div className="options-list">
@@ -641,6 +750,10 @@ const ChatMain = () => {
                                     <span>Nhóm chung</span>
                                 </Button>
                             </div>
+=======
+
+
+>>>>>>> 0728076e2a82be9747b0a4b704929a006a45f695
                         </div>
                     </div>
                 }
@@ -649,7 +762,7 @@ const ChatMain = () => {
             <div
                 className="bg"
                 style={{ backgroundImage: `url(${backgroundUrl})` }}
-            ></div>
+            />
         </>
     );
 };

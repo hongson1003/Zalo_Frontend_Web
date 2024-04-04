@@ -24,7 +24,12 @@ const ListFriends = ({ data }) => {
         <div className="friends-list">
             {friends.map((item, index) => (
                 <div key={index} className="friend-item">
-                    <AvatarUser image={item.avatar} />
+                    <AvatarUser
+                        image={item.avatar}
+                        name={item.userName}
+                        size={50}
+                        zoom
+                    />
                     <span className="name">{item.userName}</span>
                 </div>
             ))}

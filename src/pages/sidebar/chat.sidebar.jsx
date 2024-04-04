@@ -12,6 +12,8 @@ const ChatSidebar = () => {
     const [limit, setLimit] = useState(10);
     const [status, setStatus] = useState(STATE.PENDING);
     const subNav = useSelector(state => state.appReducer.subNav);
+    const user = useSelector(state => state.appReducer?.userInfo?.user);
+
 
     const fetchChats = async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
@@ -19,21 +21,21 @@ const ChatSidebar = () => {
             setChats(res.data);
             setStatus(STATE.RESOLVE);
         } else {
-            toast.warn('Có lỗi xảy ra !')
             setStatus(STATE.REJECT);
         }
     }
 
     useEffect(() => {
-        fetchChats();
+        if (user)
+            fetchChats();
     }, [subNav])
     useEffect(() => {
         if (chats && chats.length > 0) {
             chats.forEach(item => {
                 socket.then(socket => {
                     socket.emit('join-chat', item._id);
-                    socket.on('joined-chat', room => {
-                    })
+                    // socket.on('joined-chat', room => {
+                    // })
                 })
             })
         }
@@ -55,7 +57,9 @@ const ChatSidebar = () => {
             }
             {
                 status === STATE.REJECT && (
-                    <div>
+                    <div style={{
+                        padding: "10px",
+                    }}>
                         <p>Không có cuộc trò chuyện nào</p>
                     </div>
                 )

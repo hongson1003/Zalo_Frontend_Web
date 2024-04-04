@@ -1,5 +1,5 @@
 import { Modal } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from 'antd';
 import axios from '../../utils/axios';
 import { toast } from "react-toastify";
@@ -25,15 +25,19 @@ const style = {
 
 }
 
-const ForgotPasswordModal = ({ children }) => {
+const ForgotPasswordModal = ({ children, phoneNumberProp }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     const showModal = () => {
         setIsModalOpen(true);
     };
+
+    useEffect(() => {
+        setPhoneNumber(phoneNumberProp);
+    }, [phoneNumberProp]);
 
     const fetchUserByPhone = async (phoneNumber) => {
         let rs = await axios.get(`/users/user-by-phone?phoneNumber=${phoneNumber}`);
@@ -70,7 +74,9 @@ const ForgotPasswordModal = ({ children }) => {
             <Modal Modal title="Quên mật khẩu" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} >
                 <label style={{ ...style.label }}>Nhập số điện thoại của bạn:</label>
                 <Input type="text"
-                    style={{ ...style.input }} placeholder="Basic usage" value={phoneNumber}
+                    style={{ ...style.input }}
+                    placeholder="Basic usage"
+                    value={phoneNumber}
                     onChange={onChange}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {

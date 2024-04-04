@@ -4,14 +4,8 @@ import Zoom from 'react-medium-image-zoom'
 import { getFirstLetters } from "../../utils/handleUltils";
 
 
-
 const AvatarUser = (props) => {
     const { image, children, zoom, size, style, name } = props;
-
-    useEffect(() => {
-        // console.log(image, name, children, zoom, size, style)
-    }, [])
-
     return (
         <span className="avatar-container" style={{ position: 'relative', ...style }}>
             {
@@ -38,7 +32,7 @@ const AvatarUser = (props) => {
                             size={{
                                 xl: size,
                             }}
-                            src={image}
+                            src={(image && image?.substring(0, 3)) === 'rgb' ? null : image}
                             style={{
                                 border: '1px solid #ffffff',
                                 cursor: 'pointer',

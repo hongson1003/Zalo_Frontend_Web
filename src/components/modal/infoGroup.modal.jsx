@@ -25,9 +25,6 @@ const InforUserModal = ({ children }) => {
     };
 
 
-    useEffect(() => {
-        console.log(chat)
-    }, [])
 
     return (
         <>

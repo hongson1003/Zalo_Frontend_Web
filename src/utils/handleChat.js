@@ -1,6 +1,6 @@
 export const getFriend = (user, participants) => {
-    if (!user || !participants) return null;
-    return participants.find(item => item.id !== user.id);
+    if (!user || !participants || participants.length < 0) return null;
+    return participants.find(item => item?.id !== user?.id);
 }
 
 export const getDetailListMembers = (listMembers) => {
@@ -12,3 +12,4 @@ export const getDetailListMembers = (listMembers) => {
     });
     return { count, total: listMembers.length };
 }
+

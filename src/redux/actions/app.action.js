@@ -45,4 +45,11 @@ export function changeKeySubMenu(key) {
     }
 }
 
+export function editUser(user){
+    return {
+        type: STATE.EDIT_USER,
+        payload: user
+    }
+}
+
 

@@ -164,7 +164,6 @@ const VerifyComponent = (props) => {
                 {
                     state.userInfo?.avatar &&
                     <>
-                        {console.log('avatar', state.userInfo?.avatar)}
                         <AvatarUser
                             image={state?.userInfo?.avatar}
                             name={state?.userInfo?.userName}

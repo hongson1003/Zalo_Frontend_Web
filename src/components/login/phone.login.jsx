@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { LockOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import './phone.login.scss';
@@ -11,8 +11,8 @@ import { toast } from "react-toastify";
 
 const LoginPhone = () => {
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     const onFinish = async (values) => {
         let rs = await axios.post('/auth/login', values);
@@ -22,6 +22,7 @@ const LoginPhone = () => {
             navigate(`/verify?id=${rs?.data?.id}`);
         } else {
             toast.error(rs.message);
+            setPhoneNumber(values.phoneNumber);
         }
 
     };
@@ -60,7 +61,9 @@ const LoginPhone = () => {
 
             </Form.Item>
             <div className="d-flex-center">
-                <ForgotPasswordModal>
+                <ForgotPasswordModal
+                    phoneNumberProp={phoneNumber}
+                >
                     <span className="forgot-pw">
                         Quên mật khẩu
                     </span>

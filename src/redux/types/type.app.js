@@ -20,6 +20,7 @@ export const STATE = {
     CHANGE_KEY_MENU: 'CHANGE_KEY_MENU',
     CHANGE_SUB_KEY_MENU: 'CHANGE_SUB_KEY_MENU',
     ACCESS_CHAT: 'ACCESS_CHAT',
+    EDIT_USER: 'EDIT_USER',
 }
 
 export const SOCKET = {
