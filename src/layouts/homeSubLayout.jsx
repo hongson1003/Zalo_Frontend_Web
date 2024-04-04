@@ -26,6 +26,7 @@ const homeSublayout = () => {
     }, []);
 
     useEffect(() => {
+        console.log('windowSize', windowSize[0])
         setVisibleLeft('d-show')
         if (windowSize[0] < 750 && windowSize[0]) {
             if (!stateApp?.subNav) {
