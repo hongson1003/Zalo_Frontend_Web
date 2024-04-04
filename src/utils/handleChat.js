@@ -12,3 +12,4 @@ export const getDetailListMembers = (listMembers) => {
     });
     return { count, total: listMembers.length };
 }
+

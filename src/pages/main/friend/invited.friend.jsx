@@ -45,7 +45,7 @@ const InvitedFriend = () => {
                 {
                     stateUser.notificationsFriends.length <= 0 ?
                         <div className="not-found">
-                            <img src="https://raw.githubusercontent.com/hongson1003/PostImage/main/not%20found.png" />
+                            <i className="fa-regular fa-envelope-open"></i>
                             <p>Bạn không có lời mời nào</p>
                         </div> :
                         <div className="list-invited-friends">
