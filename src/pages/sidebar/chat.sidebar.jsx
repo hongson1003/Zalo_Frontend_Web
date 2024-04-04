@@ -17,7 +17,6 @@ const ChatSidebar = () => {
 
     const fetchChats = async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
-        console.log(res)
         if (res.errCode === 0) {
             setChats(res.data);
             setStatus(STATE.RESOLVE);

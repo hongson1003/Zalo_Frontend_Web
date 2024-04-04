@@ -31,7 +31,6 @@ axiosRetry(instance, {
     retryCondition: async (error) => {
         // if retry condition is not specified, by default idempotent requests are retried
         const status = error.response?.status;
-        console.log('status', status)
         if (status === 401) {
             if (!isRefresh_token) {
                 isRefresh_token = true;

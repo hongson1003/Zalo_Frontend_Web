@@ -270,7 +270,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 footer={renderFooter}
                 style={{ borderRadius: "12px", overflow: "auto", padding: "0px" }}
                 className='modal-infor-user'
-                forceRender
             >
                 {
                     friendData &&
@@ -281,9 +280,10 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 <div className='modal-avatar'>
                     <div className='modal-avatar-info'>
                         <AvatarUser
-                            image={friendData?.avatar}
+                            image={itsMe ? user?.avatar : friendData?.avatar}
                             name={friendData?.userName}
-                            zoom size={50}
+                            zoom
+                            size={50}
                         >
 
                             {itsMe &&

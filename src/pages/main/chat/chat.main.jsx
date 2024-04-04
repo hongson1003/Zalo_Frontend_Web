@@ -52,6 +52,7 @@ const ChatMain = () => {
     const scroolFirst = useRef(false);
     const scroolToTopRef = useRef(false);
     const heightScroolTopRef = useRef(0);
+    const [hasText, setHasText] = useState(false);
     // background
     useEffect(() => {
         if (chat?.background) {
@@ -137,6 +138,12 @@ const ChatMain = () => {
             scroolFirst.current = true;
         }
     }, [messages.length]);
+
+    useEffect(() => {
+        if (scroolFirst.current === true && scroolToTopRef.current === false) {
+            scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
+        }
+    }, [messages.length])
 
     useEffect(() => {
         if (isLoadingFetch) {
@@ -258,6 +265,9 @@ const ChatMain = () => {
         if (!data) {
             return;
         }
+        if (textAreaRef.current) {
+            textAreaRef.current.value = '';
+        }
         const ObjectId = objectId();
         const createMessage = {
             _id: ObjectId,
@@ -323,6 +333,11 @@ const ChatMain = () => {
     }, []);
 
     const handleOnChange = (e) => {
+        if (e.target.value) {
+            setHasText(true);
+        } else {
+            setHasText(false);
+        }
         if (sendTyping.current === false) {
             startTyping();
         }
@@ -338,6 +353,7 @@ const ChatMain = () => {
             e.preventDefault();
             sendMessage(value, MESSAGES.TEXT);
             textAreaRef.current.value = '';
+            setHasText(false);
         }
     }
 
@@ -389,6 +405,11 @@ const ChatMain = () => {
     //     }
     // }
 
+    const handleOnChangeMessageImage = (e) => {
+        const file = e.target.files[0];
+        console.log(file);
+    }
+
 
     return (
         <>
@@ -401,7 +422,7 @@ const ChatMain = () => {
                             isLoadingFetch &&
                             <ReactLoading
                                 type={'spokes'}
-                                color={'grey'}
+                                color={'#006CE5'}
                                 width={30}
                                 height={30}
                                 className={'chat-main-loading'}
@@ -579,10 +600,18 @@ const ChatMain = () => {
                                         <img src="/images/sticker.png" />
                                     </div>
                                 </StickyPopover>
+                                <label htmlFor="message-inpt-image">
+                                    <div className="item-icon">
+                                        <i className="fa-regular fa-image"></i>
+                                    </div>
+                                </label>
+                                <input
+                                    type="file"
+                                    id="message-inpt-image" hidden
+                                    accept="image/png, image/gif, image/jpeg"
+                                    onChange={e => handleOnChangeMessageImage(e)}
+                                />
 
-                                <div className="item-icon">
-                                    <i className="fa-regular fa-image"></i>
-                                </div>
                                 <div className="item-icon">
                                     <i className="fa-solid fa-paperclip"></i>
                                 </div>
@@ -605,8 +634,16 @@ const ChatMain = () => {
                                     <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
                                         <i className="fa-regular fa-face-smile emoijj"></i>
                                     </div>
-                                    <div className="item-icon emoij-like" onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
-                                        👌
+                                    <div className="item-icon emoij-like">
+                                        {
+                                            !hasText ?
+                                                <div onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
+                                                    👌
+                                                </div> :
+                                                <div onClick={() => sendMessage(textAreaRef.current?.value, MESSAGES.TEXT)}>
+                                                    <i className="fa-regular fa-paper-plane"></i>
+                                                </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -635,21 +672,22 @@ const ChatMain = () => {
                                     ) : (
                                         <div className="avatar-group" >
                                             {
-                                                chat?.image ? (
-                                                    <img src={chat?.image} alt="avatar" />
-                                                ) : (
-                                                    chat?.participants?.length > 0 &&
-                                                    chat?.participants?.map(item => {
-                                                        return (
-                                                            <React.Fragment key={item.id}>
-                                                                <AvatarUser
-                                                                    image={item.avatar}
-                                                                    size={25}
-                                                                />
-                                                            </React.Fragment>
-                                                        )
-                                                    })
-                                                )
+                                                chat?.image ?
+                                                    (
+                                                        <img src={chat?.image} alt="avatar" />
+                                                    ) : (
+                                                        chat?.participants?.length > 0 &&
+                                                        chat?.participants?.map(item => {
+                                                            return (
+                                                                <React.Fragment key={item.id}>
+                                                                    <AvatarUser
+                                                                        image={item.avatar}
+                                                                        size={25}
+                                                                    />
+                                                                </React.Fragment>
+                                                            )
+                                                        })
+                                                    )
                                             }
                                         </div>
                                     )
@@ -672,7 +710,6 @@ const ChatMain = () => {
                                     <Button className="change-background-btn">Đổi hình nền</Button>
                                 </ChangeBackgroundModal>
                             </div>
-                            {/* Nhat Thai */}
 
 
 

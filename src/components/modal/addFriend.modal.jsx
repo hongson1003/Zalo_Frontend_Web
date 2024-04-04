@@ -4,7 +4,6 @@ import { PhoneOutlined } from '@ant-design/icons';
 import './addFriend.modal.scss';
 import axios from '../../utils/axios';
 import InforUserModal from "./inforUser.modal";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 
@@ -32,7 +31,6 @@ const AddFriendModal = ({ children }) => {
         if (res.errCode === 0) {
             setFriendData(res.data);
             fetchFriendShip(res?.data?.id);
-            setPhoneNumber('');
             handleCancel();
             return true;
         } else {
@@ -74,8 +72,11 @@ const AddFriendModal = ({ children }) => {
     return (
         <>
             <span onClick={showModal}>{children}</span>
-            <Modal title="Thêm bạn" open={isModalOpen} size='small' styles={{ padding: '50px' }}
-                onOk={handleOk} onCancel={handleCancel} className="modal-add-friend"
+            <Modal title="Thêm bạn" open={isModalOpen}
+                size='small' styles={{ padding: '50px' }}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                className="modal-add-friend"
                 footer={renderFooter()}
                 forceRender
             >

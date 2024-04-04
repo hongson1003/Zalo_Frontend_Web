@@ -6,7 +6,6 @@ import { getFirstLetters } from "../../utils/handleUltils";
 
 const AvatarUser = (props) => {
     const { image, children, zoom, size, style, name } = props;
-
     return (
         <span className="avatar-container" style={{ position: 'relative', ...style }}>
             {

@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
 import './chooseImage.modal.scss';
-
+import axios from '../../utils/axios';
 import { PictureOutlined } from '@ant-design/icons';
 import Zoom from 'react-medium-image-zoom'
+import { useDispatch } from 'react-redux';
+import { editUser } from '../../redux/actions/app.action';
+
 const uploadPreset = import.meta.env.VITE_APP_CLOUNDINARY_UPLOAD_PRESET;
 const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
 const folder = import.meta.env.VITE_APP_CLOUNDINARY_FOLDER;
-import axios from '../../utils/axios';
 
 
 const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handleChangeAvatar, avatar, image }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const dispatch = useDispatch();
+
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -42,6 +46,10 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
 
     const uploadAvatar = async (base64) => {
         const res = await axios.put('/users/avatar', { avatar: base64 });
+        if (res.errCode === 0) {
+            dispatch(editUser(res.data));
+        }
+
     }
 
     const handleChooseGroupPhoto = (url) => {
