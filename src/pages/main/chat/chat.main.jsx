@@ -713,47 +713,42 @@ const ChatMain = () => {
                                 </ChangeBackgroundModal>
                             </div>
 
-<<<<<<< HEAD
                             <div className="hyphen"></div>
 
                             <div className="options-list">
-                                <div class="button-wrapper">
-                                    <Button className="button">
-                                        <img src="/images/notification.png" alt="Turn Off Notification Icon" />
-                                        <span>Tắt thông báo</span>
-                                    </Button>
+                                <div className="button-wrapper">
+                                    <button className="button">
+                                        <div className="button-icon">
+                                            <img src="/images/notification.png" alt="Turn Off Notification Icon" />
+                                        </div>
+                                        <p>Tắt thông báo</p>
+                                    </button>
                                 </div>
-                                <div class="button-wrapper">
-                                    <Button className="button">
-                                        <img src="/images/pin.png" alt="Pin Dialog Icon" />
-                                        <span>Ghim hội thoại</span>
-                                    </Button>
-                                    
+                                <div className="button-wrapper">
+                                    <button className="button">
+                                        <div className="button-icon">
+                                            <img src="/images/pin.png" alt="Pin Dialog Icon" />
+                                        </div>
+                                        <p>Ghim hội thoại</p>
+                                    </button>
+
                                 </div>
-                                <div class="button-wrapper">
-                                    <Button className="button">
-                                        <img src="/images/group.png" alt="Create Group Icon"/>
-                                        <span>Tạo nhóm chat</span>
-                                    </Button>
+                                <div className="button-wrapper">
+                                    <button className="button">
+                                        <div className="button-icon"> <img src="/images/group.png" alt="Create Group Icon" /></div>
+                                        <p>Tạo nhóm chat</p>
+                                    </button>
                                 </div>
                             </div>
 
                             <div className="hyphen"></div>
 
                             <div className="info-list">
-                                <Button className="remind">
-                                    <img src="/images/bell.png" alt="Create Group Icon"/>
-                                    <span>Danh sách nhắc hẹn</span>
-                                </Button>
-                                <Button className="common-group">
-                                    <img src="/images/people.png" alt="Create Group Icon"/>
-                                    <span>Nhóm chung</span>
-                                </Button>
+                                <button className="common-group">
+                                    <img src="/images/people.png" alt="Create Group Icon" />
+                                    <p>Nhóm chung 0 thành viên</p>
+                                </button>
                             </div>
-=======
-
-
->>>>>>> 0728076e2a82be9747b0a4b704929a006a45f695
                         </div>
                     </div>
                 }
