@@ -562,6 +562,7 @@ const ChatMain = () => {
                                             image={getFriend(user, chat.participants)?.avatar}
                                             size={50}
                                         />
+
                                     ) : (
                                         <div className="avatar-group" >
                                             {
@@ -582,6 +583,7 @@ const ChatMain = () => {
                                                 )
                                             }
                                         </div>
+
                                     )
                                 }
                                 <p className="name">
@@ -601,6 +603,43 @@ const ChatMain = () => {
                                 >
                                     <Button className="change-background-btn">Đổi hình nền</Button>
                                 </ChangeBackgroundModal>
+                            </div>
+
+                            <div className="hyphen"></div>
+
+                            <div className="options-list">
+                                <div class="button-wrapper">
+                                    <Button className="button">
+                                        <img src="/images/notification.png" alt="Turn Off Notification Icon" />
+                                        <span>Tắt thông báo</span>
+                                    </Button>
+                                </div>
+                                <div class="button-wrapper">
+                                    <Button className="button">
+                                        <img src="/images/pin.png" alt="Pin Dialog Icon" />
+                                        <span>Ghim hội thoại</span>
+                                    </Button>
+                                    
+                                </div>
+                                <div class="button-wrapper">
+                                    <Button className="button">
+                                        <img src="/images/group.png" alt="Create Group Icon"/>
+                                        <span>Tạo nhóm chat</span>
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="hyphen"></div>
+
+                            <div className="info-list">
+                                <Button className="remind">
+                                    <img src="/images/bell.png" alt="Create Group Icon"/>
+                                    <span>Danh sách nhắc hẹn</span>
+                                </Button>
+                                <Button className="common-group">
+                                    <img src="/images/people.png" alt="Create Group Icon"/>
+                                    <span>Nhóm chung</span>
+                                </Button>
                             </div>
                         </div>
                     </div>
