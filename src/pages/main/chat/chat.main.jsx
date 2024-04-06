@@ -19,12 +19,14 @@ import StickyPopover from '../../../components/popover/sticky.popover';
 import { CHAT_STATUS, MESSAGES } from "../../../redux/types/type.user";
 import ChangeBackgroundModal from "../../../components/modal/changeBackground.modal";
 import MessageChat from "./message.chat";
-import { getTimeFromDate } from '../../../utils/handleUltils';
+import { getPreviewImage, getTimeFromDate } from '../../../utils/handleUltils';
 import { useNavigate } from "react-router-dom";
 import { getFriend } from "../../../utils/handleChat";
 import { COLOR_BACKGROUND } from '../../../type/rootCss.type';
+import Zoom from 'react-medium-image-zoom';
+import { set } from "firebase/database";
 
-const ChatMain = () => {
+const ChatMain = ({ file, fileTypes }) => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
     const [show, setShow] = useState(true);
@@ -53,6 +55,54 @@ const ChatMain = () => {
     const scroolToTopRef = useRef(false);
     const heightScroolTopRef = useRef(0);
     const [hasText, setHasText] = useState(false);
+    const uploadPreset = import.meta.env.VITE_APP_CLOUNDINARY_UPLOAD_PRESET;
+    const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
+    const folder = import.meta.env.VITE_APP_CLOUNDINARY_FOLDER;
+    const [listImage, setListImage] = useState([]);
+
+
+    // handle file
+    const sendImage = async (preview, file) => {
+        const ObjectId = objectId();
+        const createMessage = {
+            _id: ObjectId,
+            chat: chat,
+            type: MESSAGES.IMAGES,
+            sender: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            images: [preview]
+        };
+        setMessages(prev => [...prev, createMessage]);
+        setSent(STATE.PENDING);
+        // upload ảnh lên cloudinary
+        const url = await uploadToCloudiry(file);
+        // save vào db
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            images: [url]
+        });
+        setSent(STATE.RESOLVE);
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                setSent(STATE.RESOLVE);
+                socket.emit('send-message', res.data);
+                socket.emit('finish-typing', chat._id);
+            })
+        } else {
+            setSent(STATE.REJECT);
+            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+        }
+    }
+
+    // get file
+    useEffect(() => {
+        if (file) {
+            const preview = getPreviewImage(file);
+            sendImage(preview, file);
+        }
+    }, [file])
+
     // background
     useEffect(() => {
         if (chat?.background) {
@@ -111,6 +161,7 @@ const ChatMain = () => {
                 });
                 socket.on('receive-message', data => {
                     setMessages(prev => [...prev, data]);
+                    fetchMessagePaginate();
                 })
             })
             receiveOnly.current = true;
@@ -127,7 +178,7 @@ const ChatMain = () => {
     // set size cho scrool
     useEffect(() => {
         if (scroolRef.current) {
-            scroolRef.current.scrollTop = scroolRef.current.scrollHeight - 10;
+            scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
         }
     }, [typing, footerHeight])
 
@@ -140,7 +191,7 @@ const ChatMain = () => {
     }, [messages.length]);
 
     useEffect(() => {
-        if (scroolFirst.current === true && scroolToTopRef.current === false) {
+        if (scroolFirst.current === true && isLoadingFetch === false) {
             scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
         }
     }, [messages.length])
@@ -190,6 +241,18 @@ const ChatMain = () => {
             }
         }
     }, [scroolRef.current]);
+
+    useEffect(() => {
+        if (moreInfoRef.current) {
+            const width = moreInfoRef.current.clientWidth;
+            if (width < 300) {
+                setShow(false);
+            } else {
+                setShow(true);
+            }
+
+        }
+    }, [moreInfoRef.current])
 
 
 
@@ -354,7 +417,42 @@ const ChatMain = () => {
             sendMessage(value, MESSAGES.TEXT);
             textAreaRef.current.value = '';
             setHasText(false);
+        } else {
+            if (e.ctrlKey && e.key === 'v') {
+                e.preventDefault();
+                handlePaste();
+
+            }
         }
+    }
+
+    const handleRemoveImage = (index) => {
+        if (listImage.length === 1) {
+            setHasText(false);
+        }
+        setListImage(prev => prev.filter((_, idx) => idx !== index));
+    }
+
+    const handlePaste = () => {
+        setHasText(true);
+        if (listImage.length > 6) {
+            toast.warn('Bạn chỉ có thể chọn tối đa 7 ảnh');
+            return;
+        }
+        navigator.clipboard.read().then(clipboardItems => {
+            clipboardItems.forEach(async item => {
+                if (item.types.includes('image/png') || item.types.includes('image/jpeg')) {
+                    const blob = await item.getType('image/png') || item.getType('image/jpeg');
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const result = reader.result;
+                        // Xử lý ảnh ở đây, có thể hiển thị nó hoặc lưu vào state
+                        setListImage(prev => [...prev, result]);
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            });
+        });
     }
 
     const handleOnClickOutSide = (e) => {
@@ -368,6 +466,7 @@ const ChatMain = () => {
     const handleChooseEmoij = (e) => {
         if (textAreaRef.current) {
             textAreaRef.current.value += e.native;
+            setHasText(true);
         }
     }
 
@@ -405,9 +504,72 @@ const ChatMain = () => {
     //     }
     // }
 
-    const handleOnChangeMessageImage = (e) => {
-        const file = e.target.files[0];
-        console.log(file);
+    const handleOnChangeMessageImage = async (e) => {
+        const files = e.target.files;
+        const previews = [];
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                previews.push(getPreviewImage(file));
+            }
+        }
+        const ObjectId = objectId();
+        const createMessage = {
+            _id: ObjectId,
+            chat: chat,
+            type: MESSAGES.IMAGES,
+            sender: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            images: previews
+        };
+        setMessages(prev => [...prev, createMessage]);
+        setSent(STATE.PENDING);
+        // upload ảnh lên cloudinary
+        const urls = [];
+        for (let i = 0; i < files.length; i++) {
+            const url = await uploadToCloudiry(files[i]);
+            urls.push(url);
+        }
+        // save vào db
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            images: urls
+        });
+        setSent(STATE.RESOLVE);
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                setSent(STATE.RESOLVE);
+                socket.emit('send-message', res.data);
+                socket.emit('finish-typing', chat._id);
+            })
+        } else {
+            setSent(STATE.REJECT);
+            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+        }
+    }
+
+
+
+    const uploadToCloudiry = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', uploadPreset);
+        formData.append("cloud_name", cloudName);
+        formData.append("folder", folder);
+        if (file) {
+            const image = file.name;
+            const name = image.split('.')[0];
+            const extName = image.split('.')[1];
+            const imgUpload = name + '-' + new Date().getTime() + '.' + extName;
+            formData.append('public_id', imgUpload); // Thêm tham số public_id vào formData
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+            const urlData = await response.json();
+            return urlData.url;
+        }
     }
 
 
@@ -445,7 +607,7 @@ const ChatMain = () => {
                     <div className="main-chat-content">
                         <div className="content-chat-messages" ref={scroolRef}
                             style={{
-                                height: `calc(100% - ${footerHeight}px)`,
+                                height: `calc(100% - ${footerHeight - 10}px)`,
                                 color: messageColor
                             }}>
                             {
@@ -479,7 +641,7 @@ const ChatMain = () => {
                                                             </div>
                                                         }
                                                         <div
-                                                            className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
+                                                            className={message.type !== MESSAGES.TEXT ? `message de-bg ${message?.images?.length > 1 && 'w-500'}` : `message ${message?.images?.length > 1 && 'w-500'}`}
                                                             style={{ backgroundColor: '#ffffff' }}
                                                         >
                                                             {
@@ -488,20 +650,43 @@ const ChatMain = () => {
                                                             }
                                                             {message.type === MESSAGES.TEXT ?
                                                                 <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
-                                                                    {message.content}
+                                                                    <p className='message-content-right-right-right'>{message.content}</p>
                                                                     {
-                                                                        messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                        messages[index + 1]?.sender?.id !== messages[index]?.sender?.id &&
                                                                         <p className='time'>{getTimeFromDate(message.createdAt)}</p>
                                                                     }
                                                                 </MessageChat> : (
-                                                                    message.type === MESSAGES.STICKER &&
-                                                                    <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
-                                                                        <img className="sticker" src={message.sticker} alt="sticker" />
-                                                                        {
-                                                                            messages[index + 1]?.sender?.id !== messages[index].sender.id &&
-                                                                            <p className='time'>{getTimeFromDate(message.createdAt)}</p>
-                                                                        }
-                                                                    </MessageChat>
+                                                                    message.type === MESSAGES.STICKER ?
+                                                                        <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
+                                                                            <img className="sticker" src={message.sticker} alt="sticker" />
+                                                                            {
+                                                                                messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                            }
+                                                                        </MessageChat> : (
+                                                                            message.type === MESSAGES.IMAGES &&
+                                                                            <MessageChat
+                                                                                handleModifyMessage={handleModifyMessage}
+                                                                                isLeft={true}
+                                                                                message={message}
+                                                                                isImage
+                                                                                lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                            >
+                                                                                {
+                                                                                    message.images.map((image, index) => {
+                                                                                        return (
+                                                                                            <Zoom key={message._id + index}>
+                                                                                                <img className="image-message" src={image} alt="image" />
+                                                                                            </Zoom>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                                {
+                                                                                    messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                    <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                }
+                                                                            </MessageChat>
+                                                                        )
                                                                 )}
                                                         </div>
                                                     </div>
@@ -513,25 +698,49 @@ const ChatMain = () => {
                                                             backgroundColor: '#e5efff',
                                                             marginBottom: message?.reactions?.length > 0 ? '10px' : '0px'
                                                         }}
-                                                        className={message.type !== MESSAGES.TEXT ? 'message de-bg' : 'message'}
+                                                        className={message.type !== MESSAGES.TEXT ? `message de-bg ${message?.images?.length > 1 && 'w-500'}` : `message ${message?.images?.length > 1 && 'w-500'}`}
                                                     >
                                                         {message.type === MESSAGES.TEXT ?
                                                             <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
-                                                                {message.content}
+                                                                <p className='message-content-right-right-right'>{message.content}</p>
                                                                 {
-                                                                    messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                    messages[index + 1]?.sender?.id !== messages[index].sender?.id &&
                                                                     <p className='time'>{getTimeFromDate(message.createdAt)}</p>
                                                                 }
                                                             </MessageChat>
                                                             : (
-                                                                message.type === MESSAGES.STICKER &&
-                                                                <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
-                                                                    <img className="sticker" src={message.sticker} alt="sticker" />
-                                                                    {
-                                                                        messages[index + 1]?.sender?.id !== messages[index].sender.id &&
-                                                                        <p className='time'>{getTimeFromDate(message.createdAt)}</p>
-                                                                    }
-                                                                </MessageChat>
+                                                                message.type === MESSAGES.STICKER ?
+                                                                    <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
+                                                                        <img className="sticker" src={message.sticker} alt="sticker" />
+                                                                        {
+                                                                            messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                            <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                        }
+                                                                    </MessageChat> : (
+                                                                        message.type === MESSAGES.IMAGES &&
+                                                                        <MessageChat
+                                                                            handleModifyMessage={handleModifyMessage}
+                                                                            isLeft={false}
+                                                                            message={message}
+                                                                            isImage
+                                                                            lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                        >
+                                                                            {
+                                                                                message.images.map((image, index) => {
+                                                                                    return (
+                                                                                        <Zoom key={message._id + index}>
+                                                                                            <img className="image-message" src={image} alt="image" />
+                                                                                        </Zoom>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                            {
+                                                                                messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                            }
+                                                                        </MessageChat>
+                                                                    )
+
                                                             )}
                                                     </div>
                                             }
@@ -545,7 +754,7 @@ const ChatMain = () => {
                                                         style={{ color: headerColor }}
                                                     >
                                                         {
-                                                            sent === STATE.PENDING ? <span>đã gửi</span> : (
+                                                            sent === STATE.PENDING ? <span>Đã gửi</span> : (
                                                                 sent === STATE.RESOLVE ? <span>
                                                                     <i className="fa-solid fa-check-double"></i>
                                                                     &nbsp;
@@ -596,7 +805,8 @@ const ChatMain = () => {
                         <div className="footer" ref={footer}>
                             <div className="footer-top footer-item">
                                 <StickyPopover >
-                                    <div className="item-icon" onClick={() => handleDispatchSendMessageFunc()}>
+                                    <div className="item-icon"
+                                        onClick={() => handleDispatchSendMessageFunc()}>
                                         <img src="/images/sticker.png" />
                                     </div>
                                 </StickyPopover>
@@ -610,6 +820,7 @@ const ChatMain = () => {
                                     id="message-inpt-image" hidden
                                     accept="image/png, image/gif, image/jpeg"
                                     onChange={e => handleOnChangeMessageImage(e)}
+                                    multiple
                                 />
 
                                 <div className="item-icon">
@@ -629,7 +840,6 @@ const ChatMain = () => {
                                     ref={textAreaRef}
                                     type="text"
                                 />
-
                                 <div className="text-quick-group">
                                     <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
                                         <i className="fa-regular fa-face-smile emoijj"></i>
@@ -637,7 +847,7 @@ const ChatMain = () => {
                                     <div className="item-icon emoij-like">
                                         {
                                             !hasText ?
-                                                <div onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
+                                                <div style={{ padding: '10px' }} onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
                                                     👌
                                                 </div> :
                                                 <div onClick={() => sendMessage(textAreaRef.current?.value, MESSAGES.TEXT)}>
@@ -647,6 +857,27 @@ const ChatMain = () => {
                                     </div>
                                 </div>
                             </div>
+                            {
+                                listImage && listImage.length > 0 && (
+                                    <div className="list-images">
+                                        {
+                                            listImage.map((image, index) => {
+                                                return (
+                                                    <div key={index} className="image-item">
+                                                        <Zoom>
+                                                            <img src={image} alt="image" />
+                                                        </Zoom>
+                                                        <div className="image-item-remove">
+                                                            <button onClick={() => handleRemoveImage(index)}>X</button>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+
+                                    </div>
+                                )
+                            }
                         </div>
                     </div>
                 </div>
@@ -668,6 +899,7 @@ const ChatMain = () => {
                                         <AvatarUser
                                             image={getFriend(user, chat.participants)?.avatar}
                                             size={50}
+                                            name={getFriend(user, chat.participants)?.userName}
                                         />
 
                                     ) : (
@@ -684,6 +916,7 @@ const ChatMain = () => {
                                                                     <AvatarUser
                                                                         image={item.avatar}
                                                                         size={25}
+                                                                        name={getFriend(user, chat.participants)?.userName}
                                                                     />
                                                                 </React.Fragment>
                                                             )
@@ -695,7 +928,7 @@ const ChatMain = () => {
                                     )
                                 }
                                 <p className="name">
-                                    <span>{chat?.name || getFriend(user, chat.participants)?.userName}</span>
+                                    <span>{getFriend(user, chat.participants)?.userName}</span>
                                     <span style={{
                                         padding: '0 5px'
                                     }}>

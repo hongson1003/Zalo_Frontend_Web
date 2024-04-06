@@ -9,6 +9,7 @@ import InvitedFriend from "./friend/invited.friend";
 import ListFriend from "./friend/list.friend";
 import GroupFriend from "./friend/group.friend";
 import { STATE } from "../../redux/types/type.app";
+import DragDrop from "../../components/customize/dropImage";
 
 const ContentMain = () => {
 
@@ -35,7 +36,12 @@ const ContentMain = () => {
         if (nav) {
             switch (nav) {
                 case stateUser?.selectedChat && KEYITEMS.MESSAGE:
-                    return <ChatMain />
+                    return (
+                        <DragDrop>
+                            <ChatMain />
+
+                        </DragDrop>
+                    )
                 case 'pb':
                     switch (subNav) {
                         case FRIEND_ITEM_MENU.INVITE_FRIEND:
@@ -49,7 +55,11 @@ const ContentMain = () => {
                     }
                 case 'ms':
                     if (subNav?.key === STATE.ACCESS_CHAT) {
-                        return <ChatMain />
+                        return (
+                            <DragDrop fileTypes={["JPG", "PNG", "GIF"]}>
+                                <ChatMain />
+                            </DragDrop>
+                        )
                     }
                 default:
                     return <Welcome />

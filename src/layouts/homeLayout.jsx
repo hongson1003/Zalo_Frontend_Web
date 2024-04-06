@@ -36,7 +36,6 @@ const HomeLayout = () => {
     })
   }, []);
 
-
   return (
     <>
       <Layout

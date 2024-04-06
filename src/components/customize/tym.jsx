@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import './tym.css';
 
-const Tym = ({ icon }) => {
+const Tym = ({ icon, clickRef }) => {
     const [isClick, setIsClick] = useState(false);
+
     const handleOnClick = () => {
         setIsClick(!isClick);
     }
+
+
     useEffect(() => {
         if (isClick) {
             setTimeout(() => {
@@ -13,6 +16,14 @@ const Tym = ({ icon }) => {
             }, 500);
         }
     }, [isClick]);
+
+    useEffect(() => {
+        if (clickRef && clickRef.current) {
+            clickRef.current = handleOnClick;
+        }
+    }, []);
+
+
     return (
         <div className="tym-main-container-xyz">
             <div

@@ -2,9 +2,33 @@
     position: relative;
     display: block;
     padding: 10px 10px;
+    &.w-500 {
+        max-width: 450px;
+        width: 100%;
+        display: flex;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+        padding: 10px 5px;
+    }
+    .message-content-right {
+        font-size: 13px;
+        text-align: right;
+    }
+    .message-content-left {
+        font-size: 13px;
+        text-align: left;
+    }
+    .image-message {
+        width: 200px;
+        height: 200px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin: 2px;
+    }
     .time {
         font-size: 10px;
         margin-top: 10px;
+        width: 100%;
     }
     &.option-right {
         & .options {
@@ -138,4 +162,14 @@
 
 .ant-popover-inner {
     padding: 0 !important;
+}
+
+@media screen and (max-width: 768px) {
+    .message-hover-container {
+        // width: 300px !important;
+        .image-message {
+            width: 70px;
+            height: 70px;
+        }
+    }
 }

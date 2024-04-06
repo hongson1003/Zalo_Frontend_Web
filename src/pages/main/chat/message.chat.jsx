@@ -6,6 +6,7 @@ import Tym from "../../../components/customize/tym";
 import _ from 'lodash';
 import { useSelector } from "react-redux";
 import axios from '../../../utils/axios';
+import { socket } from '../../../utils/io';
 
 const content = ({ optionsRef }) => {
     const contentRef = useRef(null);
@@ -73,7 +74,7 @@ const content = ({ optionsRef }) => {
     )
 }
 
-const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
+const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, lasted }) => {
     const optionsRef = useRef(null);
     const messageHoverContainerRef = useRef(null);
     const frameTymRef = useRef(null);
@@ -81,6 +82,18 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const [allowOpen, setAllowOpen] = useState(true);
     const [enableMouseOver, setEnableMouseOver] = useState(true);
+    const clickRef = useRef(null);
+
+    // socket thả tym tin nhắn
+    useEffect(() => {
+        if (clickRef.current) {
+            socket.then(socket => {
+                socket.on('receive-reaction', (data) => {
+                    console.log('data', data);
+                })
+            })
+        }
+    }, []);
 
     useEffect(() => {
         const addShowOptions = () => {
@@ -96,6 +109,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
                 setAllowOpen(true);
             }
         };
+
         const removeShowFrameTym = (e) => {
             if (!(e.toElement?.className === 'emoij-popup-container' || e.toElement?.className === 'reaction' || e.toElement?.className === 'tym-message' || e.toElement?.className === 'tym-icon-123 active' || e.toElement?.className === 'tym-icon-123' || e.toElement?.className === 'tym-main-container-xyz' || e.toElement?.className === 'tyms-frame' || e.toElement?.className === 'tyms-heart')) {
                 frameTymRef.current.classList.remove('show-frame-tym');
@@ -109,6 +123,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
             messageHoverContainerRef.current.addEventListener('mouseover', addShowFrameTym);
             messageHoverContainerRef.current.addEventListener('mouseleave', removeShowFrameTym);
         }
+
         return () => {
             if (messageHoverContainerRef.current && frameTymRef.current) {
                 messageHoverContainerRef.current.removeEventListener('mouseover', addShowOptions);
@@ -130,6 +145,13 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
             userId,
             icon
         })
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                console.log('đã emit', message.chat._id)
+                socket.emit('send-reaction', { messageId, userId, icon });
+            })
+        }
+
     }
 
     const handleTymMessage = async (icon) => {
@@ -162,17 +184,17 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
     return (
         <React.Fragment>
             <span
-                className={isLeft ? "message-hover-container option-right" : "message-hover-container option-left"}
+                className={isLeft ? `message-hover-container option-right ${isImage && 'w-500'}` : `message-hover-container option-left ${isImage && 'w-500'}`}
                 ref={messageHoverContainerRef}
             >
                 {children}
                 <div className="options" ref={optionsRef}>
                     <div className="options-content">
                         <div className="option-item">
-                            <i className="fa-solid fa-reply"></i>
+                            <i title="Trả lời" className="fa-solid fa-reply"></i>
                         </div>
                         <div className="option-item">
-                            <i className="fa-solid fa-share"></i>
+                            <i title="Chuyển tiếp" className="fa-solid fa-share"></i>
                         </div>
                         <Popover
                             content={React.createElement(content, { optionsRef })}
@@ -181,7 +203,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
                             className="popover-options"
                         >
                             <div className="option-item">
-                                <i className="fa-solid fa-ellipsis"></i>
+                                <i title="Thêm" className="fa-solid fa-ellipsis"></i>
                             </div>
                         </Popover>
 
@@ -221,7 +243,10 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage }) => {
                     >
                         <div className="tym-message" onClick={() => handleTymMessage(selectedReaction.trim())}>
                             {/* <i className="fa-regular fa-thumbs-up reaction-icon"></i> */}
-                            <Tym icon={selectedReaction} />
+                            <Tym
+                                icon={selectedReaction}
+                                clickRef={clickRef}
+                            />
                         </div>
                     </EmoijPopup>
                 </div>

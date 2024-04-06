@@ -1,0 +1,17 @@
+.sticky-title-container {
+    padding: 2px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .btn-sticky {
+        border: none;
+        cursor: pointer;
+        padding: 2px 5px;
+        &:focus {
+            outline: none;
+        }
+    }
+    .search-item {
+        cursor: pointer;
+    }
+}
