@@ -51,7 +51,7 @@ const ChatSidebar = () => {
         if (chats && chats.length > 0) {
             chats.forEach(item => {
                 socket.then(socket => {
-                    socket.emit('join-chat', item._id);
+                    socket.emit('join-room', item._id);
                     // socket.on('joined-room', room => {
                     // })
                 })

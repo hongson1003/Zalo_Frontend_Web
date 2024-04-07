@@ -79,3 +79,22 @@ export const customizeFile = (file) => {
     }
     return newFile;
 }
+
+export const accessTimeBefore = (time) => {
+    const currentTime = new Date();
+    const timeBefore = new Date(time);
+    const timeDiff = currentTime - timeBefore;
+    const seconds = timeDiff / 1000;
+    const minutes = seconds / 60;
+    const hours = minutes / 60;
+    const days = hours / 24;
+    if (days >= 1) {
+        return `${Math.floor(days)} ngày trước`;
+    } else if (hours >= 1) {
+        return `${Math.floor(hours)} giờ trước`;
+    } else if (minutes >= 1) {
+        return `${Math.floor(minutes)} phút trước`;
+    } else {
+        return 'Vừa xong';
+    }
+}

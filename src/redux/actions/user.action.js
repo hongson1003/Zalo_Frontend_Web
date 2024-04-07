@@ -1,5 +1,7 @@
 import { NOTIFICATIONS } from "../types/type.user";
 import { STATE } from '../types/type.app';
+
+
 export function notificationsFriends(notifications) {
     return {
         type: NOTIFICATIONS.FRIENDS,

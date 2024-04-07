@@ -35,7 +35,8 @@ const items = [
                 <p>Xem chi tiết</p>
             </div>
         )
-    }, {
+    },
+    {
         key: METHOD_MESSAGE.DELETE_ALL,
         item: () => (
             <div className="thu-hoi-tin-nhan">
@@ -43,8 +44,18 @@ const items = [
                 <p>Thu hồi tin nhắn</p>
             </div>
         )
+    },
+    {
+        key: METHOD_MESSAGE.DELETE_MYSEFL,
+        item: () => (
+            <div className="xoa-chi-o-phia-toi thu-hoi-tin-nhan">
+                <i className="fa-regular fa-square-minus"></i>
+                <p>Xóa chỉ ở phía tôi</p>
+            </div>
+        )
     }
 ]
+
 const content = ({ optionsRef, message, handleModifyMessage }) => {
     const contentRef = useRef(null);
 
@@ -57,6 +68,18 @@ const content = ({ optionsRef, message, handleModifyMessage }) => {
             socket.then(socket => {
                 socket.emit('modify-message', res.data);
             })
+        }
+    }
+
+    const deleteMessageMySelf = async (messageId) => {
+        const res = await axios.put('/chat/message/recall', {
+            messageId: messageId
+        });
+        if (res.errCode === 0) {
+            handleModifyMessage(res.data);
+            // socket.then(socket => {
+            //     socket.emit('modify-message', res.data);
+            // })
         }
     }
 
@@ -74,6 +97,9 @@ const content = ({ optionsRef, message, handleModifyMessage }) => {
                 break;
             case METHOD_MESSAGE.DELETE_ALL:
                 deleteMessage(message._id);
+                break;
+            case METHOD_MESSAGE.DELETE_MYSEFL:
+                deleteMessageMySelf(message._id);
                 break;
             default:
                 break;
@@ -237,6 +263,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
                             trigger={"click"}
                             placement="topRight"
                             className="popover-options"
+                            forceRender
                         >
                             <div className="option-item">
                                 <i title="Thêm" className="fa-solid fa-ellipsis"></i>

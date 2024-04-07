@@ -131,7 +131,7 @@ const ChatMain = ({ file, fileTypes }) => {
 
     // socket
     useEffect(() => {
-        if (receiveOnly.current === false) {
+        if (receiveOnly.current === false && messages.length > 0) {
             socket.then(socket => {
                 socket.on('typing', () => {
                     setTyping(true);
@@ -145,12 +145,13 @@ const ChatMain = ({ file, fileTypes }) => {
                     scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
                 })
                 socket.on('receive-modify-message', data => {
+                    console.log(data)
                     handleModifyMessage(data);
                 })
             })
             receiveOnly.current = true;
         }
-    }, [])
+    }, [messages])
 
     // footer
     useEffect(() => {
@@ -337,16 +338,12 @@ const ChatMain = ({ file, fileTypes }) => {
     }
 
     const handleModifyMessage = (message) => {
-        setMessages(prev => {
-            const index = prev.findIndex(item => item._id === message._id);
-            if (index !== -1) {
-                prev[index] = {
-                    ...prev[index],
-                    ...message
-                };
+        setMessages(prev => prev.map(item => {
+            if (item._id === message._id) {
+                return message;
             }
-            return [...prev];
-        });
+            return item;
+        }))
     }
 
 
@@ -772,9 +769,6 @@ const ChatMain = ({ file, fileTypes }) => {
         }
     }
 
-    const handleSendAudio = (file) => {
-
-    }
 
 
     return (
@@ -816,6 +810,9 @@ const ChatMain = ({ file, fileTypes }) => {
                             }}>
                             {
                                 messages && messages.length > 0 && messages.map((message, index) => {
+                                    if (message.unViewList.includes(user.id)) {
+                                        return null;
+                                    }
                                     return (
                                         <React.Fragment key={message._id}>
                                             {
@@ -859,7 +856,14 @@ const ChatMain = ({ file, fileTypes }) => {
                                                             {
                                                                 !message.unViewList.includes(user.id) &&
                                                                     message.isDelete === true ?
-                                                                    <p style={{ width: '100%', padding: '5px' }} className='message-content-right'>{'Tin nhắn đã được thu hồi'}</p> :
+                                                                    <p style={
+                                                                        {
+                                                                            width: '100%',
+                                                                            padding: '5px',
+                                                                            fontSize: '14px',
+                                                                            color: '#888'
+                                                                        }
+                                                                    } className='message-content-right'>{'Tin nhắn đã được thu hồi'}</p> :
                                                                     message.type === MESSAGES.TEXT ?
                                                                         <MessageChat
                                                                             handleModifyMessage={handleModifyMessage}
@@ -1015,8 +1019,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                         )}
                                                     >
                                                         {
-                                                            !message.unViewList.includes(user.id) &&
-                                                                message.isDelete === true ?
+                                                            message.isDelete === true ?
                                                                 <p style={{ width: '100%', padding: '5px' }} className='message-content-right'>{'Tin nhắn đã được thu hồi'}</p> :
                                                                 // render message
                                                                 message.type === MESSAGES.TEXT ?
@@ -1165,7 +1168,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                             }
                                             {
                                                 index == messages.length - 1 && message?.sender?.id === user?.id &&
-                                                !message.unViewList.includes(user.id) &&
+                                                !message.unViewList.includes(user.id) && message.isDelete === false &&
                                                 <div
                                                     style={{ alignSelf: 'flex-end' }}
                                                 >
@@ -1174,12 +1177,14 @@ const ChatMain = ({ file, fileTypes }) => {
                                                         style={{ color: headerColor }}
                                                     >
                                                         {
-                                                            sent === STATE.PENDING ? <span>Đã gửi</span> : (
-                                                                sent === STATE.RESOLVE ? <span>
-                                                                    <i className="fa-solid fa-check-double"></i>
-                                                                    &nbsp;
-                                                                    Đã nhận</span> : <span>Gửi thất bại</span>
-                                                            )
+                                                            sent === STATE.PENDING ?
+                                                                <span>Đã gửi</span> :
+                                                                (
+                                                                    sent === STATE.RESOLVE ? <span>
+                                                                        <i className="fa-solid fa-check-double"></i>
+                                                                        &nbsp;
+                                                                        Đã nhận</span> : <span>Gửi thất bại</span>
+                                                                )
                                                         }
                                                     </div>
                                                 </div>

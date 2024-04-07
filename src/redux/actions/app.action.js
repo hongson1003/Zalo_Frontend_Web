@@ -38,6 +38,13 @@ export function setError() {
     }
 }
 
+export function changeKeyMenu(key) {
+    return {
+        type: STATE.CHANGE_KEY_MENU,
+        payload: key
+    }
+}
+
 export function changeKeySubMenu(key) {
     return {
         type: STATE.CHANGE_SUB_KEY_MENU,
@@ -45,7 +52,7 @@ export function changeKeySubMenu(key) {
     }
 }
 
-export function editUser(user){
+export function editUser(user) {
     return {
         type: STATE.EDIT_USER,
         payload: user

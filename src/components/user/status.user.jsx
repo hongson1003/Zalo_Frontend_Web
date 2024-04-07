@@ -8,6 +8,7 @@ import { getFriend } from "../../utils/handleChat";
 import { useSelector } from "react-redux";
 import axios from '../../utils/axios';
 import { socket } from "../../utils/io";
+import { accessTimeBefore } from "../../utils/handleUltils";
 
 const StatusUser = ({ chat }) => {
     const user = useSelector(state => state.appReducer.userInfo.user);
@@ -111,7 +112,7 @@ const StatusUser = ({ chat }) => {
                                 {
                                     statusUser?.lastedOnline === null ?
                                         "Đang hoạt động" :
-                                        statusUser?.lastedOnline
+                                        accessTimeBefore(statusUser?.lastedOnline)
                                 }
                             </p>
                         </>

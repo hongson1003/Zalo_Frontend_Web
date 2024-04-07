@@ -42,6 +42,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         dob: dayjs(new Date(), dateFormat)
     })
 
+
     const onDateChange = (date, dateString) => {
         const newDayInfo = { ...newInfo };
         newDayInfo.dob = date;
@@ -224,6 +225,10 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     }
 
     const handleJoinChat = async () => {
+        console.log('friendship', friendShipData)
+
+        // return;
+        // validate
         const res = await axios.post('/chat/access', {
             "type": "PRIVATE_CHAT",
             "participants": [user?.id, friendData?.id],
@@ -376,7 +381,14 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                             )
                                     )
                             }
-                            <Button type='default' onClick={handleJoinChat}>Nhắn tin</Button>
+                            <Button
+                                disabled={!friendShipData}
+                                type='default'
+                                onClick={handleJoinChat}
+                                title={friendShipData?.status === STATE.RESOLVE ? 'Nhắn tin' : 'Kết bạn trước khi nhắn tin'}
+                            >
+                                Nhắn tin
+                            </Button>
                         </div>
                     }
                 </div>
