@@ -10,6 +10,13 @@ import { router } from './route.jsx'; // Import từ file routes đã tạo
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 
+import { pdfjs } from 'react-pdf';
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 

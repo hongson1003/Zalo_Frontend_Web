@@ -4,7 +4,9 @@ import ChatUser from "../../components/user/chat.user";
 import { socket } from "../../utils/io";
 import { toast } from "react-toastify";
 import { STATE } from "../../redux/types/type.app";
-import { useSelector } from "react-redux";
+import { accessChat } from "../../redux/actions/user.action";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const ChatSidebar = () => {
     const [chats, setChats] = useState([]);
@@ -13,8 +15,8 @@ const ChatSidebar = () => {
     const [status, setStatus] = useState(STATE.PENDING);
     const subNav = useSelector(state => state.appReducer.subNav);
     const user = useSelector(state => state.appReducer?.userInfo?.user);
-
-
+    const dispatch = useDispatch();
+    const chat = useSelector(state => state.appReducer?.subNav);
     const fetchChats = async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
         if (res.errCode === 0) {
@@ -24,11 +26,27 @@ const ChatSidebar = () => {
             setStatus(STATE.REJECT);
         }
     }
+    // lắng nghe sự kiện enter
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key === 'Enter' && !chat) {
+                dispatch(accessChat(chats[0]));
+            }
+        }
+        if (chats.length) {
+            window.addEventListener('keypress', handleKeyPress)
+        }
+        return () => {
+            window.removeEventListener('keypress', handleKeyPress)
+        }
+    }, [chats.length, chat])
 
     useEffect(() => {
         if (user)
             fetchChats();
     }, [subNav])
+
+
     useEffect(() => {
         if (chats && chats.length > 0) {
             chats.forEach(item => {

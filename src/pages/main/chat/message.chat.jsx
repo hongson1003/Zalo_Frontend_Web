@@ -7,46 +7,78 @@ import _ from 'lodash';
 import { useSelector } from "react-redux";
 import axios from '../../../utils/axios';
 import { socket } from '../../../utils/io';
-
-const content = ({ optionsRef }) => {
+import { METHOD_MESSAGE } from "../../../redux/types/type.user";
+const items = [
+    {
+        key: METHOD_MESSAGE.COPY,
+        item: () => (
+            <div >
+                <i className="fa-regular fa-copy"></i>
+                <p>Copy hình ảnh</p>
+            </div>
+        )
+    },
+    {
+        key: METHOD_MESSAGE.PIN,
+        item: () => (
+            <div >
+                <i className="fa-solid fa-thumbtack"></i>
+                <p>Ghim tin nhắn</p>
+            </div>
+        )
+    },
+    {
+        key: METHOD_MESSAGE.VIEW_DETAIL,
+        item: () => (
+            <div >
+                <i className="fa-solid fa-circle-info"></i>
+                <p>Xem chi tiết</p>
+            </div>
+        )
+    }, {
+        key: METHOD_MESSAGE.DELETE_ALL,
+        item: () => (
+            <div className="thu-hoi-tin-nhan">
+                <i className="fa-regular fa-square-minus"></i>
+                <p>Thu hồi tin nhắn</p>
+            </div>
+        )
+    }
+]
+const content = ({ optionsRef, message, handleModifyMessage }) => {
     const contentRef = useRef(null);
-    const items = [
-        {
-            key: 1,
-            item: () => (
-                <div >
-                    <i className="fa-regular fa-copy"></i>
-                    <p>Copy hình ảnh</p>
-                </div>
-            )
-        },
-        {
-            key: 2,
-            item: () => (
-                <div >
-                    <i className="fa-solid fa-thumbtack"></i>
-                    <p>Ghim tin nhắn</p>
-                </div>
-            )
-        },
-        {
-            key: 3,
-            item: () => (
-                <div >
-                    <i className="fa-solid fa-circle-info"></i>
-                    <p>Xem chi tiết</p>
-                </div>
-            )
-        }, {
-            key: 4,
-            item: () => (
-                <div className="thu-hoi-tin-nhan">
-                    <i className="fa-regular fa-square-minus"></i>
-                    <p>Thu hồi tin nhắn</p>
-                </div>
-            )
+
+    const deleteMessage = async (messageId) => {
+        const res = await axios.put('/chat/message/deleteMessage', {
+            messageId: messageId
+        });
+        if (res.errCode === 0) {
+            handleModifyMessage(res.data);
+            socket.then(socket => {
+                socket.emit('modify-message', res.data);
+            })
         }
-    ]
+    }
+
+    const handleOnClick = (Element) => {
+        const { key } = Element;
+        switch (key) {
+            case METHOD_MESSAGE.COPY:
+                console.log('Copy hình ảnh');
+                break;
+            case METHOD_MESSAGE.PIN:
+                console.log('Ghim tin nhắn');
+                break;
+            case METHOD_MESSAGE.VIEW_DETAIL:
+                console.log('Xem chi tiết');
+                break;
+            case METHOD_MESSAGE.DELETE_ALL:
+                deleteMessage(message._id);
+                break;
+            default:
+                break;
+        }
+    }
 
     useEffect(() => {
         if (contentRef.current) {
@@ -63,8 +95,12 @@ const content = ({ optionsRef }) => {
         <div className="subOption" ref={contentRef}>
             {
                 items && items.length > 0 &&
-                items.map((Element, index) => (
-                    <div className="option-sub-item" key={Element.key}>
+                items.map((Element) => (
+                    <div
+                        className="option-sub-item"
+                        key={Element.key}
+                        onClick={() => handleOnClick(Element)}
+                    >
                         <Element.item />
                     </div>
                 ))
@@ -197,7 +233,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
                             <i title="Chuyển tiếp" className="fa-solid fa-share"></i>
                         </div>
                         <Popover
-                            content={React.createElement(content, { optionsRef })}
+                            content={React.createElement(content, { optionsRef, message, handleModifyMessage })}
                             trigger={"click"}
                             placement="topRight"
                             className="popover-options"

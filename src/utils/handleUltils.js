@@ -1,3 +1,5 @@
+import { FILE_TYPE } from "../redux/types/type.user";
+
 export const compareSizes = (sizes1, sizes2) => {
     const m1 = +sizes1.split('px')[0];
     const m2 = +sizes2.split('px')[0];
@@ -33,4 +35,47 @@ export const getFirstLetters = (name) => {
 export const getPreviewImage = (file) => {
     const image = URL.createObjectURL(file);
     return image;
+}
+
+export const getLinkDownloadFile = (url) => {
+    // Tách đường dẫn thành các phần
+    const parts = url.split('/');
+    // Tìm chỉ số của phần chứa 'upload'
+    const uploadIndex = parts.findIndex(part => part === 'upload');
+    // Kiểm tra xem có 'upload' trong đường dẫn không
+    if (uploadIndex !== -1) {
+        // Chèn tham số fl_attachment vào sau phần 'upload'
+        parts.splice(uploadIndex + 1, 0, 'fl_attachment');
+        // Tạo đường dẫn mới từ các phần đã chỉnh sửa
+        const newUrl = parts.join('/');
+        return newUrl;
+    } else {
+        // Trả về URL ban đầu nếu không tìm thấy phần 'upload'
+        return url;
+    }
+}
+
+export const getDataFromStringifyFile = (stringifyFile) => {
+    try {
+        const file = JSON.parse(stringifyFile);
+        return file;
+    } catch (error) {
+        return null;
+    }
+}
+
+export const customizeFile = (file) => {
+    const newFile = { ...file };
+    delete newFile.type;
+    newFile.size = `${file.size} bytes`;
+    newFile.name = file.name.split('.')[0];
+    const ext = file.name.split('.')[1];
+    if (ext === 'docx') {
+        newFile.type = FILE_TYPE.WORD;
+    } else if (ext === 'xlsx') {
+        newFile.type = FILE_TYPE.EXCEL;
+    } else if (ext === 'pdf') {
+        newFile.type = FILE_TYPE.PDF;
+    }
+    return newFile;
 }

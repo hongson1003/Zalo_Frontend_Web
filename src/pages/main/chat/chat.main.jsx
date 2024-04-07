@@ -16,15 +16,25 @@ import ReactLoading from 'react-loading';
 import { STATE } from "../../../redux/types/type.app";
 import TextareaAutosize from 'react-textarea-autosize';
 import StickyPopover from '../../../components/popover/sticky.popover';
-import { CHAT_STATUS, MESSAGES } from "../../../redux/types/type.user";
+import { CHAT_STATUS, FILE_TYPE, MESSAGES } from "../../../redux/types/type.user";
 import ChangeBackgroundModal from "../../../components/modal/changeBackground.modal";
 import MessageChat from "./message.chat";
-import { getPreviewImage, getTimeFromDate } from '../../../utils/handleUltils';
+import { customizeFile, getLinkDownloadFile, getPreviewImage, getTimeFromDate } from '../../../utils/handleUltils';
 import { useNavigate } from "react-router-dom";
 import { getFriend } from "../../../utils/handleChat";
 import { COLOR_BACKGROUND } from '../../../type/rootCss.type';
 import Zoom from 'react-medium-image-zoom';
-import { set } from "firebase/database";
+import InputSearchSticky from "../../../components/customize/inputSearchSticky";
+import ChooseFileUploadPopover from "../../../components/popover/chooseFileUpload.popover";
+import File from "../../../components/upload/file.upload";
+const uploadPreset = import.meta.env.VITE_APP_CLOUNDINARY_UPLOAD_PRESET;
+const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
+const folder = import.meta.env.VITE_APP_CLOUNDINARY_FOLDER;
+import { Document, Page } from 'react-pdf';
+import "react-pdf/dist/esm/Page/TextLayer.css";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import MicModal from "../../../components/modal/mic.modal";
+
 
 const ChatMain = ({ file, fileTypes }) => {
     const chat = useSelector(state => state.appReducer.subNav);
@@ -32,7 +42,7 @@ const ChatMain = ({ file, fileTypes }) => {
     const [show, setShow] = useState(true);
     const [showEmoij, setShowEmoij] = useState(true);
     const [messages, setMessages] = useState([]);
-    const [limit, setLimit] = useState(60);
+    const [limit, setLimit] = useState(40);
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const scroolRef = useRef(null);
     const receiveOnly = useRef(false);
@@ -55,51 +65,21 @@ const ChatMain = ({ file, fileTypes }) => {
     const scroolToTopRef = useRef(false);
     const heightScroolTopRef = useRef(0);
     const [hasText, setHasText] = useState(false);
-    const uploadPreset = import.meta.env.VITE_APP_CLOUNDINARY_UPLOAD_PRESET;
-    const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
-    const folder = import.meta.env.VITE_APP_CLOUNDINARY_FOLDER;
+
     const [listImage, setListImage] = useState([]);
 
+    // text để theo dõi thay đổi
+    const [text, setText] = useState('');
 
-    // handle file
-    const sendImage = async (preview, file) => {
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type: MESSAGES.IMAGES,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            images: [preview]
-        };
-        setMessages(prev => [...prev, createMessage]);
-        setSent(STATE.PENDING);
-        // upload ảnh lên cloudinary
-        const url = await uploadToCloudiry(file);
-        // save vào db
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            images: [url]
-        });
-        setSent(STATE.RESOLVE);
-        if (res.errCode === 0) {
-            socket.then(socket => {
-                setSent(STATE.RESOLVE);
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
-        } else {
-            setSent(STATE.REJECT);
-            toast.warn('Không thể gửi tin nhắn, ' + res.message);
-        }
-    }
-
+    // Emoij
     // get file
     useEffect(() => {
         if (file) {
             const preview = getPreviewImage(file);
             sendImage(preview, file);
+            setTimeout(() => {
+                scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
+            }, 500);
         }
     }, [file])
 
@@ -162,6 +142,10 @@ const ChatMain = ({ file, fileTypes }) => {
                 socket.on('receive-message', data => {
                     setMessages(prev => [...prev, data]);
                     fetchMessagePaginate();
+                    scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
+                })
+                socket.on('receive-modify-message', data => {
+                    handleModifyMessage(data);
                 })
             })
             receiveOnly.current = true;
@@ -184,11 +168,21 @@ const ChatMain = ({ file, fileTypes }) => {
 
     // first load message and scrool to bottom
     useEffect(() => {
+        let clock = null;
         if (scroolRef.current && scroolFirst.current === false && messages.length > 0) {
             scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
-            scroolFirst.current = true;
+            clock = setTimeout(() => {
+                scroolFirst.current = true;
+                scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
+            }, 500);
         }
-    }, [messages.length]);
+        return () => {
+            if (clock) {
+                clearTimeout(clock);
+            }
+        }
+
+    }, [messages.length, scroolRef.current?.scrollHeight]);
 
     useEffect(() => {
         if (scroolFirst.current === true && isLoadingFetch === false) {
@@ -222,10 +216,16 @@ const ChatMain = ({ file, fileTypes }) => {
         }
     }, [scroolRef.current?.scrollTop]);
 
+    useEffect(() => {
+        if (textAreaRef.current && textAreaRef.current?.value === '\n') {
+            textAreaRef.current.value = '';
+        }
+    }, [textAreaRef.current])
+
 
     useEffect(() => {
         const handleScroll = () => {
-            if (scroolRef.current.scrollTop < heightScroolTopRef.current / 2 && scroolToTopRef.current === false) {
+            if (scroolRef.current.scrollTop < heightScroolTopRef.current / 1.5 && scroolToTopRef.current === false) {
                 scroolToTopRef.current = true;
                 setIsLoadingFetch(true);
                 setLimit(prev => prev + 60);
@@ -254,7 +254,72 @@ const ChatMain = ({ file, fileTypes }) => {
         }
     }, [moreInfoRef.current])
 
+    // handle file
+    const sendImage = async (preview, file) => {
+        const ObjectId = objectId();
+        const createMessage = {
+            _id: ObjectId,
+            chat: chat,
+            type: MESSAGES.IMAGES,
+            sender: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            urls: [preview],
+            unViewList: []
+        };
+        setMessages(prev => [...prev, createMessage]);
+        setSent(STATE.PENDING);
+        // upload ảnh lên cloudinary
+        const url = await uploadToCloudiry(file);
+        // save vào db
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            urls: [url]
+        });
+        setSent(STATE.RESOLVE);
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                setSent(STATE.RESOLVE);
+                socket.emit('send-message', res.data);
+                socket.emit('finish-typing', chat._id);
+            })
+        } else {
+            setSent(STATE.REJECT);
+            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+        }
+    }
 
+    const sendImagesFromBase64 = async (urls) => {
+        const ObjectId = objectId();
+        const createMessage = {
+            _id: ObjectId,
+            chat: chat,
+            type: MESSAGES.IMAGES,
+            sender: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            urls: urls,
+            unViewList: []
+        };
+        setMessages(prev => [...prev, createMessage]);
+        setSent(STATE.PENDING);
+        // save ảnh vào db
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            urls
+        });
+        setSent(STATE.RESOLVE);
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                setSent(STATE.RESOLVE);
+                socket.emit('send-message', res.data);
+                socket.emit('finish-typing', chat._id);
+            })
+        } else {
+            setSent(STATE.REJECT);
+            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+        }
+    }
 
     const onClick = (e) => {
         setCurrent(e.key);
@@ -299,9 +364,9 @@ const ChatMain = ({ file, fileTypes }) => {
             </div>
         },
         {
-            key: 'friend',
+            key: 'video-call',
             icon: <div className="box-icon">
-                <i className="fa-solid fa-camera icon"></i>
+                <i className="fa-solid fa-video icon"></i>
             </div>
         },
         {
@@ -325,9 +390,17 @@ const ChatMain = ({ file, fileTypes }) => {
     }
 
     const sendMessage = async (data, type) => {
-        if (!data) {
+        if (!data.trim()) {
+            if (listImage.length === 0)
+                return;
+            else {
+                sendImagesFromBase64(listImage);
+            }
+            setListImage([]);
+            setText('');
             return;
         }
+        setText('');
         if (textAreaRef.current) {
             textAreaRef.current.value = '';
         }
@@ -339,10 +412,16 @@ const ChatMain = ({ file, fileTypes }) => {
             sender: user,
             createdAt: new Date(),
             updatedAt: new Date(),
+            unViewList: []
         }
-        if (type === MESSAGES.TEXT)
+        if (type === MESSAGES.TEXT) {
             createMessage.content = data;
-        else if (type === MESSAGES.STICKER)
+            if (listImage.length > 0) {
+                createMessage.urls = [...listImage];
+                setListImage([]);
+            }
+
+        } else if (type === MESSAGES.STICKER)
             createMessage.sticker = data;
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -352,6 +431,7 @@ const ChatMain = ({ file, fileTypes }) => {
             sender: user.id
         });
         if (res.errCode === 0) {
+            scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
             socket.then(socket => {
                 setSent(STATE.RESOLVE);
                 socket.emit('send-message', res.data);
@@ -395,8 +475,21 @@ const ChatMain = ({ file, fileTypes }) => {
         }
     }, []);
 
+    const handleSetText = _.debounce((value) => {
+        setText(value);
+    }, 700)
+
     const handleOnChange = (e) => {
-        if (e.target.value) {
+        let value = e.target.value;
+        if (textAreaRef.current.value.length === 1) {
+            textAreaRef.current.value = value.trim().toUpperCase();
+        }
+        if (value.length < 10) {
+            handleSetText(value);
+        } else if (value.length === 10) {
+            handleSetText('');
+        }
+        if (value) {
             setHasText(true);
         } else {
             setHasText(false);
@@ -419,9 +512,8 @@ const ChatMain = ({ file, fileTypes }) => {
             setHasText(false);
         } else {
             if (e.ctrlKey && e.key === 'v') {
-                e.preventDefault();
+                // e.preventDefault();
                 handlePaste();
-
             }
         }
     }
@@ -494,15 +586,6 @@ const ChatMain = ({ file, fileTypes }) => {
         }
     }
 
-    // const [rotation, setRotation] = useState(0);
-    // const handleEvent = (e) => {
-    //     if (!unClassList.includes(e.target.className)) {
-    //         const rect = e.target.getBoundingClientRect();
-    //         const centerX = rect.left + rect.width / 2;
-    //         const angle = (e.clientX - centerX) / 10; // Điều chỉnh số 10 để tăng hoặc giảm tốc độ xoay
-    //         setRotation(angle);
-    //     }
-    // }
 
     const handleOnChangeMessageImage = async (e) => {
         const files = e.target.files;
@@ -521,7 +604,8 @@ const ChatMain = ({ file, fileTypes }) => {
             sender: user,
             createdAt: new Date(),
             updatedAt: new Date(),
-            images: previews
+            urls: previews,
+            unViewList: []
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -534,7 +618,7 @@ const ChatMain = ({ file, fileTypes }) => {
         // save vào db
         const res = await axios.post('/chat/message', {
             ...createMessage,
-            images: urls
+            urls: urls
         });
         setSent(STATE.RESOLVE);
         if (res.errCode === 0) {
@@ -549,6 +633,39 @@ const ChatMain = ({ file, fileTypes }) => {
         }
     }
 
+    const sendAudio = async (file) => {
+        // preview
+        const preview = getPreviewImage(file);
+        const ObjectId = objectId();
+        const createMessage = {
+            _id: ObjectId,
+            chat: chat,
+            type: MESSAGES.AUDIO,
+            sender: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            urls: [preview],
+            unViewList: []
+        };
+        setMessages(prev => [...prev, createMessage]);
+        setSent(STATE.PENDING);
+        // upload
+        const url = await uploadToCloudiry(file);
+        // save
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            urls: [url]
+        });
+        setSent(STATE.RESOLVE);
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                setSent(STATE.RESOLVE);
+                socket.emit('send-message', res.data);
+                socket.emit('finish-typing', chat._id);
+            })
+        }
+    }
+
 
 
     const uploadToCloudiry = async (file) => {
@@ -557,19 +674,105 @@ const ChatMain = ({ file, fileTypes }) => {
         formData.append('upload_preset', uploadPreset);
         formData.append("cloud_name", cloudName);
         formData.append("folder", folder);
+        formData.append('resource_type', 'raw');
+
         if (file) {
-            const image = file.name;
-            const name = image.split('.')[0];
-            const extName = image.split('.')[1];
+            const origin = file.name;
+            const name = origin.split('.')[0];
+            const extName = origin.split('.')[1];
             const imgUpload = name + '-' + new Date().getTime() + '.' + extName;
             formData.append('public_id', imgUpload); // Thêm tham số public_id vào formData
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/raw/upload?secure=true`, {
                 method: 'POST',
                 body: formData,
             });
-            const urlData = await response.json();
-            return urlData.url;
+            const { secure_url } = await response.json();
+            return secure_url;
         }
+    }
+
+    const sendFileOrFolder = async (filesOrFolders) => {
+        const dataFiles = [];
+        for (let i = 0; i < filesOrFolders.length; i++) {
+            dataFiles.push(customizeFile(filesOrFolders[i]));
+        }
+
+        const previews = [];
+        if (filesOrFolders.length > 0) {
+            for (let i = 0; i < filesOrFolders.length; i++) {
+                const file = filesOrFolders[i];
+                previews.push(getPreviewImage(file));
+            }
+        }
+        const ObjectId = objectId();
+        const createMessage = {
+            _id: ObjectId,
+            chat: chat,
+            type: MESSAGES.FILE_FOLDER,
+            sender: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            urls: previews,
+            content: JSON.stringify(dataFiles),
+            unViewList: []
+        };
+        setMessages(prev => [...prev, createMessage]);
+        // const data = await uploadToCloudiry(filesOrFolders[0]);
+        //save
+        const urls = [];
+        for (let i = 0; i < filesOrFolders.length; i++) {
+            const url = await uploadToCloudiry(filesOrFolders[i]);
+            urls.push(url);
+        };
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            urls,
+            content: JSON.stringify(dataFiles)
+        });
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                socket.emit('send-message', res.data);
+                socket.emit('finish-typing', chat._id);
+            })
+        } else {
+            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+        }
+    }
+
+    const sendVideo = async (file) => {
+        const preview = getPreviewImage(file);
+        const ObjectId = objectId();
+        const createMessage = {
+            _id: ObjectId,
+            chat: chat,
+            type: MESSAGES.VIDEO,
+            sender: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            urls: [preview],
+            unViewList
+        };
+        setMessages(prev => [...prev, createMessage]);
+        setSent(STATE.PENDING);
+        // upload
+        const url = await uploadToCloudiry(file);
+        // save
+        const res = await axios.post('/chat/message', {
+            ...createMessage,
+            urls: [url]
+        });
+        setSent(STATE.RESOLVE);
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                setSent(STATE.RESOLVE);
+                socket.emit('send-message', res.data);
+                socket.emit('finish-typing', chat._id);
+            })
+        }
+    }
+
+    const handleSendAudio = (file) => {
+
     }
 
 
@@ -628,12 +831,14 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                     index == 0 ?
                                                                         <AvatarUser
                                                                             image={getFriend(user, chat.participants)?.avatar}
+                                                                            name={getFriend(user, chat.participants)?.userName}
                                                                         /> :
                                                                         (
                                                                             messages[index - 1].sender.id !== messages[index].sender.id &&
                                                                             <AvatarUser
                                                                                 image={chat.type === CHAT_STATUS.PRIVATE_CHAT ?
                                                                                     getFriend(user, chat.participants)?.avatar : chat.groupPhoto}
+                                                                                name={getFriend(user, chat.participants)?.userName}
                                                                             />
 
                                                                         )
@@ -641,53 +846,159 @@ const ChatMain = ({ file, fileTypes }) => {
                                                             </div>
                                                         }
                                                         <div
-                                                            className={message.type !== MESSAGES.TEXT ? `message de-bg ${message?.images?.length > 1 && 'w-500'}` : `message ${message?.images?.length > 1 && 'w-500'}`}
-                                                            style={{ backgroundColor: '#ffffff' }}
+                                                            className={message.type !== MESSAGES.TEXT ?
+                                                                `message ${(message.type === MESSAGES.FILE_FOLDER || message.type === MESSAGES.AUDIO) ?
+                                                                    '' : 'de-bg'} ${message?.urls?.length > 1 ?
+                                                                        'w-500' : ''}` : `message ${message?.urls?.length > 1 && 'w-500'}`}
                                                         >
                                                             {
                                                                 messages[index - 1]?.sender?.id !== messages[index].sender.id &&
-                                                                <p className="name">{message?.sender?.userName}</p>
+                                                                <p style={{ color: messageColor }} className="name">{message?.sender?.userName}</p>
                                                             }
-                                                            {message.type === MESSAGES.TEXT ?
-                                                                <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
-                                                                    <p className='message-content-right-right-right'>{message.content}</p>
-                                                                    {
-                                                                        messages[index + 1]?.sender?.id !== messages[index]?.sender?.id &&
-                                                                        <p className='time'>{getTimeFromDate(message.createdAt)}</p>
-                                                                    }
-                                                                </MessageChat> : (
-                                                                    message.type === MESSAGES.STICKER ?
-                                                                        <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
-                                                                            <img className="sticker" src={message.sticker} alt="sticker" />
+                                                            {
+                                                                !message.unViewList.includes(user.id) &&
+                                                                    message.isDelete === true ?
+                                                                    <p style={{ width: '100%', padding: '5px' }} className='message-content-right'>{'Tin nhắn đã được thu hồi'}</p> :
+                                                                    message.type === MESSAGES.TEXT ?
+                                                                        <MessageChat
+                                                                            handleModifyMessage={handleModifyMessage}
+                                                                            isLeft={true} message={message}
+                                                                        >
+                                                                            <p style={{ width: '100%', padding: '5px' }} className='message-content-left'>{message.content}</p>
                                                                             {
-                                                                                messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                message.urls?.length > 0 && message.urls.map((image, index) => {
+                                                                                    return (
+                                                                                        <Zoom key={message._id + index} className='khohieu'>
+                                                                                            <img className="image-message" src={image} alt="image" />
+                                                                                        </Zoom>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                            {
+                                                                                messages[index + 1]?.sender?.id !== messages[index]?.sender?.id &&
                                                                                 <p className='time'>{getTimeFromDate(message.createdAt)}</p>
                                                                             }
                                                                         </MessageChat> : (
-                                                                            message.type === MESSAGES.IMAGES &&
-                                                                            <MessageChat
-                                                                                handleModifyMessage={handleModifyMessage}
-                                                                                isLeft={true}
-                                                                                message={message}
-                                                                                isImage
-                                                                                lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
-                                                                            >
-                                                                                {
-                                                                                    message.images.map((image, index) => {
-                                                                                        return (
-                                                                                            <Zoom key={message._id + index}>
-                                                                                                <img className="image-message" src={image} alt="image" />
-                                                                                            </Zoom>
+                                                                            message.type === MESSAGES.STICKER ?
+                                                                                <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
+                                                                                    <img className="sticker" src={message.sticker} alt="sticker" />
+                                                                                    {
+                                                                                        messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                        <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                    }
+                                                                                </MessageChat> : (
+                                                                                    message.type === MESSAGES.IMAGES ?
+                                                                                        <MessageChat
+                                                                                            handleModifyMessage={handleModifyMessage}
+                                                                                            isLeft={true}
+                                                                                            message={message}
+                                                                                            isImage
+                                                                                            lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                        >
+                                                                                            {
+                                                                                                message.urls.map((image, index) => {
+                                                                                                    return (
+                                                                                                        <Zoom key={message._id + index}>
+                                                                                                            <img className="image-message" src={image} alt="image" />
+                                                                                                        </Zoom>
+                                                                                                    )
+                                                                                                })
+                                                                                            }
+                                                                                            {
+                                                                                                messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                                <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                            }
+                                                                                        </MessageChat> : (
+                                                                                            message.type === MESSAGES.FILE_FOLDER ?
+                                                                                                <MessageChat
+                                                                                                    handleModifyMessage={handleModifyMessage}
+                                                                                                    isLeft={true}
+                                                                                                    message={message}
+                                                                                                // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                >
+                                                                                                    {
+                                                                                                        message.urls.map((url, index) => {
+                                                                                                            const { name, size, type } = JSON.parse(message.content)[index];
+                                                                                                            return (
+                                                                                                                <File
+                                                                                                                    key={message._id + index}
+                                                                                                                    url={getLinkDownloadFile(url)}
+                                                                                                                    name={name}
+                                                                                                                    type={type}
+                                                                                                                    size={size}
+                                                                                                                    className={type}
+                                                                                                                >
+                                                                                                                    {
+                                                                                                                        type === FILE_TYPE.PDF &&
+                                                                                                                        <Document
+                                                                                                                            file={url}
+                                                                                                                            onLoadSuccess={() => { }}
+                                                                                                                        >
+                                                                                                                            <Page pageNumber={1}
+                                                                                                                                width={370}
+                                                                                                                            />
+                                                                                                                        </Document>
+                                                                                                                    }
+                                                                                                                </File>
+                                                                                                            )
+                                                                                                        })
+                                                                                                    }
+                                                                                                    {
+                                                                                                        messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                                        <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                                    }
+                                                                                                </MessageChat> : (
+                                                                                                    message.type === MESSAGES.AUDIO ?
+                                                                                                        <MessageChat
+                                                                                                            handleModifyMessage={handleModifyMessage}
+                                                                                                            isLeft={true}
+                                                                                                            message={message}
+                                                                                                        // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                        >
+                                                                                                            {
+                                                                                                                message.urls.map((url, index) => {
+                                                                                                                    return (
+                                                                                                                        <audio
+                                                                                                                            key={message._id + index}
+                                                                                                                            controls
+                                                                                                                            src={url}
+                                                                                                                        />
+                                                                                                                    )
+                                                                                                                })
+                                                                                                            }
+                                                                                                            {
+                                                                                                                messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                                                <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                                            }
+                                                                                                        </MessageChat> : (
+                                                                                                            message.type === MESSAGES.VIDEO &&
+                                                                                                            <MessageChat
+                                                                                                                handleModifyMessage={handleModifyMessage}
+                                                                                                                isLeft={true}
+                                                                                                                message={message}
+                                                                                                            // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                            >
+                                                                                                                {
+                                                                                                                    message.urls.map((url, index) => {
+                                                                                                                        return (
+                                                                                                                            <video
+                                                                                                                                key={message._id + index}
+                                                                                                                                controls
+                                                                                                                                src={url}
+                                                                                                                            />
+                                                                                                                        )
+                                                                                                                    })
+                                                                                                                }
+                                                                                                                {
+                                                                                                                    messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                                                    <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                                                }
+                                                                                                            </MessageChat>
+                                                                                                        )
+                                                                                                )
                                                                                         )
-                                                                                    })
-                                                                                }
-                                                                                {
-                                                                                    messages[index + 1]?.sender?.id !== messages[index].sender.id &&
-                                                                                    <p className='time'>{getTimeFromDate(message.createdAt)}</p>
-                                                                                }
-                                                                            </MessageChat>
-                                                                        )
-                                                                )}
+                                                                                )
+                                                                        )}
                                                         </div>
                                                     </div>
                                                     // current user
@@ -695,57 +1006,165 @@ const ChatMain = ({ file, fileTypes }) => {
                                                     <div
                                                         style={{
                                                             alignSelf: 'flex-end',
-                                                            backgroundColor: '#e5efff',
-                                                            marginBottom: message?.reactions?.length > 0 ? '10px' : '0px'
+                                                            marginBottom: message?.reactions?.length > 0 ? '10px' : '0px',
                                                         }}
-                                                        className={message.type !== MESSAGES.TEXT ? `message de-bg ${message?.images?.length > 1 && 'w-500'}` : `message ${message?.images?.length > 1 && 'w-500'}`}
+                                                        className={message.type === MESSAGES.TEXT ? 'message' : (
+                                                            (message.type === MESSAGES.FILE_FOLDER || message.type === MESSAGES.AUDIO)
+                                                                ? 'message' : 'message de-bg'
+                                                        )}
                                                     >
-                                                        {message.type === MESSAGES.TEXT ?
-                                                            <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
-                                                                <p className='message-content-right-right-right'>{message.content}</p>
-                                                                {
-                                                                    messages[index + 1]?.sender?.id !== messages[index].sender?.id &&
-                                                                    <p className='time'>{getTimeFromDate(message.createdAt)}</p>
-                                                                }
-                                                            </MessageChat>
-                                                            : (
-                                                                message.type === MESSAGES.STICKER ?
-                                                                    <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
-                                                                        <img className="sticker" src={message.sticker} alt="sticker" />
+                                                        {
+                                                            !message.unViewList.includes(user.id) &&
+                                                                message.isDelete === true ?
+                                                                <p style={{ width: '100%', padding: '5px' }} className='message-content-right'>{'Tin nhắn đã được thu hồi'}</p> :
+                                                                // render message
+                                                                message.type === MESSAGES.TEXT ?
+                                                                    <MessageChat handleModifyMessage={handleModifyMessage}
+                                                                        isLeft={false} message={message}
+                                                                        isImage={message.urls?.length > 0}
+                                                                    >
+                                                                        <p style={{ width: '100%', padding: '5px' }} className='message-content-right'>{message.content}</p>
                                                                         {
-                                                                            messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                            message.urls?.length > 0 && message.urls.map((image, index) => {
+                                                                                return (
+                                                                                    <Zoom key={message._id + index}>
+                                                                                        <img className="image-message" src={image} alt="image" />
+                                                                                    </Zoom>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                        {
+                                                                            messages[index + 1]?.sender?.id !== messages[index].sender?.id &&
                                                                             <p className='time'>{getTimeFromDate(message.createdAt)}</p>
                                                                         }
-                                                                    </MessageChat> : (
-                                                                        message.type === MESSAGES.IMAGES &&
-                                                                        <MessageChat
-                                                                            handleModifyMessage={handleModifyMessage}
-                                                                            isLeft={false}
-                                                                            message={message}
-                                                                            isImage
-                                                                            lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
-                                                                        >
-                                                                            {
-                                                                                message.images.map((image, index) => {
-                                                                                    return (
-                                                                                        <Zoom key={message._id + index}>
-                                                                                            <img className="image-message" src={image} alt="image" />
-                                                                                        </Zoom>
+                                                                    </MessageChat>
+                                                                    : (
+                                                                        message.type === MESSAGES.STICKER ?
+                                                                            <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
+                                                                                <img className="sticker" src={message.sticker} alt="sticker" />
+                                                                                {
+                                                                                    messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                    <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                }
+                                                                            </MessageChat> : (
+                                                                                message.type === MESSAGES.IMAGES ?
+                                                                                    <MessageChat
+                                                                                        handleModifyMessage={handleModifyMessage}
+                                                                                        isLeft={false}
+                                                                                        message={message}
+                                                                                        isImage
+                                                                                        lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                    >
+                                                                                        {
+                                                                                            message.urls.map((image, index) => {
+                                                                                                return (
+                                                                                                    <Zoom key={message._id + index}>
+                                                                                                        <img className="image-message" src={image} alt="image" />
+                                                                                                    </Zoom>
+                                                                                                )
+                                                                                            })
+                                                                                        }
+                                                                                        {
+                                                                                            messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                            <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                        }
+                                                                                    </MessageChat> : (
+                                                                                        message.type === MESSAGES.FILE_FOLDER ?
+                                                                                            <MessageChat
+                                                                                                handleModifyMessage={handleModifyMessage}
+                                                                                                isLeft={false}
+                                                                                                message={message}
+                                                                                            // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                            >
+                                                                                                {
+                                                                                                    message.urls.map((url, index) => {
+                                                                                                        const { name, size, type } = JSON.parse(message.content)[index];
+                                                                                                        return (
+                                                                                                            <File
+                                                                                                                key={message._id + index}
+                                                                                                                url={getLinkDownloadFile(url)}
+                                                                                                                name={name}
+                                                                                                                type={type}
+                                                                                                                size={size}
+                                                                                                                className={type}
+                                                                                                            >
+                                                                                                                {
+                                                                                                                    type === FILE_TYPE.PDF &&
+                                                                                                                    <Document
+                                                                                                                        file={url}
+                                                                                                                        onLoadSuccess={() => { }}
+                                                                                                                    >
+                                                                                                                        <Page pageNumber={1}
+                                                                                                                            width={370}
+                                                                                                                        />
+                                                                                                                    </Document>
+                                                                                                                }
+                                                                                                            </File>
+                                                                                                        )
+                                                                                                    })
+                                                                                                }
+                                                                                                {
+                                                                                                    messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                                    <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                                }
+                                                                                            </MessageChat> : (
+                                                                                                message.type === MESSAGES.AUDIO ?
+                                                                                                    <MessageChat
+                                                                                                        handleModifyMessage={handleModifyMessage}
+                                                                                                        isLeft={false}
+                                                                                                        message={message}
+                                                                                                    // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                    >
+                                                                                                        {
+                                                                                                            message.urls.map((url, index) => {
+                                                                                                                return (
+                                                                                                                    <audio
+                                                                                                                        key={message._id + index}
+                                                                                                                        controls
+                                                                                                                        src={url}
+                                                                                                                    />
+                                                                                                                )
+                                                                                                            })
+                                                                                                        }
+                                                                                                        {
+                                                                                                            messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                                            <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                                        }
+                                                                                                    </MessageChat> : (
+                                                                                                        message.type === MESSAGES.VIDEO &&
+                                                                                                        <MessageChat
+                                                                                                            handleModifyMessage={handleModifyMessage}
+                                                                                                            isLeft={false}
+                                                                                                            message={message}
+                                                                                                        // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                        >
+                                                                                                            {
+                                                                                                                message.urls.map((url, index) => {
+                                                                                                                    return (
+                                                                                                                        <video
+                                                                                                                            key={message._id + index}
+                                                                                                                            controls
+                                                                                                                            src={url}
+                                                                                                                        />
+                                                                                                                    )
+                                                                                                                })
+                                                                                                            }
+                                                                                                            {
+                                                                                                                messages[index + 1]?.sender?.id !== messages[index].sender.id &&
+                                                                                                                <p className='time'>{getTimeFromDate(message.createdAt)}</p>
+                                                                                                            }
+                                                                                                        </MessageChat>
+                                                                                                    )
+                                                                                            )
                                                                                     )
-                                                                                })
-                                                                            }
-                                                                            {
-                                                                                messages[index + 1]?.sender?.id !== messages[index].sender.id &&
-                                                                                <p className='time'>{getTimeFromDate(message.createdAt)}</p>
-                                                                            }
-                                                                        </MessageChat>
-                                                                    )
+                                                                            )
 
-                                                            )}
+                                                                    )}
                                                     </div>
                                             }
                                             {
                                                 index == messages.length - 1 && message?.sender?.id === user?.id &&
+                                                !message.unViewList.includes(user.id) &&
                                                 <div
                                                     style={{ alignSelf: 'flex-end' }}
                                                 >
@@ -762,7 +1181,6 @@ const ChatMain = ({ file, fileTypes }) => {
                                                             )
                                                         }
                                                     </div>
-
                                                 </div>
                                             }
                                         </React.Fragment>
@@ -802,85 +1220,105 @@ const ChatMain = ({ file, fileTypes }) => {
 
                         </div>
 
-                        <div className="footer" ref={footer}>
-                            <div className="footer-top footer-item">
-                                <StickyPopover >
-                                    <div className="item-icon"
-                                        onClick={() => handleDispatchSendMessageFunc()}>
-                                        <img src="/images/sticker.png" />
-                                    </div>
-                                </StickyPopover>
-                                <label htmlFor="message-inpt-image">
-                                    <div className="item-icon">
-                                        <i className="fa-regular fa-image"></i>
-                                    </div>
-                                </label>
-                                <input
-                                    type="file"
-                                    id="message-inpt-image" hidden
-                                    accept="image/png, image/gif, image/jpeg"
-                                    onChange={e => handleOnChangeMessageImage(e)}
-                                    multiple
-                                />
+                        <InputSearchSticky
+                            content={text}
+                            sendMessage={sendMessage}
+                            style={listImage?.length > 0 ? { height: '170px' } : {}}
+                        >
+                            <div style={listImage?.length > 0 ? { height: '170px' } : {}} className="footer" ref={footer}>
+                                <div className="footer-top footer-item">
+                                    <StickyPopover >
+                                        <div className="item-icon"
+                                            onClick={() => handleDispatchSendMessageFunc()}>
+                                            <img src="/images/sticker.png" />
+                                        </div>
+                                    </StickyPopover>
+                                    <label htmlFor="message-inpt-image">
+                                        <div className="item-icon">
+                                            <i className="fa-regular fa-image"></i>
+                                        </div>
+                                    </label>
+                                    <input
+                                        type="file"
+                                        id="message-inpt-image" hidden
+                                        accept="image/png, image/gif, image/jpeg"
+                                        onChange={e => handleOnChangeMessageImage(e)}
+                                        multiple
+                                    />
 
-                                <div className="item-icon">
-                                    <i className="fa-solid fa-paperclip"></i>
-                                </div>
+                                    <ChooseFileUploadPopover
+                                        sendFileOrFolder={sendFileOrFolder}
+                                        sendVideo={sendVideo}
+                                        sendAudio={sendAudio}
+                                    >
+                                        <div className="item-icon">
+                                            <i className="fa-solid fa-paperclip"></i>
+                                        </div>
+                                    </ChooseFileUploadPopover>
 
-                            </div>
-                            <div className="footer-bottom footer-item" onClick={handleOnClickFooter}>
-                                <TextareaAutosize
-                                    className="input-text"
-                                    onChange={e => handleOnChange(e)}
-                                    placeholder="Nhập tin nhắn..."
-                                    onKeyDown={e => handleOnKeyDown(e)}
-                                    autoFocus
-                                    spellCheck={false}
-                                    onHeightChange={(height, meta) => handleResize(height, meta)}
-                                    ref={textAreaRef}
-                                    type="text"
-                                />
-                                <div className="text-quick-group">
-                                    <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
-                                        <i className="fa-regular fa-face-smile emoijj"></i>
-                                    </div>
-                                    <div className="item-icon emoij-like">
-                                        {
-                                            !hasText ?
-                                                <div style={{ padding: '10px' }} onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
-                                                    👌
-                                                </div> :
-                                                <div onClick={() => sendMessage(textAreaRef.current?.value, MESSAGES.TEXT)}>
-                                                    <i className="fa-regular fa-paper-plane"></i>
-                                                </div>
-                                        }
-                                    </div>
+                                    <MicModal
+                                        sendAudio={sendAudio}
+                                    >
+                                        <div className="item-icon">
+                                            <i className="fa-solid fa-microphone"></i>
+                                        </div>
+                                    </MicModal>
+
                                 </div>
-                            </div>
-                            {
-                                listImage && listImage.length > 0 && (
-                                    <div className="list-images">
-                                        {
-                                            listImage.map((image, index) => {
-                                                return (
-                                                    <div key={index} className="image-item">
-                                                        <Zoom>
-                                                            <img src={image} alt="image" />
-                                                        </Zoom>
-                                                        <div className="image-item-remove">
-                                                            <button onClick={() => handleRemoveImage(index)}>X</button>
-                                                        </div>
+                                <div className="footer-bottom footer-item" onClick={handleOnClickFooter}>
+                                    <TextareaAutosize
+                                        className="input-text"
+                                        onChange={e => handleOnChange(e)}
+                                        placeholder="Nhập tin nhắn..."
+                                        onKeyDown={e => handleOnKeyDown(e)}
+                                        autoFocus
+                                        spellCheck={false}
+                                        onHeightChange={(height, meta) => handleResize(height, meta)}
+                                        ref={textAreaRef}
+                                        type="text"
+                                    />
+                                    <div className="text-quick-group">
+                                        <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
+                                            <i className="fa-regular fa-face-smile emoijj"></i>
+                                        </div>
+                                        <div className="item-icon emoij-like">
+                                            {
+                                                !hasText ?
+                                                    <div style={{ padding: '10px' }} onClick={() => sendMessage('👌', MESSAGES.TEXT)}>
+                                                        👌
+                                                    </div> :
+                                                    <div onClick={() => sendMessage(textAreaRef.current?.value, MESSAGES.TEXT)}>
+                                                        <i className="fa-regular fa-paper-plane"></i>
                                                     </div>
-                                                )
-                                            })
-                                        }
-
+                                            }
+                                        </div>
                                     </div>
-                                )
-                            }
-                        </div>
-                    </div>
-                </div>
+                                </div>
+                                {
+                                    listImage && listImage.length > 0 && (
+                                        <div className="list-images">
+                                            {
+                                                listImage.map((image, index) => {
+                                                    return (
+                                                        <div key={index} className="image-item">
+                                                            <Zoom>
+                                                                <img src={image} alt="image" />
+                                                            </Zoom>
+                                                            <div className="image-item-remove">
+                                                                <button onClick={() => handleRemoveImage(index)}>X</button>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        </InputSearchSticky>
+                    </div >
+                </div >
 
                 {
                     show &&

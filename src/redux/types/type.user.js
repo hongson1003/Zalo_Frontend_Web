@@ -26,8 +26,28 @@ export const NOTIFICATIONS = {
 export const MESSAGES = {
     SEND_MESSAGE_FUNC: 'SEND_MESSAGE_FUNC',
     IMAGES: 'IMAGES',
-    VIDEOS: 'VIDEOS',
-    AUDIOS: 'AUDIOS',
+    VIDEO: 'VIDEO',
+    AUDIO: 'AUDIO',
     TEXT: 'TEXT',
     STICKER: 'STICKER',
+    FILE_FOLDER: 'FILE_FOLDER',
+
+}
+
+export const FILE_TYPE = {
+    FILE: 'FILE',
+    FOLDER: 'FOLDER',
+    PDF: 'PDF',
+    WORD: 'WORD',
+    EXCEL: 'EXCEL',
+    JAR: 'JAR',
+}
+
+export const METHOD_MESSAGE = {
+    DELETE_MYSEFL: 'DELETE_MYSEFL',
+    DELETE_ALL: 'DELETE_ALL',
+    COPY: 'COPY',
+    PIN: 'PIN',
+    VIEW_DETAIL: 'VIEW_DETAIL',
+    
 }

@@ -1,0 +1,24 @@
+.mic-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    .mic-item {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 1px solid;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        i {
+            font-size: 30px;
+            color: #aadbdf;
+        }
+    }
+    .audio-item {
+        margin-top: 10px;
+    }
+}
