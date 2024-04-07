@@ -7,11 +7,12 @@ import InfoGroupModal from "../modal/infoGroup.modal";
 import { getFriend } from "../../utils/handleChat";
 import { useSelector } from "react-redux";
 import axios from '../../utils/axios';
+import { socket } from "../../utils/io";
 
 const StatusUser = ({ chat }) => {
     const user = useSelector(state => state.appReducer.userInfo.user);
     const [friendShipData, setFriendShipData] = useState(null);
-
+    const [statusUser, setStatusUser] = useState(null);
 
     const fetchFriendShip = async (userId) => {
         const res = await axios.get(`/users/friendShip?userId=${userId}`);
@@ -23,6 +24,34 @@ const StatusUser = ({ chat }) => {
     useEffect(() => {
         fetchFriendShip(getFriend(user, chat.participants)?.id);
     }, []);
+
+    useEffect(() => {
+        if (chat) {
+            setStatusUser(getFriend(user, chat.participants));
+        }
+    }, [chat]);
+
+    useEffect(() => {
+        if (statusUser) {
+            socket.then(socket => {
+                socket.on('online', () => {
+                    setStatusUser({
+                        ...statusUser,
+                        lastedOnline: null
+                    });
+                });
+                socket.on('offline', (data) => {
+                    setStatusUser({
+                        ...statusUser,
+                        lastedOnline: (new Date()).toISOString()
+                    });
+                });
+            })
+        }
+    }, [statusUser]);
+
+
+
     return (
         <div className="status-user-container">
             {
@@ -36,6 +65,7 @@ const StatusUser = ({ chat }) => {
                             image={getFriend(user, chat.participants)?.avatar}
                             size={50}
                             name={getFriend(user, chat.participants)?.userName}
+                            isOnline={statusUser?.lastedOnline === null ? true : false}
                         />
                     </InforUserModal>
                 ) : (
@@ -77,7 +107,13 @@ const StatusUser = ({ chat }) => {
                     ) : (
                         <>
                             <p className="username">{getFriend(user, chat?.participants)?.userName}</p>
-                            <p className="connected-time">Truy cập 57 phút trước</p>
+                            <p className="connected-time">
+                                {
+                                    statusUser?.lastedOnline === null ?
+                                        "Đang hoạt động" :
+                                        statusUser?.lastedOnline
+                                }
+                            </p>
                         </>
                     )
 

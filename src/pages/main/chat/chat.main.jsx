@@ -750,8 +750,9 @@ const ChatMain = ({ file, fileTypes }) => {
             createdAt: new Date(),
             updatedAt: new Date(),
             urls: [preview],
-            unViewList
+            unViewList: [],
         };
+
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
         // upload

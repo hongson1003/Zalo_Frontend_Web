@@ -3,11 +3,21 @@ import { Avatar } from 'antd';
 import Zoom from 'react-medium-image-zoom'
 import { getFirstLetters } from "../../utils/handleUltils";
 
+const styleCSS = {
+    position: 'absolute',
+    right: '-2px',
+    bottom: '-2px',
+    borderRadius: '50%',
+    border: '2px solid #ffffff',
+    backgroundColor: '#1DA57A',
+    width: '15px',
+    height: '15px'
+}
 
 const AvatarUser = (props) => {
-    const { image, children, zoom, size, style, name } = props;
+    const { image, children, zoom, size, style, name, isOnline } = props;
     return (
-        <span className="avatar-container" style={{ position: 'relative', ...style }}>
+        <div className="avatar-container" style={{ position: 'relative', ...style }}>
             {
                 zoom === true ?
                     (
@@ -42,9 +52,11 @@ const AvatarUser = (props) => {
                         </Avatar>
                     )
             }
-
             {children}
-        </span>
+            {
+                isOnline && <div className="online" style={styleCSS}></div>
+            }
+        </div>
     )
 }
 

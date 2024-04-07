@@ -80,12 +80,21 @@ const Sidebar = () => {
     const dispatch = useDispatch();
     const navigator = useNavigate();
 
+    const updateOnline = async (time) => {
+        await axios.put('/users/updateOnline', { time });
+    }
+
     const handleLogout = async () => {
+        await updateOnline(new Date());
+        socket.then(socket => {
+            socket.emit('offline', state?.userInfo?.user?.id)
+        })
         let rs = await axios.post('/auth/logout');
         if (rs.errCode === 0) {
             dispatch(logoutSuccess());
             navigator('/login');
         } else {
+            updateOnline(null);
             toast.error('Không thể đăng xuất, có lỗi xảy ra !')
         }
     }

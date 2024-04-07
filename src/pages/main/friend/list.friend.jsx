@@ -39,7 +39,7 @@ const ListFriend = () => {
         const res = await axios.get(`/users/friends?page=${page}&limit=${limit}`);
         if (res.errCode === 0) {
             setFriends(res.data);
-            setStateFriends(STATE.SUCCESS);
+            setStateFriends(STATE.RESOLVE);
         } else {
             setStateFriends(STATE.REJECT);
             toast.warn(res.message);
@@ -84,7 +84,7 @@ const ListFriend = () => {
                 <span className="label">{headerData.label}</span>
             </header>
             {
-                stateFriends === STATE.PENDING ? friends && friends.length > 0 && (
+                (stateFriends !== STATE.REJECT) && friends && friends.length > 0 ? (
                     <div className="friends-body">
                         <div className="friends-main">
                             <div className="interactaction">

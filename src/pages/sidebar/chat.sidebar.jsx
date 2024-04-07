@@ -52,7 +52,7 @@ const ChatSidebar = () => {
             chats.forEach(item => {
                 socket.then(socket => {
                     socket.emit('join-chat', item._id);
-                    // socket.on('joined-chat', room => {
+                    // socket.on('joined-room', room => {
                     // })
                 })
             })
