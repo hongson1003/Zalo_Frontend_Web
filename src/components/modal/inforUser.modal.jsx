@@ -224,9 +224,19 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
 
     }
 
+    const handleRecallAddFriend = async () => {
+        const res = await axios.post('/users/friendShip',
+            { userId: friendData?.id, content: description }
+        );
+        if (res.errCode === 3) {
+            fetchFriendShip(friendData?.id);
+        } else {
+            toast.warn(res.message);
+        }
+    }
+
     const handleJoinChat = async () => {
         console.log('friendship', friendShipData)
-
         // return;
         // validate
         const res = await axios.post('/chat/access', {
@@ -376,13 +386,13 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                             <Button type='default' onClick={() => handleNeedAddFriend()}>Thêm bạn</Button> :
                                             (
                                                 friendShipData?.status === STATE.PENDING && friendShipData?.user1?.id === user?.id ?
-                                                    <Button type='default' onClick={() => handleAddFriend()}>Thu hồi lời mời</Button> :
+                                                    <Button type='default' onClick={() => handleRecallAddFriend()}>Thu hồi lời mời</Button> :
                                                     <Button type='default' onClick={() => handleAddFriend()}>Chấp nhận kết bạn</Button>
                                             )
                                     )
                             }
                             <Button
-                                disabled={!friendShipData}
+                                disabled={!friendShipData || !(friendShipData.status === STATE.RESOLVE)}
                                 type='default'
                                 onClick={handleJoinChat}
                                 title={friendShipData?.status === STATE.RESOLVE ? 'Nhắn tin' : 'Kết bạn trước khi nhắn tin'}

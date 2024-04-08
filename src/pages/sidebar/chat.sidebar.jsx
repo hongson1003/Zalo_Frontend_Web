@@ -4,7 +4,7 @@ import ChatUser from "../../components/user/chat.user";
 import { socket } from "../../utils/io";
 import { toast } from "react-toastify";
 import { STATE } from "../../redux/types/type.app";
-import { accessChat } from "../../redux/actions/user.action";
+import { accessChat, fetchChatsFunc } from "../../redux/actions/user.action";
 import { useDispatch, useSelector } from "react-redux";
 
 
@@ -17,6 +17,7 @@ const ChatSidebar = () => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const dispatch = useDispatch();
     const chat = useSelector(state => state.appReducer?.subNav);
+
     const fetchChats = async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
         if (res.errCode === 0) {
@@ -59,6 +60,14 @@ const ChatSidebar = () => {
         }
     }, [chats])
 
+    // bắn chat đầu tiên
+    useEffect(() => {
+        if (fetchChats) {
+            dispatch(fetchChatsFunc(fetchChats));
+        }
+
+    }, [])
+
     return (
         <div>
             {
@@ -69,6 +78,7 @@ const ChatSidebar = () => {
                             key={index}
                             chat={chat}
                             activeKey={chat._id}
+                            fetchChats={fetchChats}
                         />
                     )
                 })

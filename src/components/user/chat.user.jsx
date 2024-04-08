@@ -3,7 +3,7 @@ import AvatarUser from './avatar';
 import { useDispatch, useSelector } from "react-redux";
 import './chat.user.scss'
 import { accessChat } from "../../redux/actions/user.action";
-import { CHAT_STATUS } from "../../redux/types/type.user";
+import { CHAT_STATUS, MESSAGES } from "../../redux/types/type.user";
 import { getFriend } from '../../utils/handleChat';
 
 const ChatUser = ({ chat, activeKey }) => {
@@ -62,7 +62,20 @@ const ChatUser = ({ chat, activeKey }) => {
                     }
                 </div>
                 <div className="bottom">
-                    <p>{'Hi chào cậu'}</p>
+                    <p>
+                        {
+                            chat?.lastedMessage?.type === MESSAGES.TEXT ?
+                                chat.lastedMessage?.content : (
+                                    chat.lastedMessage?.type === MESSAGES.IMAGES ? 'Đã gửi ảnh' : (
+                                        chat.lastedMessage?.type === MESSAGES.FILE_FOLDER ? 'Đã gửi file' : (
+                                            chat.lastedMessage?.type === MESSAGES.VIDEO ? 'Đã gửi video' : (
+                                                chat.lastedMessage?.type === MESSAGES.STICKER ? 'Đã gửi sticker' : ''
+                                            )
+                                        )
+                                    )
+                                )
+                        }
+                    </p>
                 </div>
             </div>
         </div>

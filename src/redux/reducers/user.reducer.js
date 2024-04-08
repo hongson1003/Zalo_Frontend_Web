@@ -33,6 +33,12 @@ export default function userReducer(state = initialState, action) {
             return stateFetchNotificationsFunc;
         }
 
+        case CHAT_STATUS.FETCH: {
+            let stateFetchFunc = { ...state };
+            stateFetchFunc.fetchChats = action.payload;
+            return stateFetchFunc;
+        }
+
 
         default:
             return state

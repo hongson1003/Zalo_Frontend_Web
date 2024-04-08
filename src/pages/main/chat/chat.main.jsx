@@ -34,6 +34,7 @@ import { Document, Page } from 'react-pdf';
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import MicModal from "../../../components/modal/mic.modal";
+import PinsModal from "../../../components/modal/pins.modal";
 
 
 const ChatMain = ({ file, fileTypes }) => {
@@ -65,8 +66,10 @@ const ChatMain = ({ file, fileTypes }) => {
     const scroolToTopRef = useRef(false);
     const heightScroolTopRef = useRef(0);
     const [hasText, setHasText] = useState(false);
-
     const [listImage, setListImage] = useState([]);
+    const userState = useSelector(state => state.userReducer);
+    const listMessageIsPinRef = useRef([]);
+    const [hasPin, setHasPin] = useState(false);
 
     // text để theo dõi thay đổi
     const [text, setText] = useState('');
@@ -140,6 +143,7 @@ const ChatMain = ({ file, fileTypes }) => {
                     setTyping(false);
                 });
                 socket.on('receive-message', data => {
+                    userState.fetchChats();
                     setMessages(prev => [...prev, data]);
                     fetchMessagePaginate();
                     scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
@@ -266,7 +270,8 @@ const ChatMain = ({ file, fileTypes }) => {
             createdAt: new Date(),
             updatedAt: new Date(),
             urls: [preview],
-            unViewList: []
+            unViewList: [],
+            isDelete: false
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -279,6 +284,7 @@ const ChatMain = ({ file, fileTypes }) => {
         });
         setSent(STATE.RESOLVE);
         if (res.errCode === 0) {
+            userState.fetchChats();
             socket.then(socket => {
                 setSent(STATE.RESOLVE);
                 socket.emit('send-message', res.data);
@@ -300,7 +306,8 @@ const ChatMain = ({ file, fileTypes }) => {
             createdAt: new Date(),
             updatedAt: new Date(),
             urls: urls,
-            unViewList: []
+            unViewList: [],
+            isDelete: false
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -311,6 +318,7 @@ const ChatMain = ({ file, fileTypes }) => {
         });
         setSent(STATE.RESOLVE);
         if (res.errCode === 0) {
+            userState.fetchChats();
             socket.then(socket => {
                 setSent(STATE.RESOLVE);
                 socket.emit('send-message', res.data);
@@ -326,11 +334,30 @@ const ChatMain = ({ file, fileTypes }) => {
         setCurrent(e.key);
     };
 
+    // Quan sát
+    useEffect(() => {
+        console.log(listMessageIsPinRef.current)
+    }, [listMessageIsPinRef.current.length])
+
 
     const fetchMessagePaginate = async () => {
         const res = await axios.get(`/chat/message/pagination?chatId=${chat._id}&limit=${limit}`)
         if (res.errCode === 0) {
             setMessages(res?.data);
+            const data = res?.data;
+            if (data.length > 0) {
+                let i = 0;
+                data.forEach(item => {
+                    if (!item.unViewList.includes(user.id) && item.isPin === true && !item.isDelete) {
+                        if (item.isPin === true) {
+                            setHasPin(true);
+                            i++;
+                        }
+                    }
+                })
+                if (!i)
+                    setHasPin(false);
+            }
         }
         else {
             setMessages([])
@@ -409,7 +436,8 @@ const ChatMain = ({ file, fileTypes }) => {
             sender: user,
             createdAt: new Date(),
             updatedAt: new Date(),
-            unViewList: []
+            unViewList: [],
+            isDelete: false,
         }
         if (type === MESSAGES.TEXT) {
             createMessage.content = data;
@@ -428,6 +456,7 @@ const ChatMain = ({ file, fileTypes }) => {
             sender: user.id
         });
         if (res.errCode === 0) {
+            userState.fetchChats();
             scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
             socket.then(socket => {
                 setSent(STATE.RESOLVE);
@@ -602,7 +631,8 @@ const ChatMain = ({ file, fileTypes }) => {
             createdAt: new Date(),
             updatedAt: new Date(),
             urls: previews,
-            unViewList: []
+            unViewList: [],
+            isDelete: false
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -619,6 +649,7 @@ const ChatMain = ({ file, fileTypes }) => {
         });
         setSent(STATE.RESOLVE);
         if (res.errCode === 0) {
+            userState.fetchChats();
             socket.then(socket => {
                 setSent(STATE.RESOLVE);
                 socket.emit('send-message', res.data);
@@ -642,7 +673,8 @@ const ChatMain = ({ file, fileTypes }) => {
             createdAt: new Date(),
             updatedAt: new Date(),
             urls: [preview],
-            unViewList: []
+            unViewList: [],
+            isDelete: false
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -711,7 +743,8 @@ const ChatMain = ({ file, fileTypes }) => {
             updatedAt: new Date(),
             urls: previews,
             content: JSON.stringify(dataFiles),
-            unViewList: []
+            unViewList: [],
+            isDelete: false
         };
         setMessages(prev => [...prev, createMessage]);
         // const data = await uploadToCloudiry(filesOrFolders[0]);
@@ -727,6 +760,7 @@ const ChatMain = ({ file, fileTypes }) => {
             content: JSON.stringify(dataFiles)
         });
         if (res.errCode === 0) {
+            userState.fetchChats();
             socket.then(socket => {
                 socket.emit('send-message', res.data);
                 socket.emit('finish-typing', chat._id);
@@ -748,6 +782,7 @@ const ChatMain = ({ file, fileTypes }) => {
             updatedAt: new Date(),
             urls: [preview],
             unViewList: [],
+            isDelete: false
         };
 
         setMessages(prev => [...prev, createMessage]);
@@ -767,6 +802,10 @@ const ChatMain = ({ file, fileTypes }) => {
                 socket.emit('finish-typing', chat._id);
             })
         }
+    }
+
+    const handleFindMessageFirst = (ref) => {
+        ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
 
@@ -803,10 +842,44 @@ const ChatMain = ({ file, fileTypes }) => {
                     </header>
 
                     <div className="main-chat-content">
-                        <div className="content-chat-messages" ref={scroolRef}
+                        {
+                            hasPin && listMessageIsPinRef.current?.length > 0 &&
+                            <div className="pin-container">
+                                <div className="pin-icon-item">
+                                    <i className="fa-regular fa-message"></i>
+                                </div>
+                                <div className="pin-content-item" onClick={() => handleFindMessageFirst(listMessageIsPinRef.current?.[0].ref)}>
+                                    <p className="title">Tin nhắn</p>
+                                    <div className="content">
+                                        <span>{listMessageIsPinRef.current?.[0].message.sender.userName}</span>
+                                        {
+                                            listMessageIsPinRef.current?.[0].message.type === MESSAGES.TEXT ?
+                                                <span>{listMessageIsPinRef.current?.[0].message.content}</span> : (
+                                                    listMessageIsPinRef.current?.[0].message.type === MESSAGES.IMAGES ?
+                                                        <span>Đã gửi ảnh</span> : (
+                                                            listMessageIsPinRef.current?.[0].message.type === MESSAGES.FILE_FOLDER ?
+                                                                <span>File</span> : <span>Sticker</span>
+                                                        )
+                                                )
+
+                                        }
+                                    </div>
+
+                                </div>
+                                <div className="more-pin">
+                                    <PinsModal
+                                        data={listMessageIsPinRef.current}
+                                        handleFindMessageFirst={handleFindMessageFirst}
+                                    >
+                                        <i className="fa-solid fa-circle-info"></i>
+                                    </PinsModal>
+                                </div>
+                            </div>
+                        }
+                        <div className={`content-chat-messages ${hasPin ? 'pt-50' : ''}`} ref={scroolRef}
                             style={{
                                 height: `calc(100% - ${footerHeight - 10}px)`,
-                                color: messageColor
+                                color: messageColor,
                             }}>
                             {
                                 messages && messages.length > 0 && messages.map((message, index) => {
@@ -821,6 +894,12 @@ const ChatMain = ({ file, fileTypes }) => {
                                                     <div className="group-message"
                                                         style={{
                                                             marginBottom: message?.reactions?.length > 0 ? '10px' : '0px',
+                                                        }}
+                                                        ref={(ref) => {
+                                                            if (message.isPin === true) {
+                                                                listMessageIsPinRef.current = _.unionBy([{ message: message, ref }], listMessageIsPinRef.current, 'message._id');
+
+                                                            }
                                                         }}
                                                     >
                                                         {
@@ -1017,6 +1096,12 @@ const ChatMain = ({ file, fileTypes }) => {
                                                             (message.type === MESSAGES.FILE_FOLDER || message.type === MESSAGES.AUDIO)
                                                                 ? 'message' : 'message de-bg'
                                                         )}
+                                                        ref={(ref) => {
+                                                            if (message.isPin === true) {
+                                                                listMessageIsPinRef.current = _.unionBy([{ message: message, ref }], listMessageIsPinRef.current, 'message._id');
+
+                                                            }
+                                                        }}
                                                     >
                                                         {
                                                             message.isDelete === true ?
@@ -1167,8 +1252,8 @@ const ChatMain = ({ file, fileTypes }) => {
                                                     </div>
                                             }
                                             {
+                                                !message.isDelete &&
                                                 index == messages.length - 1 && message?.sender?.id === user?.id &&
-                                                !message.unViewList.includes(user.id) && message.isDelete === false &&
                                                 <div
                                                     style={{ alignSelf: 'flex-end' }}
                                                 >
@@ -1178,7 +1263,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                     >
                                                         {
                                                             sent === STATE.PENDING ?
-                                                                <span>Đã gửi</span> :
+                                                                <span>Đang gửi</span> :
                                                                 (
                                                                     sent === STATE.RESOLVE ? <span>
                                                                         <i className="fa-solid fa-check-double"></i>

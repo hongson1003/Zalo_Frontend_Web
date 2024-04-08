@@ -2,6 +2,7 @@ export const CHAT_STATUS = {
     SELECTED_CHAT: 'SELECTED_CHAT',
     PRIVATE_CHAT: 'PRIVATE_CHAT',
     GROUP_CHAT: 'GROUP_CHAT',
+    FETCH: 'FETCH',
 }
 
 export const NOTIFICATIONS = {
@@ -49,5 +50,5 @@ export const METHOD_MESSAGE = {
     COPY: 'COPY',
     PIN: 'PIN',
     VIEW_DETAIL: 'VIEW_DETAIL',
-    
+
 }

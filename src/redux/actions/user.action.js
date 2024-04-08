@@ -1,4 +1,4 @@
-import { NOTIFICATIONS } from "../types/type.user";
+import { CHAT_STATUS, NOTIFICATIONS } from "../types/type.user";
 import { STATE } from '../types/type.app';
 
 
@@ -19,6 +19,13 @@ export function accessChat(chat) {
 export function fetchNotificationsfunc(func) {
     return {
         type: NOTIFICATIONS.FETCH_NOTIFICATIONS_FUNC,
+        payload: func
+    }
+}
+
+export function fetchChatsFunc(func) {
+    return {
+        type: CHAT_STATUS.FETCH,
         payload: func
     }
 }

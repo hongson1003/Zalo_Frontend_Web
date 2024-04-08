@@ -10,7 +10,61 @@
     display: flex;
     color: #ffffff;
     z-index: 2;
-
+    .pt-50 {
+        padding-top: 60px !important;
+    }
+    .pin-container {
+        height: 50px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 2px 15px;
+        border: 1px solid #e0e0e0;
+        background-color: #ffffff;
+        color: #888;
+        .pin-icon-item {
+            width: 50px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            i {
+                font-size: 20px;
+                color: #005ae0;
+            }
+        }
+        .pin-content-item {
+            cursor: pointer;
+            .title {
+                font-size: 12px;
+                font-weight: 600;
+                color: #333;
+            }
+            .content {
+                span {
+                    color: #7589a3;
+                    &:first-child {
+                        margin-right: 10px;
+                    }
+                }
+            }
+        }
+        .more-pin {
+            height: 100%;
+            align-self: flex-end;
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            cursor: pointer;
+            padding-right: 20px;
+        }
+    }
     header {
         width: 100%;
         max-height: 65px;
@@ -21,7 +75,7 @@
         justify-content: space-between;
         gap: calc(0px + 2vw);
         padding: 0px 20px;
-        background-color: transparent;
+        background-color: #ffffff;
         ul {
             background-color: transparent;
             li {
