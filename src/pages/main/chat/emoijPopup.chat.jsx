@@ -5,7 +5,10 @@ import _ from 'lodash';
 import Tym from "../../../components/customize/tym";
 import axios from '../../../utils/axios';
 
-const Content = ({ setSelectedReaction, handleTymMessage, setOpen, message, handleModifyMessage }) => {
+const Content = (
+    { setSelectedReaction, handleTymMessage, setOpen, message, handleModifyMessage }
+) => {
+
     const emoijContainerRef = useRef(null);
     const reactions = [
         { name: 'like', icon: '👍' },
@@ -49,27 +52,31 @@ const Content = ({ setSelectedReaction, handleTymMessage, setOpen, message, hand
 
     return (
         <div className="emoij-popup-container" ref={emoijContainerRef}>
-            {reactions.map((reaction, index) => {
-                if (reactions?.length - 1 !== index) {
-                    return (
-                        <Tym
-                            key={reaction.name}
-                            icon={<span
-                                key={index} className="reaction"
-                                onClick={() => handleGetReaction(reaction)}
-                            >{reaction.icon}</span>}
-                        />
-                    )
-                } else {
-                    return (
-                        <span
-                            key={reaction.name}
-                            className="reaction"
-                            onClick={() => handleClearReaction()}
-                        >{reaction.icon}</span>
-                    )
-                }
-            })}
+            {
+                reactions.map((reaction, index) => {
+                    if (reactions?.length - 1 !== index) {
+                        return (
+                            <Tym
+                                key={reaction.name}
+                                icon={
+                                    <span
+                                        key={index} className="reaction"
+                                        onClick={() => handleGetReaction(reaction)}
+                                    >
+                                        {reaction.icon}
+                                    </span>}
+                            />
+                        )
+                    } else {
+                        return (
+                            <span
+                                key={reaction.name}
+                                className="reaction"
+                                onClick={() => handleClearReaction()}
+                            >{reaction.icon}</span>
+                        )
+                    }
+                })}
         </div>
     );
 };
@@ -77,7 +84,7 @@ const Content = ({ setSelectedReaction, handleTymMessage, setOpen, message, hand
 
 const EmoijPopup = ({
     children, placement, setSelectedReaction,
-    handleTymMessage, allowOpen, message, handleModifyMessage
+    handleTymMessage, allowOpen, message, handleModifyMessage,
 }) => {
     const [open, setOpen] = useState(false);
     const handleOpenChange = (newOpen) => {
@@ -88,7 +95,11 @@ const EmoijPopup = ({
 
     return (
         <Popover
-            content={React.createElement(Content, { setSelectedReaction, handleTymMessage, setOpen, message, handleModifyMessage })}
+            content={React.createElement(Content, {
+                setSelectedReaction, handleTymMessage,
+                setOpen, message, handleModifyMessage
+            })}
+
             trigger={'hover'}
             open={open && allowOpen}
             onOpenChange={handleOpenChange}

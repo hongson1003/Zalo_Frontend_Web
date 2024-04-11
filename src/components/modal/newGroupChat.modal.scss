@@ -58,6 +58,8 @@
         margin-top: 10px;
         .main-left {
             flex: 1;
+            max-height: 400px;
+            overflow-y: scroll;
             .item-friend {
                 margin: 10px 0;
                 .username {
@@ -90,14 +92,16 @@
                 gap: 10px;
                 display: flex;
                 flex-direction: column;
+                height: 300px;
                 .item-dachon {
                     display: flex;
-                    justify-content: space-between;
+                    justify-content: flex-start;
                     align-items: center;
                     padding: 5px 10px;
                     border-radius: 30px;
                     background-color: #e5efff;
                     color: #005ae0;
+                    gap: 5px;
                 }
             }
         }

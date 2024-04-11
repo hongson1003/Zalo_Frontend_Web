@@ -1,5 +1,8 @@
 .friends-list {
     margin-top: 10px;
+    overflow-y: scroll;
+    height: calc(100% - 32px);
+
     .friend-item {
         display: flex;
         align-items: center;

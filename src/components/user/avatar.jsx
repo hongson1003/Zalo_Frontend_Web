@@ -10,8 +10,8 @@ const styleCSS = {
     borderRadius: '50%',
     border: '2px solid #ffffff',
     backgroundColor: '#1DA57A',
-    width: '15px',
-    height: '15px'
+    width: '12px',
+    height: '12px'
 }
 
 const AvatarUser = (props) => {

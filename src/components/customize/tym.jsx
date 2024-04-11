@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './tym.css';
 
-const Tym = ({ icon, clickRef }) => {
+const Tym = ({ icon, messageRef }) => {
     const [isClick, setIsClick] = useState(false);
 
     const handleOnClick = () => {
@@ -17,11 +17,6 @@ const Tym = ({ icon, clickRef }) => {
         }
     }, [isClick]);
 
-    useEffect(() => {
-        if (clickRef && clickRef.current) {
-            clickRef.current = handleOnClick;
-        }
-    }, []);
 
 
     return (
@@ -29,6 +24,7 @@ const Tym = ({ icon, clickRef }) => {
             <div
                 className={`tym-icon-123 ${isClick ? 'active' : ''}`}
                 onClick={() => handleOnClick()}
+                ref={messageRef}
             >
                 {icon}
                 <div className="tyms-frame">

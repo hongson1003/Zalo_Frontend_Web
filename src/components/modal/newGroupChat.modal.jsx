@@ -50,7 +50,7 @@ const NewGroupChatModal = ({ children }) => {
     };
     const containerStyle = {
         position: 'relative',
-        height: 200,
+        height: 400,
         padding: 48,
         overflow: 'hidden',
         background: token.colorFillAlter,
@@ -172,6 +172,7 @@ const NewGroupChatModal = ({ children }) => {
                 className='group-chat-modal'
                 size='xxl'
                 footer={renderFooter}
+                centered
             >
                 <div className='group-chat-name'>
                     <ChooseImageModal
@@ -221,11 +222,12 @@ const NewGroupChatModal = ({ children }) => {
                                             <AvatarUser
                                                 image={getFriend(user, [item.user1, item.user2])?.avatar}
                                                 size={50}
+                                                name={getFriend(user, [item.user1, item.user2])?.userName}
                                             />
-                                            <span className='username'>
-                                                {getFriend(user, [item.user1, item.user2])?.userName}
-                                            </span>
                                         </Radio>
+                                        <span className='username'>
+                                            {getFriend(user, [item.user1, item.user2])?.userName}
+                                        </span>
                                     </div>
                                 )
                             })
@@ -246,6 +248,9 @@ const NewGroupChatModal = ({ children }) => {
                                     onClose={onClose}
                                     open={open}
                                     getContainer={false}
+                                    height={300}
+                                    forceRender
+
                                 >
                                     <div className='list-dachon'>
                                         {
@@ -255,6 +260,7 @@ const NewGroupChatModal = ({ children }) => {
                                                         <AvatarUser
                                                             image={getFriend(user, [item.user1, item.user2])?.avatar}
                                                             size={20}
+                                                            name={getFriend(user, [item.user1, item.user2])?.userName}
                                                         />
                                                         <span className='username'>
                                                             {getFriend(user, [item.user1, item.user2])?.userName}

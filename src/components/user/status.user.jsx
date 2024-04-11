@@ -35,11 +35,13 @@ const StatusUser = ({ chat }) => {
     useEffect(() => {
         if (statusUser) {
             socket.then(socket => {
-                socket.on('online', () => {
-                    setStatusUser({
-                        ...statusUser,
-                        lastedOnline: null
-                    });
+                socket.on('online', (data) => {
+                    if (data === statusUser.id) {
+                        setStatusUser({
+                            ...statusUser,
+                            lastedOnline: null
+                        });
+                    }
                 });
                 socket.on('offline', (data) => {
                     setStatusUser({

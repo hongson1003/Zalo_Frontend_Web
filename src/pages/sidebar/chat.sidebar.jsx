@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import axios from '../../utils/axios';
 import ChatUser from "../../components/user/chat.user";
 import { socket } from "../../utils/io";
@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { STATE } from "../../redux/types/type.app";
 import { accessChat, fetchChatsFunc } from "../../redux/actions/user.action";
 import { useDispatch, useSelector } from "react-redux";
+import { getFriend } from "../../utils/handleChat";
 
 
 const ChatSidebar = () => {
@@ -13,20 +14,23 @@ const ChatSidebar = () => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [status, setStatus] = useState(STATE.PENDING);
-    const subNav = useSelector(state => state.appReducer.subNav);
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const dispatch = useDispatch();
     const chat = useSelector(state => state.appReducer?.subNav);
 
-    const fetchChats = async () => {
+    const fetchChats = useCallback(async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
         if (res.errCode === 0) {
             setChats(res.data);
+            if (chat) {
+                const currentChat = res.data.find(item => item._id === chat._id);
+                dispatch(accessChat({ ...currentChat }));
+            }
             setStatus(STATE.RESOLVE);
         } else {
             setStatus(STATE.REJECT);
         }
-    }
+    }, [chat])
     // lắng nghe sự kiện enter
     useEffect(() => {
         const handleKeyPress = (e) => {
@@ -43,9 +47,11 @@ const ChatSidebar = () => {
     }, [chats.length, chat])
 
     useEffect(() => {
-        if (user)
+        if (user) {
             fetchChats();
-    }, [subNav])
+        }
+
+    }, [chat?._id])
 
 
     useEffect(() => {
@@ -53,8 +59,8 @@ const ChatSidebar = () => {
             chats.forEach(item => {
                 socket.then(socket => {
                     socket.emit('join-room', item._id);
-                    // socket.on('joined-room', room => {
-                    // })
+                    const friend = getFriend(user, item.participants);
+                    socket.emit('join-room', friend.id);
                 })
             })
         }
@@ -65,8 +71,7 @@ const ChatSidebar = () => {
         if (fetchChats) {
             dispatch(fetchChatsFunc(fetchChats));
         }
-
-    }, [])
+    }, [fetchChats])
 
     return (
         <div>

@@ -51,8 +51,6 @@ const InforUserModal = ({ children }) => {
                         <Button className='send-btn' type="default">Nhắn tin</Button>
                     </div>
                     <div className='members'>
-                        <Avatar.Group>
-                        </Avatar.Group>
                         {
                             chat?.participants?.map((item, index) => {
                                 return (

@@ -43,6 +43,8 @@ const AddFriendModal = ({ children }) => {
         const res = await axios.get(`/users/friendShip?userId=${userId}`);
         if (res.errCode === 0) {
             setFriendShipData(res.data);
+        } else {
+            setFriendShipData(null);
         }
     }
 

@@ -12,15 +12,19 @@ import { socket } from '../utils/io';
 import { STATE } from '../redux/types/type.app';
 import { connectSocketSuccess } from '../redux/actions/app.action';
 import axios from '../utils/axios';
-import { getFriend } from '../utils/handleChat';
+
 
 const HomeLayout = () => {
   const navigate = useNavigate();
   const state = useSelector(state => state?.appReducer);
   const dispatch = useDispatch();
-  const [limit, setLimit] = useState(10);
-  const [friends, setFriends] = useState([]);
-  const onlyRenderRef = useRef(false);
+
+
+  const updateOnline = async (time) => {
+    await axios.put('/users/updateOnline', { time });
+  }
+
+
   // check authentication
   useEffect(() => {
     if (state.isLogin !== STATE.RESOLVE)
@@ -30,17 +34,6 @@ const HomeLayout = () => {
     }
   }, [state]);
 
-  const fetchFriends = async () => {
-    const { data } = await axios.get(`/users/friends?page=1&limit=${limit}`);
-    const friends = [];
-    data.forEach(item => {
-      const friend = getFriend(state?.userInfo?.user, [item.user1, item.user2]);
-      delete friend.avatar;
-      friends.push(friend);
-    })
-    setFriends(friends);
-  }
-
   // connect to socket
   useState(() => {
     socket.then((socket) => {
@@ -48,44 +41,31 @@ const HomeLayout = () => {
       socket.on('connected', () => {
         if (state?.isConnectedSocket === false)
           dispatch(connectSocketSuccess());
-        updateOnline(null);
-        // join room and online
-        fetchFriends();
       })
     })
   }, []);
 
-  useEffect(() => {
-    if (onlyRenderRef.current === false && friends.length > 0) {
-      socket.then((socket) => {
-        friends.forEach(friend => {
-          socket.emit('join-room', friend.id);
-        })
-        socket.on('joined-room', (room) => {
-          socket.emit('online', state?.userInfo?.user?.id);
-        })
-      })
-      onlyRenderRef.current = true;
-    }
-  }, [friends]);
-
-  const updateOnline = async (time) => {
-    await axios.put('/users/updateOnline', { time });
-  }
 
   useEffect(() => {
-    const handleBeforeUnload = async () => {
-      updateOnline(new Date());
+    const triggerOnline = async () => {
+      await updateOnline(null);
       socket.then((socket) => {
-        socket.emit('offline', state?.userInfo?.user?.id);
+        socket.emit('online', state?.userInfo?.user.id);
       })
     }
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
+    const triggerOffline = async () => {
+      socket.then((socket) => {
+        window.addEventListener('beforeunload', async (e) => {
+          socket.emit('offline', state?.userInfo?.user.id);
+        });
+      })
+    }
 
+    if (state?.isConnectedSocket === true) {
+      triggerOnline();
+      triggerOffline();
+    }
+  }, [state?.isConnectedSocket]);
 
   return (
     <>

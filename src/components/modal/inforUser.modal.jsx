@@ -40,7 +40,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         name: user?.userName,
         gender: 0,
         dob: dayjs(new Date(), dateFormat)
-    })
+    });
 
 
     const onDateChange = (date, dateString) => {
@@ -236,7 +236,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     }
 
     const handleJoinChat = async () => {
-        console.log('friendship', friendShipData)
         // return;
         // validate
         const res = await axios.post('/chat/access', {

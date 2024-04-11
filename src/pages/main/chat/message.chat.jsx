@@ -8,20 +8,21 @@ import { useSelector } from "react-redux";
 import axios from '../../../utils/axios';
 import { socket } from '../../../utils/io';
 import { METHOD_MESSAGE } from "../../../redux/types/type.user";
+import { set } from "firebase/database";
 const items = [
     {
         key: METHOD_MESSAGE.COPY,
         item: () => (
-            <div >
+            <div className="item-popover-message">
                 <i className="fa-regular fa-copy"></i>
-                <p>Copy hình ảnh</p>
+                <p>Copy tin nhắn</p>
             </div>
         )
     },
     {
         key: METHOD_MESSAGE.PIN,
         item: () => (
-            <div >
+            <div className="item-popover-message">
                 <i className="fa-solid fa-thumbtack"></i>
                 <p>Ghim tin nhắn</p>
             </div>
@@ -30,7 +31,7 @@ const items = [
     {
         key: METHOD_MESSAGE.VIEW_DETAIL,
         item: () => (
-            <div >
+            <div className="item-popover-message">
                 <i className="fa-solid fa-circle-info"></i>
                 <p>Xem chi tiết</p>
             </div>
@@ -39,8 +40,8 @@ const items = [
     {
         key: METHOD_MESSAGE.DELETE_ALL,
         item: () => (
-            <div className="thu-hoi-tin-nhan">
-                <i className="fa-regular fa-square-minus"></i>
+            <div className="item-popover-message error-item">
+                <i className="fa-solid fa-trash-can"></i>
                 <p>Thu hồi tin nhắn</p>
             </div>
         )
@@ -48,7 +49,7 @@ const items = [
     {
         key: METHOD_MESSAGE.DELETE_MYSEFL,
         item: () => (
-            <div className="xoa-chi-o-phia-toi thu-hoi-tin-nhan">
+            <div className="item-popover-message error-item">
                 <i className="fa-regular fa-square-minus"></i>
                 <p>Xóa chỉ ở phía tôi</p>
             </div>
@@ -56,7 +57,7 @@ const items = [
     }
 ]
 
-const content = ({ optionsRef, message, handleModifyMessage }) => {
+const content = ({ optionsRef, message, handleModifyMessage, isDelete, fetchChats, setOpenPopover }) => {
     const contentRef = useRef(null);
 
     const deleteMessage = async (messageId) => {
@@ -83,6 +84,17 @@ const content = ({ optionsRef, message, handleModifyMessage }) => {
         }
     }
 
+    const handlePinMessage = async (messageId) => {
+        const res = await axios.put('/chat/message/pinMessage', {
+            messageId: messageId,
+            chat: message.chat
+        });
+        setOpenPopover(false);
+        if (res.errCode === 0) {
+            fetchChats();
+        }
+    }
+
     const handleOnClick = (Element) => {
         const { key } = Element;
         switch (key) {
@@ -90,7 +102,7 @@ const content = ({ optionsRef, message, handleModifyMessage }) => {
                 console.log('Copy hình ảnh');
                 break;
             case METHOD_MESSAGE.PIN:
-                console.log('Ghim tin nhắn');
+                handlePinMessage(message._id);
                 break;
             case METHOD_MESSAGE.VIEW_DETAIL:
                 console.log('Xem chi tiết');
@@ -121,22 +133,27 @@ const content = ({ optionsRef, message, handleModifyMessage }) => {
         <div className="subOption" ref={contentRef}>
             {
                 items && items.length > 0 &&
-                items.map((Element) => (
-                    <div
-                        className="option-sub-item"
-                        key={Element.key}
-                        onClick={() => handleOnClick(Element)}
-                    >
-                        <Element.item />
-                    </div>
-                ))
+                items.map((Element) => {
+                    if (Element.key === METHOD_MESSAGE.DELETE_ALL && !isDelete) {
+                        return null;
+                    }
+                    return (
+                        <div
+                            className="option-sub-item"
+                            key={Element.key}
+                            onClick={() => handleOnClick(Element)}
+                        >
+                            <Element.item />
+                        </div>
+                    )
+                })
             }
 
         </div>
     )
 }
 
-const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, lasted }) => {
+const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage }) => {
     const optionsRef = useRef(null);
     const messageHoverContainerRef = useRef(null);
     const frameTymRef = useRef(null);
@@ -144,18 +161,29 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const [allowOpen, setAllowOpen] = useState(true);
     const [enableMouseOver, setEnableMouseOver] = useState(true);
-    const clickRef = useRef(null);
+    const [openPopover, setOpenPopover] = useState(false);
+    const userState = useSelector(state => state.userReducer);
+    const messageRef = useRef(null);
+    const previousReaction = useRef(JSON.stringify(message.reactions));
 
-    // socket thả tym tin nhắn
     useEffect(() => {
-        if (clickRef.current) {
-            socket.then(socket => {
-                socket.on('receive-reaction', (data) => {
-                    console.log('data', data);
-                })
-            })
+        const currentReaction = JSON.stringify(message.reactions);
+        const [objReaction] = _.differenceWith(JSON.parse(currentReaction), JSON.parse(previousReaction.current), _.isEqual);
+        if (!previousReaction.current) return;
+        if (previousReaction.current !== currentReaction) {
+            if (messageRef.current) {
+                setSelectedReaction(objReaction.icon || '👌');
+                frameTymRef.current.classList.add('show-frame-tym');
+                messageRef.current.classList.add('active');
+                setTimeout(() => {
+                    messageRef.current.classList.remove('active');
+                }, 1000)
+            }
         }
-    }, []);
+
+
+        previousReaction.current = JSON.stringify(message.reactions);
+    }, [message]);
 
     useEffect(() => {
         const addShowOptions = () => {
@@ -196,6 +224,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
         }
     }, [enableMouseOver]);
 
+
     const handleAllowOpen = useCallback(_.debounce((value) => {
         setAllowOpen(value);
         setEnableMouseOver(value);
@@ -209,8 +238,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
         })
         if (res.errCode === 0) {
             socket.then(socket => {
-                console.log('đã emit', message.chat._id)
-                socket.emit('send-reaction', { messageId, userId, icon });
+                socket.emit('send-reaction', res.data);
             })
         }
 
@@ -241,13 +269,17 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
         await handleSendReaction(newMessage._id, user.id, icon);
     }
 
-
+    const handleOnContextMenu = (e) => {
+        e.preventDefault();
+        setOpenPopover(true);
+    }
 
     return (
         <React.Fragment>
             <span
                 className={isLeft ? `message-hover-container option-right ${isImage && 'w-500'}` : `message-hover-container option-left ${isImage && 'w-500'}`}
                 ref={messageHoverContainerRef}
+                onContextMenu={handleOnContextMenu}
             >
                 {children}
                 <div className="options" ref={optionsRef}>
@@ -259,13 +291,25 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
                             <i title="Chuyển tiếp" className="fa-solid fa-share"></i>
                         </div>
                         <Popover
-                            content={React.createElement(content, { optionsRef, message, handleModifyMessage })}
-                            trigger={"click"}
+                            content={React.createElement(content,
+                                {
+                                    optionsRef, message, handleModifyMessage,
+                                    isDelete: !isLeft, fetchChats: userState.fetchChats,
+                                    setOpenPopover
+                                }
+                            )}
+                            trigger={"hover"}
                             placement="topRight"
                             className="popover-options"
                             forceRender
+                            onOpenChange={(visible) => {
+                                if (!visible) {
+                                    setOpenPopover(false);
+                                }
+                            }}
+                            open={openPopover}
                         >
-                            <div className="option-item">
+                            <div className="option-item" onClick={() => setOpenPopover(prev => !prev)}>
                                 <i title="Thêm" className="fa-solid fa-ellipsis"></i>
                             </div>
                         </Popover>
@@ -280,7 +324,9 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
                             message?.reactions.map((reaction, index) => {
                                 if (index < 3) {
                                     return (
-                                        <span className="reaction-item" key={reaction.userId + reaction.icon}>{reaction?.icon}</span>
+                                        <span className="reaction-item" key={reaction.userId + reaction.icon}>
+                                            {reaction?.icon}
+                                        </span>
                                     )
                                 }
                             })
@@ -308,7 +354,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
                             {/* <i className="fa-regular fa-thumbs-up reaction-icon"></i> */}
                             <Tym
                                 icon={selectedReaction}
-                                clickRef={clickRef}
+                                messageRef={messageRef}
                             />
                         </div>
                     </EmoijPopup>
