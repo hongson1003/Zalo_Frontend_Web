@@ -4,7 +4,7 @@ import "./status.user.scss";
 import InforUserModal from "../modal/inforUser.modal";
 import { CHAT_STATUS } from "../../redux/types/type.user";
 import InfoGroupModal from "../modal/infoGroup.modal";
-import { getFriend } from "../../utils/handleChat";
+import { getDetailListMembers, getFriend } from "../../utils/handleChat";
 import { useSelector } from "react-redux";
 import axios from '../../utils/axios';
 import { socket } from "../../utils/io";
@@ -78,6 +78,7 @@ const StatusUser = ({ chat }) => {
                                 <AvatarUser
                                     image={chat?.groupPhoto}
                                     size={50}
+                                    name={chat?.name}
                                 />
                             ) : (
                                 <div className="avatar-group" >
@@ -89,6 +90,7 @@ const StatusUser = ({ chat }) => {
                                                     <AvatarUser
                                                         image={item.avatar}
                                                         size={25}
+                                                        name={getFriend(user, chat.participants)?.userName}
                                                     />
                                                 </React.Fragment>
                                             )
@@ -105,7 +107,10 @@ const StatusUser = ({ chat }) => {
                     chat?.type === CHAT_STATUS.GROUP_CHAT ? (
                         <>
                             <p className="username">{chat?.name}</p>
-                            <p className="connected-time">Truy cập 57 phút trước</p>
+                            <p className="connected-time">
+                                <span><i className="fa-regular fa-user"></i></span>
+                                <span>{getDetailListMembers(chat?.participants).total} thành viên</span>
+                            </p>
                         </>
                     ) : (
                         <>

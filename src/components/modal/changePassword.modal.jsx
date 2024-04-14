@@ -44,7 +44,7 @@ const ChangePasswordModal = ({ children }) => {
             <span type="primary" onClick={showModal}>
                 {children}
             </span>
-            <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <Modal title="Đổi mật khẩu" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <Form
                     form={form}
                     name="dependencies"

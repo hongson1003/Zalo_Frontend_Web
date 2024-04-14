@@ -11,7 +11,7 @@ import GroupFriend from "./friend/group.friend";
 import { STATE } from "../../redux/types/type.app";
 import DragDrop from "../../components/customize/dropImage";
 
-const ContentMain = () => {
+const ContentMain = ({ drawerMethods }) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const stateUser = useSelector(state => state?.userReducer);
@@ -38,8 +38,7 @@ const ContentMain = () => {
                 case stateUser?.selectedChat && KEYITEMS.MESSAGE:
                     return (
                         <DragDrop>
-                            <ChatMain />
-
+                            <ChatMain drawerMethods={drawerMethods} />
                         </DragDrop>
                     )
                 case 'pb':
@@ -57,7 +56,7 @@ const ContentMain = () => {
                     if (subNav?.key === STATE.ACCESS_CHAT) {
                         return (
                             <DragDrop fileTypes={["JPG", "PNG", "GIF"]}>
-                                <ChatMain />
+                                <ChatMain drawerMethods={drawerMethods} />
                             </DragDrop>
                         )
                     }

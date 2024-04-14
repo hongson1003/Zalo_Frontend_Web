@@ -1,4 +1,4 @@
-import { CHAT_STATUS, NOTIFICATIONS } from "../types/type.user";
+import { CALL, CHAT_STATUS, NOTIFICATIONS } from "../types/type.user";
 import { STATE } from '../types/type.app';
 
 
@@ -27,5 +27,12 @@ export function fetchChatsFunc(func) {
     return {
         type: CHAT_STATUS.FETCH,
         payload: func
+    }
+}
+
+export function addMemberCall(member) {
+    return {
+        type: CALL.ADD_MEMBER,
+        payload: member
     }
 }

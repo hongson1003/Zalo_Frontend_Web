@@ -59,4 +59,11 @@ export function editUser(user) {
     }
 }
 
+export function editGroup(group) {
+    return {
+        type: STATE.EDIT_GROUP,
+        payload: group
+    }
+}
+
 

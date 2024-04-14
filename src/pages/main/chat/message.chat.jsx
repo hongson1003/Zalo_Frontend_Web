@@ -153,7 +153,7 @@ const content = ({ optionsRef, message, handleModifyMessage, isDelete, fetchChat
     )
 }
 
-const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage }) => {
+const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, handleOnClickReply }) => {
     const optionsRef = useRef(null);
     const messageHoverContainerRef = useRef(null);
     const frameTymRef = useRef(null);
@@ -166,9 +166,10 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage }
     const messageRef = useRef(null);
     const previousReaction = useRef(JSON.stringify(message.reactions));
 
+
     useEffect(() => {
         const currentReaction = JSON.stringify(message.reactions);
-        const [objReaction] = _.differenceWith(JSON.parse(currentReaction), JSON.parse(previousReaction.current), _.isEqual);
+        const [objReaction] = currentReaction && _.differenceWith(JSON.parse(currentReaction), JSON.parse(previousReaction.current), _.isEqual);
         if (!previousReaction.current) return;
         if (previousReaction.current !== currentReaction) {
             if (messageRef.current) {
@@ -270,97 +271,106 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage }
     }
 
     const handleOnContextMenu = (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         setOpenPopover(true);
     }
 
     return (
         <React.Fragment>
-            <span
-                className={isLeft ? `message-hover-container option-right ${isImage && 'w-500'}` : `message-hover-container option-left ${isImage && 'w-500'}`}
-                ref={messageHoverContainerRef}
-                onContextMenu={handleOnContextMenu}
-            >
-                {children}
-                <div className="options" ref={optionsRef}>
-                    <div className="options-content">
-                        <div className="option-item">
-                            <i title="Trả lời" className="fa-solid fa-reply"></i>
-                        </div>
-                        <div className="option-item">
-                            <i title="Chuyển tiếp" className="fa-solid fa-share"></i>
-                        </div>
-                        <Popover
-                            content={React.createElement(content,
-                                {
-                                    optionsRef, message, handleModifyMessage,
-                                    isDelete: !isLeft, fetchChats: userState.fetchChats,
-                                    setOpenPopover
-                                }
-                            )}
-                            trigger={"hover"}
-                            placement="topRight"
-                            className="popover-options"
-                            forceRender
-                            onOpenChange={(visible) => {
-                                if (!visible) {
-                                    setOpenPopover(false);
-                                }
-                            }}
-                            open={openPopover}
-                        >
-                            <div className="option-item" onClick={() => setOpenPopover(prev => !prev)}>
-                                <i title="Thêm" className="fa-solid fa-ellipsis"></i>
-                            </div>
-                        </Popover>
-
-                    </div>
-                </div>
-
+            <div className="group-message-hover-container">
                 {
-                    message?.reactions?.length > 0 &&
-                    <div className="reactions">
-                        {
-                            message?.reactions.map((reaction, index) => {
-                                if (index < 3) {
-                                    return (
-                                        <span className="reaction-item" key={reaction.userId + reaction.icon}>
-                                            {reaction?.icon}
-                                        </span>
-                                    )
-                                }
-                            })
-                        }
-                        {
-                            message?.reactions?.length > 0 && <span>{
-                                message?.reactions?.reduce((partialSum, a) => {
-                                    return partialSum + a.count;
-                                }, 0)
-                            }</span>
-                        }
+                    message.reply &&
+                    <div className="message-reply">
+                        <p className="reply-name">{message.reply.sender.userName}</p>
+                        <p className="message-reply-content">{message.reply.content}</p>
                     </div>
                 }
+                <span
+                    className={isLeft ? `message-hover-container option-right ${isImage && 'w-500'}` : `message-hover-container option-left ${isImage && 'w-500'}`}
+                    ref={messageHoverContainerRef}
+                    onContextMenu={handleOnContextMenu}
+                >
+                    {children}
+                    <div className="options" ref={optionsRef}>
+                        <div className="options-content">
+                            <div className="option-item" onClick={() => handleOnClickReply(message)}>
+                                <i title="Trả lời" className="fa-solid fa-reply"></i>
+                            </div>
+                            <div className="option-item">
+                                <i title="Chuyển tiếp" className="fa-solid fa-share"></i>
+                            </div>
+                            <Popover
+                                content={React.createElement(content,
+                                    {
+                                        optionsRef, message, handleModifyMessage,
+                                        isDelete: !isLeft, fetchChats: userState.fetchChats,
+                                        setOpenPopover
+                                    }
+                                )}
+                                trigger={"hover"}
+                                placement="topRight"
+                                className="popover-options"
+                                forceRender
+                                onOpenChange={(visible) => {
+                                    if (!visible) {
+                                        setOpenPopover(false);
+                                    }
+                                }}
+                                open={openPopover}
+                            >
+                                <div className="option-item" onClick={() => setOpenPopover(prev => !prev)}>
+                                    <i title="Thêm" className="fa-solid fa-ellipsis"></i>
+                                </div>
+                            </Popover>
 
-                <div className="frame-tym" ref={frameTymRef}>
-                    <EmoijPopup
-                        placement={isLeft ? 'top' : 'topRight'}
-                        setSelectedReaction={setSelectedReaction}
-                        handleTymMessage={handleTymMessage}
-                        allowOpen={allowOpen}
-                        message={message}
-                        handleModifyMessage={handleModifyMessage}
-                    >
-                        <div className="tym-message" onClick={() => handleTymMessage(selectedReaction.trim())}>
-                            {/* <i className="fa-regular fa-thumbs-up reaction-icon"></i> */}
-                            <Tym
-                                icon={selectedReaction}
-                                messageRef={messageRef}
-                            />
                         </div>
-                    </EmoijPopup>
-                </div>
+                    </div>
 
-            </span>
+                    {
+                        message?.reactions?.length > 0 &&
+                        <div className="reactions">
+                            {
+                                message?.reactions.map((reaction, index) => {
+                                    if (index < 3) {
+                                        return (
+                                            <span className="reaction-item" key={reaction.userId + reaction.icon}>
+                                                {reaction?.icon}
+                                            </span>
+                                        )
+                                    }
+                                })
+                            }
+                            {
+                                message?.reactions?.length > 0 && <span>{
+                                    message?.reactions?.reduce((partialSum, a) => {
+                                        return partialSum + a.count;
+                                    }, 0)
+                                }</span>
+                            }
+                        </div>
+                    }
+
+                    <div className="frame-tym" ref={frameTymRef}>
+                        <EmoijPopup
+                            placement={isLeft ? 'top' : 'topRight'}
+                            setSelectedReaction={setSelectedReaction}
+                            handleTymMessage={handleTymMessage}
+                            allowOpen={allowOpen}
+                            message={message}
+                            handleModifyMessage={handleModifyMessage}
+                        >
+                            <div className="tym-message" onClick={() => handleTymMessage(selectedReaction.trim())}>
+                                {/* <i className="fa-regular fa-thumbs-up reaction-icon"></i> */}
+                                <Tym
+                                    icon={selectedReaction}
+                                    messageRef={messageRef}
+                                />
+                            </div>
+                        </EmoijPopup>
+                    </div>
+
+                </span>
+            </div>
         </React.Fragment>
     )
 }

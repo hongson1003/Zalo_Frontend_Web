@@ -4,4 +4,41 @@
     .d-none {
         display: none;
     }
+    .drawer-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 20px;
+        p {
+            font-size: 13px;
+        }
+        img {
+            width: 170px;
+            height: 170px;
+        }
+    }
+    .search-drawer {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 15px;
+        .group-search {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            align-items: center;
+            .search-item {
+                font-size: 13px;
+                cursor: pointer;
+                text-align: left;
+                span {
+                    &:first-child {
+                        font-weight: 690;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -7,7 +7,7 @@ import FriendSideBar from "./friend.sidebar";
 import ChatSidebar from "./chat.sidebar";
 
 
-const SidebarHome = () => {
+const SidebarHome = ({ children }) => {
     const stateApp = useSelector(state => state?.appReducer);
     const renderContent = () => {
         switch (stateApp?.nav) {
@@ -22,7 +22,7 @@ const SidebarHome = () => {
 
     return (
         <div className="sidebar-home">
-            <SearchMessage />
+            < SearchMessage />
             {renderContent()}
         </div>
     )

@@ -5,8 +5,8 @@ import { getFirstLetters } from "../../utils/handleUltils";
 
 const styleCSS = {
     position: 'absolute',
-    right: '-2px',
-    bottom: '-2px',
+    right: '0px',
+    bottom: '0px',
     borderRadius: '50%',
     border: '2px solid #ffffff',
     backgroundColor: '#1DA57A',

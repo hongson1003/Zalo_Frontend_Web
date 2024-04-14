@@ -5,6 +5,9 @@ import 'split-pane-react/esm/themes/default.css';
 import SidebarHome from "../pages/sidebar/home.sidebar";
 import ContentMain from "../pages/main/content.main";
 import { useSelector } from "react-redux";
+import { Drawer, theme } from 'antd';
+import AvatarUser from "../components/user/avatar";
+import { socket } from "../utils/io";
 
 const homeSublayout = () => {
     const [sizes, setSizes] = useState([
@@ -87,6 +90,29 @@ const homeSublayout = () => {
             document.removeEventListener('keydown', handleKeyDown);
         }
     }, [visibleLeft])
+
+    //Drawer
+    const [open, setOpen] = useState(false);
+    const showDrawer = () => {
+        setOpen(true);
+    };
+    const onClose = () => {
+        setOpen(false);
+    };
+    const [searchDrawer, setSearchDrawer] = useState('');
+    const listMessageRef = useRef([]);
+    const [listMessages, setListMessages] = useState(listMessageRef.current);
+
+
+    useEffect(() => {
+        setListMessages(listMessageRef.current)
+    }, [searchDrawer])
+
+    const handleScrollMessage = (element) => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+
     return (
         <div className="homeSublayout">
             <SplitPane
@@ -94,14 +120,59 @@ const homeSublayout = () => {
                 sizes={sizes}
                 onChange={size => handleOnChange(size)}
             >
-                <Pane className={`${visibleLeft}`} minSize={280}>
+                <Pane className={`${visibleLeft}`} minSize={280} >
                     <SidebarHome />
+                    <Drawer
+                        title="Kết quả tìm kiếm"
+                        placement="left"
+                        closable={false}
+                        onClose={onClose}
+                        open={open}
+                        getContainer={false}
+                        width={'100%'}
+                    >
+                        {
+                            searchDrawer ?
+                                <div className="search-drawer">
+                                    {
+                                        listMessages.map(({ message: item, ref }, index) => {
+                                            return (
+                                                <div className="group-search" key={item._id}>
+                                                    <AvatarUser
+                                                        image={item?.sender?.avatar}
+                                                        name={item?.sender?.userName}
+                                                    />
+                                                    <p className="search-item" onClick={() => handleScrollMessage(ref)}>
+                                                        <span>{item?.sender?.userName}: </span>
+                                                        <span>{item?.content}</span>
+                                                    </p>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div> :
+                                <div className="drawer-empty">
+                                    <p>Nhập nội dung cần tìm trong hộp thoại</p>
+                                    <img src="/images/search.png"></img>
+                                </div>
+                        }
+                    </Drawer>
                 </Pane>
                 <Pane
                     className={`pane-content ${visibleRight}`}
                     minSize={400}
                 >
-                    <ContentMain />
+                    <ContentMain
+                        drawerMethods={{
+                            showDrawer,
+                            onClose,
+                            searchDrawer,
+                            setSearchDrawer,
+                            listMessages,
+                            setListMessages,
+                            listMessageRef
+                        }}
+                    />
                 </Pane>
             </SplitPane>
         </div >

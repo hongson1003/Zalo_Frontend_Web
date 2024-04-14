@@ -2,17 +2,11 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 10px;
+    gap: 20px;
     .header {
         display: flex;
         align-items: center;
         gap: 15px;
-        .groupPhoto {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
         p {
             font-size: 1.2rem;
             font-weight: 600;
@@ -36,12 +30,36 @@
 
     .members {
         display: flex;
+        flex-direction: column;
         justify-content: flex-start;
-        align-items: center;
         height: 100%;
-        .member {
-            border-radius: 50%;
-            overflow: hidden;
+        gap: 5px;
+        .title {
+            font-size: 14px;
+            font-weight: 700;
         }
+        .members-items {
+            display: flex;
+            align-items: center;
+            .member {
+                border-radius: 50%;
+                overflow: hidden;
+            }
+        }
+    }
+    .setting-group-item {
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        gap: 10px;
+        cursor: pointer;
+    }
+    .out-group-item {
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        gap: 10px;
+        cursor: pointer;
+        color: red;
     }
 }

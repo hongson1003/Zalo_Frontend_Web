@@ -22,8 +22,11 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
     };
 
     const handleOk = async () => {
-        const base64 = await convertBase64(image);
-        uploadAvatar(base64);
+        if (type === 'avatar') {
+            const base64 = await convertBase64(image);
+            uploadAvatar(base64);
+            return;
+        }
         setIsModalOpen(false);
     };
 
@@ -49,7 +52,6 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
         if (res.errCode === 0) {
             dispatch(editUser(res.data));
         }
-
     }
 
     const handleChooseGroupPhoto = (url) => {
@@ -117,7 +119,7 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
 
                     <div className='group-collection'>
                         {
-                            data && data.length > 0 && data.map((collection, index) => (
+                            data && data.length > 0 && data.map((collection) => (
                                 <div
                                     key={collection.key} className='group-collection-item'
                                     onClick={() => handleChooseGroupPhoto(collection.url)}

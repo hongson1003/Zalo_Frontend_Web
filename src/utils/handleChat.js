@@ -4,7 +4,8 @@ export const getFriend = (user, participants) => {
 }
 
 export const getDetailListMembers = (listMembers) => {
-    let count = 0, total = 0;
+    let count = 0;
+    if (!listMembers || listMembers.length < 0) return { count, total: 0 };
     listMembers.forEach(item => {
         if (item.checked) {
             count++;
@@ -12,4 +13,5 @@ export const getDetailListMembers = (listMembers) => {
     });
     return { count, total: listMembers.length };
 }
+
 

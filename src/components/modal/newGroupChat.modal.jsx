@@ -11,6 +11,8 @@ import ChooseImageModal from './chooseImage.modal';
 import { toast } from 'react-toastify';
 import { CHAT_STATUS } from '../../redux/types/type.user';
 import { accessChat } from '../../redux/actions/user.action';
+import { socket } from '../../utils/io';
+
 
 const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
 
@@ -62,6 +64,7 @@ const NewGroupChatModal = ({ children }) => {
     const showModal = () => {
         setIsModalOpen(true);
     };
+
     const handleOk = async () => {
         try {
             const members = [];
@@ -74,11 +77,6 @@ const NewGroupChatModal = ({ children }) => {
                 toast.warning('Chọn ít nhất 2 người để tạo nhóm chat');
                 return;
             }
-            // const members = list.filter(item => {
-            //     if (item.checked) {
-            //         return item.user1Id === user.id ? item.user2 : item.user1;
-            //     }
-            // })
             if (!name.trim()) {
                 toast.warning('Nhập tên nhóm chat');
                 return;
@@ -105,15 +103,21 @@ const NewGroupChatModal = ({ children }) => {
             const resCreateGroupRes = await axios.post('/chat/group', payload);
             setIsLoading(false);
             if (resCreateGroupRes.errCode === 0) {
-                setIsModalOpen(false);
-                dispatch(accessChat(resCreateGroupRes.data));
+                socket.then(socket => {
+                    socket.emit('join-room', resCreateGroupRes.data._id);
+                    dispatch(accessChat(resCreateGroupRes.data));
+                    setIsModalOpen(false)
+                    socket.emit('new-group-chat', resCreateGroupRes.data);
+                })
             }
         } catch (error) {
+            console.log(error);
             setIsLoading(false);
             toast.error('Upload ảnh thất bại');
         }
         setIsModalOpen(false);
     };
+
     const handleCancel = () => {
         setIsModalOpen(false);
     };
@@ -160,6 +164,23 @@ const NewGroupChatModal = ({ children }) => {
         )
     }
 
+    const removeMember = (item) => {
+        const newList = list.map(i => {
+            if (i.user1Id === item.user1Id && i.user2Id === item.user2Id) {
+                i.checked = false;
+            }
+            return i;
+        })
+        setList(newList);
+    }
+    const handleRemoveAll = () => {
+        const newList = list.map(i => {
+            i.checked = false;
+            return i;
+        })
+        setList(newList);
+    }
+
 
     return (
         <>
@@ -172,7 +193,6 @@ const NewGroupChatModal = ({ children }) => {
                 className='group-chat-modal'
                 size='xxl'
                 footer={renderFooter}
-                centered
             >
                 <div className='group-chat-name'>
                     <ChooseImageModal
@@ -181,11 +201,13 @@ const NewGroupChatModal = ({ children }) => {
                         data={collections}
                     >
                         <div className='element-modal-groupPhoto'>
-                            {
-                                !groupPhoto ?
-                                    <i className="fa-solid fa-camera"></i> :
-                                    <img className='groupPhoto' src={groupPhoto} />
-                            }
+                            <div className='element-modal-groupPhoto'>
+                                {
+                                    !groupPhoto ?
+                                        <i className="fa-solid fa-camera"></i> :
+                                        <img className='groupPhoto' src={groupPhoto} />
+                                }
+                            </div>
                         </div>
                     </ChooseImageModal>
                     <div className='element-input'>
@@ -240,9 +262,12 @@ const NewGroupChatModal = ({ children }) => {
                                 style={containerStyle}
                             >
                                 <Drawer
-                                    title={<div dangerouslySetInnerHTML={{
-                                        __html: `Đã chọn: <span class="dachon">${getDetailListMembers(list).count}/${getDetailListMembers(list).total}</span>`
-                                    }}></div>}
+                                    title={
+                                        <div className='main-title'>
+                                            <span className="dachon">Đã chọn: {getDetailListMembers(list).count}/{getDetailListMembers(list).total}</span>
+                                            <p className="delele-all" onClick={handleRemoveAll}>Xóa tất cả</p>
+                                        </div>
+                                    }
                                     placement="right"
                                     closable={true}
                                     onClose={onClose}
@@ -265,6 +290,11 @@ const NewGroupChatModal = ({ children }) => {
                                                         <span className='username'>
                                                             {getFriend(user, [item.user1, item.user2])?.userName}
                                                         </span>
+                                                        <p className='action'>
+                                                            <i className="fa-regular fa-circle-xmark"
+                                                                onClick={() => removeMember(item)}
+                                                            ></i>
+                                                        </p>
                                                     </div>
                                                 ))
                                         }

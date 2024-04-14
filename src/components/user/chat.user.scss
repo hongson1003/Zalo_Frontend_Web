@@ -1,13 +1,65 @@
 .chat-user-container {
-    padding: 15px 20px;
+    padding: 15px 5px 20px 15px;
     display: flex;
     align-items: center;
     width: 100%;
     gap: 20px;
     cursor: pointer;
-    .right {
-        .name {
-            font-weight: 500;
+    .chat-left {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        width: 80%;
+        .right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            max-width: calc(100% - 60px);
+            .top {
+                .name {
+                    font-weight: 500;
+                    font-size: 16px;
+                    display: -webkit-box; /* Thiết lập hiển thị theo kiểu box */
+                    -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
+                    -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
+                    overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
+                    text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá phần tử */
+                }
+                .group-name {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 16px;
+                }
+            }
+            .bottom {
+                p {
+                    font-size: 14px;
+                    display: -webkit-box; /* Thiết lập hiển thị theo kiểu box */
+                    -webkit-line-clamp: 2; /* Giới hạn số dòng hiển thị */
+                    -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
+                    overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
+                    text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá phần tử */
+                }
+            }
+        }
+    }
+
+    .ultils {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        .ultils-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+            &:hover {
+                background-color: #dfe2e7;
+            }
         }
     }
 }

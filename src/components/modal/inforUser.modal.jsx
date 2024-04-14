@@ -299,7 +299,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                             zoom
                             size={50}
                         >
-
                             {itsMe &&
                                 <ChooseImageModal
                                     type='avatar'

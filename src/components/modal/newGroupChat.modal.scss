@@ -74,6 +74,11 @@
                 width: 100% !important;
                 .ant-drawer-title {
                     font-size: 13px;
+                    .main-title {
+                        display: flex;
+                        align-items: center;
+                        gap: 2px;
+                    }
                 }
             }
             .ant-drawer-header {
@@ -87,6 +92,13 @@
                 padding: 3px;
                 border-radius: 5px;
                 color: #005ae0;
+            }
+            .delele-all {
+                display: inline-block;
+                font-size: 12px;
+                text-align: right;
+                flex: 1;
+                cursor: pointer;
             }
             .list-dachon {
                 gap: 10px;
@@ -102,6 +114,16 @@
                     background-color: #e5efff;
                     color: #005ae0;
                     gap: 5px;
+                    .action {
+                        flex: 1;
+                        text-align: right;
+                        cursor: pointer;
+                        i {
+                            background-color: #005ae0;
+                            border-radius: 50%;
+                            color: #ffffff;
+                        }
+                    }
                 }
             }
         }

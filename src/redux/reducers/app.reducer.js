@@ -88,6 +88,14 @@ export default function appReducer(state = initialState, action) {
             };
             return stateEditUser;
         }
+        case STATE.EDIT_GROUP: {
+            let stateEditGroup = { ...state };
+            stateEditGroup.subNav = {
+                ...state.subNav,
+                ...action.payload
+            };
+            return stateEditGroup;
+        }
         default:
             return state
     }

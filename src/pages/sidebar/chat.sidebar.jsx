@@ -17,6 +17,7 @@ const ChatSidebar = () => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const dispatch = useDispatch();
     const chat = useSelector(state => state.appReducer?.subNav);
+    const state = useSelector(state => state.appReducer);
 
     const fetchChats = useCallback(async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
@@ -50,7 +51,6 @@ const ChatSidebar = () => {
         if (user) {
             fetchChats();
         }
-
     }, [chat?._id])
 
 
@@ -59,19 +59,31 @@ const ChatSidebar = () => {
             chats.forEach(item => {
                 socket.then(socket => {
                     socket.emit('join-room', item._id);
-                    const friend = getFriend(user, item.participants);
-                    socket.emit('join-room', friend.id);
                 })
             })
         }
-    }, [chats])
+    }, [chats.length])
 
     // bắn chat đầu tiên
     useEffect(() => {
         if (fetchChats) {
             dispatch(fetchChatsFunc(fetchChats));
         }
-    }, [fetchChats])
+    }, [fetchChats]);
+
+    useEffect(() => {
+        socket.then(socket => {
+            socket.on('transfer-disband-group', (dataa) => {
+                console.log('Nhóm đã bị giải tán')
+            })
+            socket.on('new-group-chat', (data) => {
+                fetchChats();
+                setTimeout(() => {
+                    socket.emit('join-room', data._id);
+                }, 5000);
+            })
+        })
+    }, [])
 
     return (
         <div>

@@ -1,11 +1,12 @@
 import { KEYITEMS } from "../../utils/keyMenuItem";
 import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from "../types/type.app"
-import { CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/type.user";
+import { CALL, CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/type.user";
 
 const initialState = {
     notificationsFriends: [],
     sendMessageFunc: {},
-    message: null
+    message: null,
+    callMembers: [],
 }
 
 export default function userReducer(state = initialState, action) {

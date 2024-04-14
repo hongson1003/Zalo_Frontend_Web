@@ -14,11 +14,13 @@
         }
     }
     video {
+        position: relative;
         max-width: 500px;
         min-width: 250px;
         width: 100%;
         height: 400px;
         padding: 0px 5px;
+        z-index: 1;
     }
     &.w-500 {
         max-width: 450px;
@@ -37,8 +39,8 @@
         text-align: left;
     }
     .image-message {
-        width: 200px;
-        height: 200px;
+        width: 300px;
+        height: 300px;
         border-radius: 10px;
         object-fit: cover;
         margin: 2px;
@@ -50,12 +52,15 @@
     }
     &.option-right {
         [aria-owns] {
-            min-width: 200px;
+            min-width: 100%;
             display: inline-flex;
             justify-content: center;
             align-items: center;
             width: 50%;
             margin: 0;
+            [data-rmiz-content] {
+                width: 100%;
+            }
         }
         & .options {
             right: -100px;
@@ -123,6 +128,7 @@
         background-color: #ffffff;
         padding: 5px 5px;
         box-shadow: 1px 1px 2px 2px #00000040;
+        z-index: 2;
         .reaction-item {
             cursor: pointer;
             font-size: 10px;
@@ -143,7 +149,7 @@
             width: 22px;
             height: 22px;
             border-radius: 50%;
-            bottom: 0;
+            bottom: 0px;
             right: 50%;
             transform: translate(50%, 50%);
             display: flex;
@@ -157,6 +163,31 @@
                 font-size: 16px;
             }
         }
+    }
+}
+
+.group-message-hover-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px;
+    padding-bottom: 0;
+    .message-reply {
+        align-self: flex-end;
+        width: 100%;
+        background-color: #c7e0ff;
+        padding: 10px;
+        cursor: pointer;
+        .reply-name {
+            font-size: 11px;
+            font-weight: 660;
+        }
+        .message-reply-content {
+            font-size: 12px;
+        }
+    }
+    .message-hover-container {
+        padding-top: 0px;
     }
 }
 
@@ -202,8 +233,8 @@
     .message-hover-container {
         // width: 300px !important;
         .image-message {
-            width: 70px;
-            height: 70px;
+            width: 200px;
+            height: 200px;
         }
     }
 }
@@ -211,10 +242,10 @@
 @media screen and (max-width: 790px) {
     .message-hover-container {
         [aria-owns] {
-            min-width: 70px !important;
+            min-width: 200px !important;
         }
         audio {
-            min-width: 180px !important;
+            min-width: 200px !important;
         }
         video {
             max-width: 200px;

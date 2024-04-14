@@ -15,14 +15,19 @@
         }
     }
     .status {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
         .username {
             font-weight: 600;
         }
         .connected-time {
-            font-size: calc(5px + 0.5vw);
-            margin-top: 10px;
-            // color: #333;
-            // color: #ffffff;
+            font-size: calc(5px + 0.6vw);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 5px;
         }
     }
 }

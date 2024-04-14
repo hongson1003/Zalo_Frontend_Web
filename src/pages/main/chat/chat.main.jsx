@@ -8,7 +8,7 @@ import data from '@emoji-mart/data/sets/14/facebook.json'
 import Picker from '@emoji-mart/react'
 import axios from '../../../utils/axios';
 import AvatarUser from "../../../components/user/avatar";
-import { Button, Menu } from 'antd';
+import { Button, Menu, message } from 'antd';
 import { socket } from "../../../utils/io";
 import { toast } from "react-toastify";
 import _ from 'lodash';
@@ -35,10 +35,13 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import MicModal from "../../../components/modal/mic.modal";
 import PinsModal from "../../../components/modal/pins.modal";
-import { set } from "firebase/database";
+import { Input } from 'antd';
+import { Popover } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
+import { changeKeySubMenu } from "../../../redux/actions/app.action";
+import WrapperVideo from "../../../components/customize/wrapperVideo";
 
-
-const ChatMain = ({ file, fileTypes }) => {
+const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
     const [show, setShow] = useState(false);
@@ -72,11 +75,21 @@ const ChatMain = ({ file, fileTypes }) => {
     const listMessageIsPinRef = useRef([]);
     const [listMessageIsPinState, setListMessageIsPinState] = useState(listMessageIsPinRef.current);
     const [hasPin, setHasPin] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const searchRef = useRef(null);
+    const [openReply, setOpenReply] = useState(false);
+    const [messageReply, setMessageReply] = useState(null);
 
     // text để theo dõi thay đổi
     const [text, setText] = useState('');
     // Emoij
 
+    useEffect(() => {
+        if (!chat._id) {
+            dispatch(changeKeySubMenu(''));
+        }
+
+    }, [chat]);
 
     useEffect(() => {
         socket.then(socket => {
@@ -149,7 +162,7 @@ const ChatMain = ({ file, fileTypes }) => {
 
     // socket
     useEffect(() => {
-        if (receiveOnly.current === false && messages.length > 0) {
+        if (receiveOnly.current === false) {
             socket.then(socket => {
                 socket.on('typing', () => {
                     setTyping(true);
@@ -301,7 +314,8 @@ const ChatMain = ({ file, fileTypes }) => {
             updatedAt: new Date(),
             urls: [preview],
             unViewList: [],
-            isDelete: false
+            isDelete: false,
+            reactions: []
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -337,7 +351,8 @@ const ChatMain = ({ file, fileTypes }) => {
             updatedAt: new Date(),
             urls: urls,
             unViewList: [],
-            isDelete: false
+            isDelete: false,
+            reactions: []
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -366,6 +381,7 @@ const ChatMain = ({ file, fileTypes }) => {
 
 
     const fetchMessagePaginate = async () => {
+        if (!chat._id) return;
         const res = await axios.get(`/chat/message/pagination?chatId=${chat._id}&limit=${limit}`);
         if (res.errCode === 0) {
             setMessages(res?.data);
@@ -390,9 +406,17 @@ const ChatMain = ({ file, fileTypes }) => {
     const items = [
         {
             key: 'search',
-            icon: <div className="box-icon">
+            icon: <div className="box-icon" onClick={() => {
+                setIsSearching(true);
+                drawerMethods.showDrawer();
+                setTimeout(() => {
+                    if (searchRef.current) {
+                        searchRef.current.focus();
+                    }
+                }, 500);
+            }}>
                 <i className="fa-solid fa-magnifying-glass icon"></i>
-            </div>
+            </div >
         },
         {
             key: 'phone',
@@ -402,9 +426,11 @@ const ChatMain = ({ file, fileTypes }) => {
         },
         {
             key: 'video-call',
-            icon: <div className="box-icon">
-                <i className="fa-solid fa-video icon"></i>
-            </div>
+            icon: <WrapperVideo>
+                <div className="box-icon">
+                    <i className="fa-solid fa-video icon"></i>
+                </div>
+            </WrapperVideo>
         },
         {
             key: 'foremore',
@@ -453,6 +479,9 @@ const ChatMain = ({ file, fileTypes }) => {
             isDelete: false,
             reactions: []
         }
+        if (openReply) {
+            createMessage.reply = messageReply;
+        }
         if (type === MESSAGES.TEXT) {
             createMessage.content = data;
             if (listImage.length > 0) {
@@ -463,6 +492,7 @@ const ChatMain = ({ file, fileTypes }) => {
         } else if (type === MESSAGES.STICKER)
             createMessage.sticker = data;
         setMessages(prev => [...prev, createMessage]);
+        setOpenReply(false);
         setSent(STATE.PENDING);
         const res = await axios.post('/chat/message', {
             ...createMessage,
@@ -646,7 +676,8 @@ const ChatMain = ({ file, fileTypes }) => {
             updatedAt: new Date(),
             urls: previews,
             unViewList: [],
-            isDelete: false
+            isDelete: false,
+            reactions: []
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -688,7 +719,8 @@ const ChatMain = ({ file, fileTypes }) => {
             updatedAt: new Date(),
             urls: [preview],
             unViewList: [],
-            isDelete: false
+            isDelete: false,
+            reactions: []
         };
         setMessages(prev => [...prev, createMessage]);
         setSent(STATE.PENDING);
@@ -758,7 +790,8 @@ const ChatMain = ({ file, fileTypes }) => {
             urls: previews,
             content: JSON.stringify(dataFiles),
             unViewList: [],
-            isDelete: false
+            isDelete: false,
+            reactions: []
         };
         setMessages(prev => [...prev, createMessage]);
         // const data = await uploadToCloudiry(filesOrFolders[0]);
@@ -796,7 +829,8 @@ const ChatMain = ({ file, fileTypes }) => {
             updatedAt: new Date(),
             urls: [preview],
             unViewList: [],
-            isDelete: false
+            isDelete: false,
+            reactions: []
         };
 
         setMessages(prev => [...prev, createMessage]);
@@ -821,6 +855,38 @@ const ChatMain = ({ file, fileTypes }) => {
 
     const handleFindMessageFirst = (ref) => {
         ref.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    }
+
+    const handleOnSearch = _.debounce((value) => {
+        drawerMethods.setSearchDrawer(value);
+    }, 500);
+
+    const Content = () => {
+        return (
+            <div className="reply-content">
+                <p>{messageReply?.content}</p>
+                {
+                    (messageReply?.sticker ||
+                        (messageReply?.urls?.length > 0 && messageReply.type === MESSAGES.IMAGES)) ?
+                        <img src={messageReply?.sticker} ></img> : (
+                            messageReply?.urls?.length > 0 && messageReply.type === MESSAGES.VIDEO &&
+                            <video src={messageReply?.urls[0]} />
+                        )
+                }
+            </div>
+        )
+    };
+
+    const handleOnClickReply = (message) => {
+        setMessageReply(message);
+        setOpenReply(true);
+        textAreaRef.current.focus();
+    }
+
+    const handleRemoveReply = () => {
+        setMessageReply(null);
+        setOpenReply(false);
+        textAreaRef.current.value = '';
     }
 
 
@@ -848,7 +914,8 @@ const ChatMain = ({ file, fileTypes }) => {
                             <Menu
                                 onClick={onClick}
                                 selectedKeys={[current]}
-                                mode="horizontal" items={items}
+                                mode="horizontal"
+                                items={items}
                                 className="menu-header"
                                 style={{ color: headerColor }}
                             />
@@ -857,7 +924,26 @@ const ChatMain = ({ file, fileTypes }) => {
 
                     <div className="main-chat-content">
                         {
-                            hasPin &&
+                            isSearching && (
+                                <div className="searching">
+                                    <Input
+                                        value={drawerMethods.searchValue}
+                                        placeholder="Tìm tin nhắn"
+                                        prefix={<i className="fa-solid fa-search"></i>}
+                                        onChange={(e) => handleOnSearch(e.target.value)}
+                                        spellCheck={false}
+                                        ref={searchRef}
+                                    />
+                                    <Button type="default" onClick={() => {
+                                        setCurrent('');
+                                        drawerMethods.onClose();
+                                        setIsSearching(false);
+                                    }}>Đóng</Button>
+                                </div>
+                            )
+                        }
+                        {
+                            hasPin && !isSearching &&
                             <div className="pin-container">
                                 <div className="pin-icon-item">
                                     <i className="fa-regular fa-message"></i>
@@ -891,7 +977,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                 </div>
                             </div>
                         }
-                        <div className={`content-chat-messages ${hasPin ? 'pt-50' : ''}`} ref={scroolRef}
+                        <div className={`content-chat-messages ${(hasPin || isSearching) ? 'pt-50' : ''}`} ref={scroolRef}
                             style={{
                                 height: `calc(100% - ${footerHeight - 10}px)`,
                                 color: messageColor,
@@ -912,11 +998,13 @@ const ChatMain = ({ file, fileTypes }) => {
                                                         }}
                                                         ref={(ref) => {
                                                             if (message.isPin === true) {
-
                                                                 listMessageIsPinRef.current = _.unionBy([{ message: message, ref }], listMessageIsPinRef.current, 'message._id');
                                                                 if (hasPin === false) {
                                                                     setHasPin(true);
                                                                 }
+                                                            }
+                                                            if (drawerMethods.searchDrawer.toLowerCase().trim() !== '' && message?.content?.toLowerCase().includes(drawerMethods.searchDrawer.toLowerCase().trim())) {
+                                                                drawerMethods.listMessageRef.current = _.unionBy([{ message: message, ref }], drawerMethods.listMessageRef.current, 'message._id');
                                                             }
                                                         }}
                                                     >
@@ -925,36 +1013,34 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                 {
                                                                     index == 0 ?
                                                                         <AvatarUser
-                                                                            image={getFriend(user, chat.participants)?.avatar}
-                                                                            name={getFriend(user, chat.participants)?.userName}
+                                                                            image={message?.sender?.avatar || '/images/user-dev.png'}
+                                                                            name={message?.sender?.userName || 'Người dùng'}
                                                                         /> :
                                                                         (
                                                                             messages[index - 1].sender.id !== messages[index].sender.id &&
                                                                             <AvatarUser
-                                                                                image={chat.type === CHAT_STATUS.PRIVATE_CHAT ?
-                                                                                    getFriend(user, chat.participants)?.avatar : chat.groupPhoto}
-                                                                                name={getFriend(user, chat.participants)?.userName}
+                                                                                image={message?.sender?.avatar || '/images/user-dev.png'}
+                                                                                name={message?.sender?.userName || 'Người dùng'}
                                                                             />
-
                                                                         )
                                                                 }
                                                             </div>
                                                         }
                                                         <div
                                                             className={
-                                                                message.type !== MESSAGES.TEXT ?
-                                                                    `message ${(message.type === MESSAGES.FILE_FOLDER || message.type === MESSAGES.AUDIO) ?
-                                                                        '' : 'de-bg'} ${message?.urls?.length > 1 ?
-                                                                            'w-500' : ''}` : `message ${message?.urls?.length > 1 && 'w-500'}`
+                                                                (message.type === MESSAGES.TEXT || message.isDelete === true) ? 'message' : (
+                                                                    (message.type === MESSAGES.IMAGES || message.type === MESSAGES.VIDEO ||
+                                                                        message.type === MESSAGES.AUDIO
+                                                                    ) ? 'message de-bg w-500' : 'message'
+                                                                )
                                                             }
                                                         >
                                                             {
                                                                 messages[index - 1]?.sender?.id !== messages[index].sender.id &&
-                                                                <p style={{ color: messageColor }} className="name">{message?.sender?.userName}</p>
+                                                                <p style={{ color: messageColor }} className="name">{message?.sender?.userName || 'Người dùng'}</p>
                                                             }
                                                             {
-                                                                !message.unViewList.includes(user.id) &&
-                                                                    message.isDelete === true ?
+                                                                message.isDelete === true ?
                                                                     <p style={
                                                                         {
                                                                             width: '100%',
@@ -967,6 +1053,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                         <MessageChat
                                                                             handleModifyMessage={handleModifyMessage}
                                                                             isLeft={true} message={message}
+                                                                            handleOnClickReply={handleOnClickReply}
                                                                         >
                                                                             <p style={{ width: '100%', padding: '5px' }} className='message-content-left'>{message.content}</p>
                                                                             {
@@ -984,8 +1071,16 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                             }
                                                                         </MessageChat> : (
                                                                             message.type === MESSAGES.STICKER ?
-                                                                                <MessageChat handleModifyMessage={handleModifyMessage} isLeft={true} message={message}>
-                                                                                    <img className="sticker" src={message.sticker} alt="sticker" />
+                                                                                <MessageChat
+                                                                                    handleModifyMessage={handleModifyMessage}
+                                                                                    isLeft={true}
+                                                                                    message={message}
+                                                                                    handleOnClickReply={handleOnClickReply}
+
+                                                                                >
+                                                                                    <img className="sticker"
+                                                                                        src={message.sticker} alt="sticker"
+                                                                                    />
                                                                                     {
                                                                                         messages[index + 1]?.sender?.id !== messages[index].sender.id &&
                                                                                         <p className='time'>{getTimeFromDate(message.createdAt)}</p>
@@ -997,7 +1092,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                             isLeft={true}
                                                                                             message={message}
                                                                                             isImage
-                                                                                            lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                            handleOnClickReply={handleOnClickReply}
                                                                                         >
                                                                                             {
                                                                                                 message.urls.map((image, index) => {
@@ -1018,7 +1113,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                                     handleModifyMessage={handleModifyMessage}
                                                                                                     isLeft={true}
                                                                                                     message={message}
-                                                                                                // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                    handleOnClickReply={handleOnClickReply}
                                                                                                 >
                                                                                                     {
                                                                                                         message.urls.map((url, index) => {
@@ -1057,7 +1152,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                                             handleModifyMessage={handleModifyMessage}
                                                                                                             isLeft={true}
                                                                                                             message={message}
-                                                                                                        // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                            handleOnClickReply={handleOnClickReply}
                                                                                                         >
                                                                                                             {
                                                                                                                 message.urls.map((url, index) => {
@@ -1080,7 +1175,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                                                 handleModifyMessage={handleModifyMessage}
                                                                                                                 isLeft={true}
                                                                                                                 message={message}
-                                                                                                            // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                                handleOnClickReply={handleOnClickReply}
                                                                                                             >
                                                                                                                 {
                                                                                                                     message.urls.map((url, index) => {
@@ -1112,7 +1207,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                             alignSelf: 'flex-end',
                                                             marginBottom: message?.reactions?.length > 0 ? '10px' : '0px',
                                                         }}
-                                                        className={message.type === MESSAGES.TEXT ? 'message' : (
+                                                        className={(message.type === MESSAGES.TEXT || message.isDelete) ? 'message' : (
                                                             (message.type === MESSAGES.AUDIO || message.type === MESSAGES.VIDEO)
                                                                 ? 'message w-500 de-bg' : (
                                                                     message.type === MESSAGES.FILE_FOLDER ? 'message' : 'message de-bg'
@@ -1125,16 +1220,21 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                     setHasPin(true);
                                                                 }
                                                             }
+                                                            if (drawerMethods.searchDrawer.toLowerCase().trim() !== '' && message?.content?.toLowerCase().includes(drawerMethods.searchDrawer.toLowerCase().trim())) {
+                                                                drawerMethods.listMessageRef.current = _.unionBy([{ message: message, ref }], drawerMethods.listMessageRef.current, 'message._id');
+                                                            }
                                                         }}
                                                     >
                                                         {
                                                             message.isDelete === true ?
-                                                                <p style={{ width: '100%', padding: '5px' }} className='message-content-right'>{'Tin nhắn đã được thu hồi'}</p> :
+                                                                <p style={{ width: '100%', padding: '5px' }} className='message-content-right-isDelete'>{'Tin nhắn đã được thu hồi'}</p> :
                                                                 // render message
                                                                 message.type === MESSAGES.TEXT ?
-                                                                    <MessageChat handleModifyMessage={handleModifyMessage}
+                                                                    <MessageChat
+                                                                        handleModifyMessage={handleModifyMessage}
                                                                         isLeft={false} message={message}
                                                                         isImage={message.urls?.length > 0}
+                                                                        handleOnClickReply={handleOnClickReply}
                                                                     >
                                                                         <p style={{ width: '100%', padding: '5px' }} className='message-content-right'>{message.content}</p>
                                                                         {
@@ -1153,7 +1253,12 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                     </MessageChat>
                                                                     : (
                                                                         message.type === MESSAGES.STICKER ?
-                                                                            <MessageChat handleModifyMessage={handleModifyMessage} isLeft={false} message={message}>
+                                                                            <MessageChat
+                                                                                handleModifyMessage={handleModifyMessage}
+                                                                                isLeft={false}
+                                                                                message={message}
+                                                                                handleOnClickReply={handleOnClickReply}
+                                                                            >
                                                                                 <img className="sticker" src={message.sticker} alt="sticker" />
                                                                                 {
                                                                                     messages[index + 1]?.sender?.id !== messages[index].sender.id &&
@@ -1166,7 +1271,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                         isLeft={false}
                                                                                         message={message}
                                                                                         isImage
-                                                                                        lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                        handleOnClickReply={handleOnClickReply}
                                                                                     >
                                                                                         {
                                                                                             message.urls.map((image, index) => {
@@ -1187,7 +1292,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                                 handleModifyMessage={handleModifyMessage}
                                                                                                 isLeft={false}
                                                                                                 message={message}
-                                                                                            // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                handleOnClickReply={handleOnClickReply}
                                                                                             >
                                                                                                 {
                                                                                                     message.urls.map((url, index) => {
@@ -1226,7 +1331,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                                         handleModifyMessage={handleModifyMessage}
                                                                                                         isLeft={false}
                                                                                                         message={message}
-                                                                                                    // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                        handleOnClickReply={handleOnClickReply}
                                                                                                     >
                                                                                                         {
                                                                                                             message.urls.map((url, index) => {
@@ -1249,7 +1354,7 @@ const ChatMain = ({ file, fileTypes }) => {
                                                                                                             handleModifyMessage={handleModifyMessage}
                                                                                                             isLeft={false}
                                                                                                             message={message}
-                                                                                                        // lasted={messages[index + 1]?.sender?.id !== messages[index].sender.id}
+                                                                                                            handleOnClickReply={handleOnClickReply}
                                                                                                         >
                                                                                                             {
                                                                                                                 message.urls.map((url, index) => {
@@ -1381,17 +1486,33 @@ const ChatMain = ({ file, fileTypes }) => {
 
                                 </div>
                                 <div className="footer-bottom footer-item" onClick={handleOnClickFooter}>
-                                    <TextareaAutosize
-                                        className="input-text"
-                                        onChange={e => handleOnChange(e)}
-                                        placeholder="Nhập tin nhắn..."
-                                        onKeyDown={e => handleOnKeyDown(e)}
-                                        autoFocus
-                                        spellCheck={false}
-                                        onHeightChange={(height, meta) => handleResize(height, meta)}
-                                        ref={textAreaRef}
-                                        type="text"
-                                    />
+                                    <Popover
+                                        content={
+                                            <Content
+                                            />
+                                        }
+                                        title={
+                                            <div className="title-reply">
+                                                <i className="fa-solid fa-reply"></i>
+                                                <p>Trả lời: {messageReply?.sender?.userName}</p>
+                                                <Button onClick={handleRemoveReply}><CloseOutlined /></Button>
+                                            </div>}
+                                        placement="topLeft"
+                                        open={openReply}
+                                    >
+                                        <TextareaAutosize
+                                            className="input-text"
+                                            onChange={e => handleOnChange(e)}
+                                            placeholder="Nhập tin nhắn..."
+                                            onKeyDown={e => handleOnKeyDown(e)}
+                                            autoFocus
+                                            spellCheck={false}
+                                            onHeightChange={(height, meta) => handleResize(height, meta)}
+                                            ref={textAreaRef}
+                                            type="text"
+                                        />
+                                    </Popover>
+
                                     <div className="text-quick-group">
                                         <div className="item-icon emoijj" onClick={handleShowHideEmoij}>
                                             <i className="fa-regular fa-face-smile emoijj"></i>

@@ -10,6 +10,7 @@ import OutsideLayout from './layouts/outsideLayout';
 import ErrorPage from './pages/error.page';
 import NotFound from './pages/notFound.page';
 import TestPage from './pages/test.page';
+import VideoCallWindow from './windows/videoCall.window';
 
 
 
@@ -21,7 +22,11 @@ const routes = [
         children: [
             {
                 path: 'home',
-                element: <HomeSubLayout />
+                element: <HomeSubLayout />,
+            },
+            {
+                path: 'video-call',
+                element: <VideoCallWindow />
             },
         ],
     },
@@ -36,7 +41,7 @@ const routes = [
     {
         path: '/reset-password',
         element: <ResetPassword />
-     },
+    },
     {
         path: '/outside',
         element: <OutsideLayout />,
@@ -49,17 +54,17 @@ const routes = [
         ],
     },
     {
-        path: '/notfound',
-        element: <NotFound />
-    },
-    {
         path: '/error',
         element: <ErrorPage />
     },
     {
         path: '/test',
         element: <TestPage />
-    }
+    },
+    {
+        path: '*',
+        element: <NotFound />
+    },
 ];
 
 export const router = createBrowserRouter(routes);
