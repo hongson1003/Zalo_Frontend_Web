@@ -23,7 +23,10 @@ const StatusUser = ({ chat }) => {
     }
 
     useEffect(() => {
-        fetchFriendShip(getFriend(user, chat.participants)?.id);
+        const friendId = getFriend(user, chat.participants)?.id;
+        if (chat && friendId) {
+            fetchFriendShip(friendId);
+        }
     }, []);
 
     useEffect(() => {

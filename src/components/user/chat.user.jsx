@@ -5,21 +5,16 @@ import './chat.user.scss'
 import { accessChat } from "../../redux/actions/user.action";
 import { CHAT_STATUS, MESSAGES } from "../../redux/types/type.user";
 import { getFriend } from '../../utils/handleChat';
+import _ from 'lodash';
 
 const ChatUser = ({ chat, activeKey }) => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
-    const dispatch = useDispatch();
     const subNav = useSelector(state => state.appReducer.subNav);
 
-    const handleOnClick = () => {
-        dispatch(accessChat(chat));
-    }
 
     return (
         <div className={`chat-user-container ${activeKey === subNav?._id && 'active-chat'}`} >
-            <div className="chat-left" onClick={() => {
-                handleOnClick()
-            }}>
+            <div className="chat-left" >
                 {
                     chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
                         <AvatarUser

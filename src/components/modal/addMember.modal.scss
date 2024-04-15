@@ -1,0 +1,15 @@
+.add-member-modal {
+    .list-main {
+        padding: 10px;
+        .list-friend {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            .group-friend {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+        }
+    }
+}

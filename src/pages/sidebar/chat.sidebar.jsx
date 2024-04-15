@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import { STATE } from "../../redux/types/type.app";
 import { accessChat, fetchChatsFunc } from "../../redux/actions/user.action";
 import { useDispatch, useSelector } from "react-redux";
-import { getFriend } from "../../utils/handleChat";
-
+import _ from 'lodash';
+import { editGroup } from "../../redux/actions/app.action";
 
 const ChatSidebar = () => {
     const [chats, setChats] = useState([]);
@@ -17,7 +17,7 @@ const ChatSidebar = () => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const dispatch = useDispatch();
     const chat = useSelector(state => state.appReducer?.subNav);
-    const state = useSelector(state => state.appReducer);
+    const [selectedChat, setSelectedChat] = useState(null);
 
     const fetchChats = useCallback(async () => {
         const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
@@ -32,6 +32,7 @@ const ChatSidebar = () => {
             setStatus(STATE.REJECT);
         }
     }, [chat])
+
     // lắng nghe sự kiện enter
     useEffect(() => {
         const handleKeyPress = (e) => {
@@ -73,30 +74,53 @@ const ChatSidebar = () => {
 
     useEffect(() => {
         socket.then(socket => {
-            socket.on('transfer-disband-group', (dataa) => {
+            socket.on('transfer-disband-group', (data) => {
                 console.log('Nhóm đã bị giải tán')
+                fetchChats();
             })
             socket.on('new-group-chat', (data) => {
                 fetchChats();
                 setTimeout(() => {
                     socket.emit('join-room', data._id);
-                }, 5000);
+                }, 500);
+            })
+            socket.on('add-member', (data) => {
+                if (chat?._id === data._id) {
+                    dispatch(editGroup(data));
+                }
+                fetchChats();
+            })
+            socket.on('leave-group', data => {
+                console.log('nó rời nhóm')
+                fetchChats();
             })
         })
-    }, [])
+    }, []);
+
+    const handleSelectChat = (chat) => {
+        setSelectedChat(chat);
+        dispatch(accessChat(chat));
+    }
+
+    const handleSelectChatDebouce = _.debounce(handleSelectChat, 200)
+
 
     return (
-        <div>
+        <div style={{ overflowY: 'scroll', height: 'calc(100vh - 100px)' }}>
             {
                 chats?.length > 0 && status === STATE.RESOLVE &&
                 chats.map((chat, index) => {
                     return (
-                        <ChatUser
-                            key={index}
-                            chat={chat}
-                            activeKey={chat._id}
-                            fetchChats={fetchChats}
-                        />
+                        <span key={chat._id}
+                            onClick={() => handleSelectChatDebouce(chat)}
+                        >
+                            <ChatUser
+                                key={index}
+                                chat={chat}
+                                activeKey={chat._id}
+                                fetchChats={fetchChats}
+                            />
+                        </span>
                     )
                 })
             }

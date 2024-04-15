@@ -197,6 +197,16 @@
                     border-radius: 15px;
                     font-size: 13px;
                 }
+                .notify-message {
+                    width: 100%;
+                    height: 50px;
+                    p {
+                        text-align: center;
+                        font-size: 15px;
+                        font-style: italic;
+                        color: #888;
+                    }
+                }
                 .message {
                     width: auto;
                     border-radius: 5px;
@@ -383,7 +393,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 20px 0;
+            .avatar-group {
+                width: 50px;
+                height: 50px;
+                img {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                }
+            }
             .item-avatar {
                 display: flex;
                 flex-direction: column;
@@ -399,7 +418,7 @@
                 }
             }
             .item-change-bg {
-                margin-top: 10px;
+                margin: 10px 0;
                 display: flex;
                 width: 100%;
                 justify-content: center;
@@ -413,20 +432,28 @@
             }
             .hyphen {
                 width: 100%;
-                height: 1vh;
+                height: 5px;
                 background-color: #eee9e9;
-                margin-top: 3vh;
+                margin: 5px 0;
+            }
+            .leave-group {
+                width: 100%;
+                padding: 10px 15px;
+                .leave-group-btn {
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                }
             }
             .options-list {
-                margin-top: 3vh;
+                margin: 10px 0;
                 width: 100%;
                 display: flex;
                 flex-direction: row;
-                justify-content: space-between;
+                justify-content: space-evenly;
                 background-color: white;
                 .button-wrapper {
                     display: flex;
-                    width: 30%;
                     .button {
                         display: flex;
                         justify-content: center;
@@ -467,12 +494,41 @@
                     }
                 }
             }
+            .right-members {
+                width: 100%;
+                padding: 10px 0;
+                .title {
+                    margin: 10px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #333;
+                    text-align: left;
+                    padding-left: 20px;
+                }
+                .content {
+                    padding-left: 20px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                    &:hover {
+                        background-color: #dfe2e7;
+                    }
+                    img {
+                        height: 25px;
+                        width: 25px;
+                    }
+                    .count-members {
+                        font-size: 14px;
+                    }
+                }
+            }
             .info-list {
                 width: 100%;
-                height: 13vh;
                 flex-direction: column;
                 align-items: flex-start;
-                margin-top: 2vh;
+                height: 40px;
                 .remind {
                     width: 100%;
                     height: 5vh;
@@ -481,8 +537,8 @@
                     align-items: center;
                     border-color: white;
                     img {
-                        width: 8%;
-                        height: 3.5vh;
+                        height: 25px;
+                        width: 25px;
                     }
                     span {
                         margin-top: 1vh;

@@ -8,6 +8,7 @@ import AvatarUser from '../user/avatar';
 import axios from '../../utils/axios';
 import { accessChat } from '../../redux/actions/user.action';
 import { socket } from '../../utils/io';
+import { sendNotifyToChatRealTime } from '../../utils/handleChat';
 
 const DisbandGroupModal = ({ children }) => {
 
@@ -25,7 +26,10 @@ const DisbandGroupModal = ({ children }) => {
             memberId: value.id,
             chatId: chat._id
         })
-        if (res.errCode === 0) {
+        const kq = await sendNotifyToChatRealTime(chat._id,
+            `${user?.userName} đã rời nhóm, ${value.userName} đã trở thành nhóm trưởng.`
+        );
+        if (res.errCode === 0 && kq === true) {
             socket.then(socket => {
                 socket.emit('transfer-disband-group', { _id: chat._id });
                 dispatch(accessChat(null));

@@ -1,0 +1,28 @@
+.forward-container {
+    border-top: 1px solid grey;
+    .forward-input {
+        padding: 10px;
+    }
+    .main-chats-share {
+        padding: 10px;
+        .title {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0 15px;
+        }
+        .list-chats {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            .list-checkbox {
+                flex-direction: column;
+                gap: 18px;
+                .group-checkbox {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+            }
+        }
+    }
+}

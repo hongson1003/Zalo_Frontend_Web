@@ -38,13 +38,17 @@ import PinsModal from "../../../components/modal/pins.modal";
 import { Input } from 'antd';
 import { Popover } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import { changeKeySubMenu } from "../../../redux/actions/app.action";
+import { changeKeySubMenu, editGroup } from "../../../redux/actions/app.action";
 import WrapperVideo from "../../../components/customize/wrapperVideo";
+import AddMemberModal from "../../../components/modal/addMember.modal";
+import InforGroupModal from "../../../components/modal/infoGroup.modal";
+import MemberDrawer from "../../../components/drawer/members.drawer";
+import DisbandGroupModal from "../../../components/modal/disbandGroup.modal";
 
 const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
-    const [show, setShow] = useState(false);
+    const [show, setShow] = useState(true);
     const [showEmoij, setShowEmoij] = useState(true);
     const [messages, setMessages] = useState([]);
     const [limit, setLimit] = useState(30);
@@ -88,13 +92,23 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         if (!chat._id) {
             dispatch(changeKeySubMenu(''));
         }
-
+        textAreaRef.current.focus();
     }, [chat]);
 
     useEffect(() => {
         socket.then(socket => {
             socket.on('receive-reaction', (data) => {
                 handleModifyMessage(data);
+            })
+            socket.on('transfer-disband-group', (data) => {
+                fetchMessagePaginate();
+                dispatch(editGroup(data));
+            })
+            socket.on('leave-group', data => {
+                if (chat?._id === data.chatId) {
+                    const participants = chat.participants.filter(item => item.id !== data.userId);
+                    dispatch(editGroup({ ...chat, participants }));
+                }
             })
         });
     }, [])
@@ -987,6 +1001,13 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     if (message.unViewList.includes(user.id)) {
                                         return null;
                                     }
+                                    if (message.type === MESSAGES.NOTIFY) {
+                                        return (
+                                            <div className="notify-message" key={message._id}>
+                                                <p>{message.content}</p>
+                                            </div>
+                                        )
+                                    }
                                     return (
                                         <React.Fragment key={message._id}>
                                             {
@@ -1414,7 +1435,15 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             typing &&
                             <div className="sending">
                                 <div className="message-status">
-                                    <span><span className="message-status-user">{getFriend(user, chat.participants)?.userName}</span> đang gửi tin nhắn</span>
+                                    <span>
+                                        {
+                                            chat.type === CHAT_STATUS.PRIVATE_CHAT ?
+                                                <span className="message-status-user">{getFriend(user, chat.participants)?.userName}</span> :
+                                                <span className="message-status-user">Thành viên nhóm</span>
+                                        }
+                                        &nbsp;
+                                        <span>đang soạn tin nhắn</span>
+                                    </span>
                                 </div>
                                 <ReactLoading
                                     type={'bubbles'}
@@ -1579,9 +1608,9 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     ) : (
                                         <div className="avatar-group" >
                                             {
-                                                chat?.image ?
+                                                chat?.groupPhoto ?
                                                     (
-                                                        <img src={chat?.image} alt="avatar" />
+                                                        <img src={chat?.groupPhoto} alt="avatar" />
                                                     ) : (
                                                         chat?.participants?.length > 0 &&
                                                         chat?.participants?.map(item => {
@@ -1601,14 +1630,27 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
                                     )
                                 }
-                                <p className="name">
-                                    <span>{getFriend(user, chat.participants)?.userName}</span>
-                                    <span style={{
-                                        padding: '0 5px'
-                                    }}>
-                                        <i className="fa-solid fa-pen-to-square edit"></i>
-                                    </span>
-                                </p>
+                                {
+                                    chat?.type === CHAT_STATUS.PRIVATE_CHAT ?
+                                        <p className="name">
+                                            <span>{getFriend(user, chat.participants)?.userName}</span>
+                                            <span style={{
+                                                padding: '0 5px'
+                                            }}>
+                                                <i className="fa-solid fa-pen-to-square edit"></i>
+                                            </span>
+                                        </p> :
+                                        <p className="name">
+                                            <span>{chat?.name}</span>
+                                            <span style={{
+                                                padding: '0 5px'
+                                            }}>
+                                                <InforGroupModal>
+                                                    <i className="fa-solid fa-pen-to-square edit"></i>
+                                                </InforGroupModal>
+                                            </span>
+                                        </p>
+                                }
                             </div>
 
                             <div className="item-change-bg">
@@ -1638,24 +1680,93 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                         </div>
                                         <p>Ghim hội thoại</p>
                                     </button>
-
                                 </div>
-                                <div className="button-wrapper">
-                                    <button className="button">
-                                        <div className="button-icon"> <img src="/images/group.png" alt="Create Group Icon" /></div>
-                                        <p>Tạo nhóm chat</p>
-                                    </button>
-                                </div>
+                                {
+                                    chat.type === CHAT_STATUS.GROUP_CHAT &&
+                                    <div className="button-wrapper">
+                                        <AddMemberModal
+                                            chat={chat}
+                                        >
+                                            <button className="button">
+                                                <div className="button-icon">
+                                                    <img src="/images/add-member.png" alt="Create Group Icon" />
+                                                </div>
+                                                <p>Thêm thành viên</p>
+                                            </button>
+                                        </AddMemberModal>
+                                    </div>
+                                }
+                                {
+                                    chat.type === CHAT_STATUS.PRIVATE_CHAT &&
+                                    <div className="button-wrapper">
+                                        <button className="button">
+                                            <div className="button-icon">
+                                                <img src="/images/group.png" alt="Create Group Icon" />
+                                            </div>
+                                            <p>Tạo nhóm chat</p>
+                                        </button>
+                                    </div>
+                                }
                             </div>
 
                             <div className="hyphen"></div>
 
-                            <div className="info-list">
-                                <button className="common-group">
-                                    <img src="/images/people.png" alt="Create Group Icon" />
-                                    <p>Nhóm chung 0 thành viên</p>
-                                </button>
-                            </div>
+                            {
+                                chat.type === CHAT_STATUS.GROUP_CHAT &&
+                                <div className="right-members">
+                                    <MemberDrawer
+                                        chat={chat}
+                                    >
+                                        <p className="title">Thành viên</p>
+                                        <div className="content">
+                                            <img src="/images/group.png" alt="Create Group Icon" />
+                                            <p className="count-members">{chat.participants?.length} thành viên</p>
+                                        </div>
+                                    </MemberDrawer>
+                                </div>
+                            }
+
+
+
+                            {
+                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
+                                <div className="info-list">
+                                    <button className="common-group">
+                                        <img src="/images/people.png" alt="Create Group Icon" />
+                                        <p>Nhóm chung 0 thành viên</p>
+                                    </button>
+                                </div>
+                            }
+
+                            <div className="hyphen"></div>
+
+                            {
+                                chat.type === CHAT_STATUS.GROUP_CHAT &&
+                                <div className="leave-group">
+                                    {
+                                        chat?.administrator === user?.id ?
+                                            <DisbandGroupModal>
+                                                <Button
+                                                    type="primary"
+                                                    danger
+                                                    icon={<i className="fa-solid fa-sign-out"></i>}
+                                                    className="leave-group-btn"
+                                                >
+                                                    <p>Giải tán nhóm</p>
+                                                </Button>
+                                            </DisbandGroupModal> :
+                                            <Button
+                                                type="primary"
+                                                danger
+                                                icon={<i className="fa-solid fa-sign-out"></i>}
+                                                className="leave-group-btn"
+                                            >
+                                                <p>Rời nhóm</p>
+                                            </Button>
+                                    }
+
+                                </div>
+                            }
                         </div>
                     </div>
                 }

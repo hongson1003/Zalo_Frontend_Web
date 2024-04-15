@@ -9,6 +9,7 @@ import axios from '../../../utils/axios';
 import { socket } from '../../../utils/io';
 import { METHOD_MESSAGE } from "../../../redux/types/type.user";
 import { set } from "firebase/database";
+import ForwardModal from "../../../components/modal/forward.modal";
 const items = [
     {
         key: METHOD_MESSAGE.COPY,
@@ -271,7 +272,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
     }
 
     const handleOnContextMenu = (e) => {
-        // e.preventDefault();
+        e.preventDefault();
         setOpenPopover(true);
     }
 
@@ -296,9 +297,13 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
                             <div className="option-item" onClick={() => handleOnClickReply(message)}>
                                 <i title="Trả lời" className="fa-solid fa-reply"></i>
                             </div>
-                            <div className="option-item">
-                                <i title="Chuyển tiếp" className="fa-solid fa-share"></i>
-                            </div>
+                            <ForwardModal
+                                message={message}
+                            >
+                                <div className="option-item">
+                                    <i title="Chuyển tiếp" className="fa-solid fa-share"></i>
+                                </div>
+                            </ForwardModal>
                             <Popover
                                 content={React.createElement(content,
                                     {

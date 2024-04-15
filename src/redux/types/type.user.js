@@ -32,7 +32,7 @@ export const MESSAGES = {
     TEXT: 'TEXT',
     STICKER: 'STICKER',
     FILE_FOLDER: 'FILE_FOLDER',
-
+    NOTIFY: 'NOTIFY',
 }
 
 export const FILE_TYPE = {

@@ -1,3 +1,5 @@
+import axios from '../utils/axios';
+
 export const getFriend = (user, participants) => {
     if (!user || !participants || participants.length < 0) return null;
     return participants.find(item => item?.id !== user?.id);
@@ -14,4 +16,13 @@ export const getDetailListMembers = (listMembers) => {
     return { count, total: listMembers.length };
 }
 
+export const sendNotifyToChatRealTime = async (chatId, message) => {
+    const res = await axios.post('/chat/notify', {
+        chatId,
+        message
+    })
+    if (res.errCode === 0)
+        return true;
+    return false;
+}
 

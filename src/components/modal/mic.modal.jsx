@@ -91,7 +91,7 @@ const MicModal = ({ children, sendAudio }) => {
                 <div className="mic-container">
                     <div className="mic-item" onClick={handleOnClick}>
                         {
-                            !isRecording ?
+                            isRecording ?
                                 <i className="fa-solid fa-microphone"></i> :
                                 <i className="fa-solid fa-microphone-slash"></i>
                         }
