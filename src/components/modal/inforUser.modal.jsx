@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 import { editUser } from '../../redux/actions/app.action';
 
 
-const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe }) => {
+const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe, readOnly, refuseAction }) => {
     const [profile, setProfile] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [acceptOpenModal, setAcceptOpenModal] = useState(false);
@@ -281,7 +281,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 onCancel={handleCancel}
                 width={400}
                 centered
-                footer={renderFooter}
+                footer={refuseAction ? null : renderFooter()}
                 style={{ borderRadius: "12px", overflow: "auto", padding: "0px" }}
                 className='modal-infor-user'
             >
@@ -315,9 +315,12 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                         </AvatarUser>
                         <div className='top-10px'>
                             <span style={{ fontWeight: 'bold', marginRight: '5px' }}>{!itsMe ? friendData?.userName : user?.userName}</span>
-                            <EditOutlined style={{ fontSize: '18px', cursor: 'pointer' }}
-                                onClick={handleOpenUpdate}
-                            />
+                            {
+                                !readOnly &&
+                                <EditOutlined style={{ fontSize: '18px', cursor: 'pointer' }}
+                                    onClick={handleOpenUpdate}
+                                />
+                            }
                         </div>
                     </div>
                     {
@@ -374,7 +377,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                         )
                     }
                     {
-                        !itsMe && user?.id !== friendData?.id && (needAddFriend === false || needAddFriend === STATE.PENDING) &&
+                        !refuseAction && !itsMe && user?.id !== friendData?.id && (needAddFriend === false || needAddFriend === STATE.PENDING) &&
                         <div className={`add-friends ${needAddFriend === false && 'appear'}`} ref={actionRef}>
                             {
                                 friendShipData?.status === STATE.RESOLVE ?
@@ -383,7 +386,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                         friendShipData?.status === STATE.REJECT || !friendShipData?.status ?
                                             <Button type='default' onClick={() => handleNeedAddFriend()}>Thêm bạn</Button> :
                                             (
-                                                friendShipData?.status === STATE.PENDING && friendShipData?.user1?.id === user?.id ?
+                                                friendShipData?.status === STATE.PENDING && friendShipData?.sender?.id === user?.id ?
                                                     <Button type='default' onClick={() => handleRecallAddFriend()}>Thu hồi lời mời</Button> :
                                                     <Button type='default' onClick={() => handleAddFriend()}>Chấp nhận kết bạn</Button>
                                             )

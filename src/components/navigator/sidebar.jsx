@@ -29,15 +29,10 @@ const friends = () => {
     const dispatch = useDispatch();
     const [count, setCount] = useState(0);
     const fetchNotifications = async () => {
-        const res = await axios.get(`/users/notifications/friendShip/noread?userId=${user?.id}`);
+        const res = await axios.get(`/users/notifications/friendShip?userId=${user?.id}`);
         if (res.errCode === 0) {
             setCount(res.data.length);
-            const resAll = await axios.get(`/users/notifications/friendShip?userId=${user?.id}`);
-            if (resAll.errCode === 0) {
-                dispatch(notificationsFriends(resAll.data));
-            } else {
-                toast.warn('Có lỗi xảy ra !')
-            }
+            dispatch(notificationsFriends(res.data));
         } else {
             toast.warn('Có lỗi xảy ra !')
         }

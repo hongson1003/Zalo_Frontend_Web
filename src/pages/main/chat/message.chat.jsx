@@ -169,7 +169,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
 
 
     useEffect(() => {
-        const currentReaction = JSON.stringify(message.reactions);
+        const currentReaction = JSON.stringify(message?.reactions);
         const [objReaction] = currentReaction && _.differenceWith(JSON.parse(currentReaction), JSON.parse(previousReaction.current), _.isEqual);
         if (!previousReaction.current) return;
         if (previousReaction.current !== currentReaction) {

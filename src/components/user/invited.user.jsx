@@ -5,17 +5,8 @@ import './invited.user.scss';
 import moment from "moment";
 import InforUserModal from "../modal/inforUser.modal";
 import axios from '../../utils/axios';
-import { useSelector } from "react-redux";
 
 const InvitedUser = ({ user, content, date, fetchInvitedFriends }) => {
-    const [friendShipData, setFriendShipData] = useState(null);
-    const userReducer = useSelector(state => state.userReducer);
-
-    const handleOk = async () => {
-        const res = await axios.get(`users/friendShip?userId=${user.id}`)
-        setFriendShipData(res.data);
-        return res.data;
-    }
 
     const handleResolve = async () => {
         const res = await axios.put('/users/friendShip', { userId: user.id });
@@ -25,7 +16,10 @@ const InvitedUser = ({ user, content, date, fetchInvitedFriends }) => {
     }
 
     const handleReject = async () => {
-
+        const res = await axios.put('/users/friendShip/reject', { userId: user.id });
+        if (res.errCode === 0) {
+            await fetchInvitedFriends();
+        }
     }
 
     return (
@@ -34,10 +28,13 @@ const InvitedUser = ({ user, content, date, fetchInvitedFriends }) => {
                 <InforUserModal
                     friendData={user}
                     type={'button'}
-                    friendShipData={friendShipData}
-                    handleOk={handleOk}
+                    readOnly
                 >
-                    <AvatarUser image={user.avatar} />
+                    <AvatarUser
+                        image={user.avatar}
+                        name={user.userName}
+                        size={50}
+                    />
                 </InforUserModal>
                 <div className="description">
                     <p className="username">{user.userName}</p>

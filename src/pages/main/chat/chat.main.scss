@@ -439,10 +439,26 @@
             .leave-group {
                 width: 100%;
                 padding: 10px 15px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 .leave-group-btn {
                     display: flex;
                     gap: 10px;
                     align-items: center;
+                    p {
+                        font-size: 12px;
+                    }
+                }
+            }
+            .grant-adminstrator {
+                width: 100%;
+                padding: 10px 15px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                span {
+                    font-size: 12px;
                 }
             }
             .options-list {

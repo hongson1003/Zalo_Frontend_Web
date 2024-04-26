@@ -94,6 +94,12 @@ const ChatSidebar = () => {
                 console.log('nó rời nhóm')
                 fetchChats();
             })
+            socket.on('grant', data => {
+                fetchChats();
+            })
+            socket.on('receive-message', data => {
+                fetchChats();
+            })
         })
     }, []);
 

@@ -44,6 +44,7 @@ import AddMemberModal from "../../../components/modal/addMember.modal";
 import InforGroupModal from "../../../components/modal/infoGroup.modal";
 import MemberDrawer from "../../../components/drawer/members.drawer";
 import DisbandGroupModal from "../../../components/modal/disbandGroup.modal";
+import GrantModal from "../../../components/modal/grant.modal";
 
 const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const chat = useSelector(state => state.appReducer.subNav);
@@ -109,6 +110,9 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                     const participants = chat.participants.filter(item => item.id !== data.userId);
                     dispatch(editGroup({ ...chat, participants }));
                 }
+            })
+            socket.on('grant', data => {
+                dispatch(editGroup(data));
             })
         });
     }, [])
@@ -1051,7 +1055,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                                             className={
                                                                 (message.type === MESSAGES.TEXT || message.isDelete === true) ? 'message' : (
                                                                     (message.type === MESSAGES.IMAGES || message.type === MESSAGES.VIDEO ||
-                                                                        message.type === MESSAGES.AUDIO
+                                                                        message.type === MESSAGES.AUDIO || message.type === MESSAGES.STICKER
                                                                     ) ? 'message de-bg w-500' : 'message'
                                                                 )
                                                             }
@@ -1742,6 +1746,19 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
                             {
                                 chat.type === CHAT_STATUS.GROUP_CHAT &&
+                                chat.administrator === user.id &&
+                                <div className="grant-adminstrator">
+                                    <GrantModal
+                                        chat={chat}
+                                    >
+                                        <Button>Chuyền trưởng nhóm</Button>
+                                    </GrantModal>
+                                </div>
+                            }
+
+
+                            {
+                                chat.type === CHAT_STATUS.GROUP_CHAT &&
                                 <div className="leave-group">
                                     {
                                         chat?.administrator === user?.id ?
@@ -1767,6 +1784,9 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
                                 </div>
                             }
+
+
+
                         </div>
                     </div>
                 }

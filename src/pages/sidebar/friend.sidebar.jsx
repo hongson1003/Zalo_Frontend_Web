@@ -33,6 +33,7 @@ const FriendSideBar = () => {
     const dispatch = useDispatch();
 
     const [windowSize, setWindowSize] = useState([0, 0]);
+
     useLayoutEffect(() => {
         function updateSize() {
             setWindowSize([window.innerWidth, window.innerHeight]);
@@ -54,7 +55,7 @@ const FriendSideBar = () => {
             dispatch(changeKeySubMenu(FRIEND_ITEM_MENU.LIST_FRIENDS))
             setCurrent(FRIEND_ITEM_MENU.LIST_FRIENDS)
         }
-    }, [windowSize])
+    }, [])
 
     return (
         <Menu

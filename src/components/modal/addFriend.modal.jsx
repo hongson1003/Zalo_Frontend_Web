@@ -63,6 +63,7 @@ const AddFriendModal = ({ children }) => {
                     friendShipData={friendShipData}
                     type={'button'}
                     fetchFriendShip={fetchFriendShip}
+                    readOnly
                 >
                     <Button type="primary" onClick={handleOk}>Tìm kiếm</Button>
                 </InforUserModal>
@@ -91,6 +92,7 @@ const AddFriendModal = ({ children }) => {
                     type={'input'}
                     handleOk={handleOk}
                     fetchFriendShip={fetchFriendShip}
+                    readOnly
                 >
                     <Input style={{ gap: '5px' }} prefix={<PhoneOutlined className="site-form-item-icon" />}
                         placeholder="Số điện thoại" onChange={(e) => setPhoneNumber(e.target.value)}

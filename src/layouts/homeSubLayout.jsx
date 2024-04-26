@@ -7,9 +7,10 @@ import ContentMain from "../pages/main/content.main";
 import { useSelector } from "react-redux";
 import { Drawer, theme } from 'antd';
 import AvatarUser from "../components/user/avatar";
-import { socket } from "../utils/io";
 
 const homeSublayout = () => {
+
+
     const [sizes, setSizes] = useState([
         '22%',
         'auto',
@@ -19,6 +20,7 @@ const homeSublayout = () => {
     const stateApp = useSelector(state => state?.appReducer);
 
     const [windowSize, setWindowSize] = useState([0, 0]);
+
     useLayoutEffect(() => {
         function updateSize() {
             setWindowSize([window.innerWidth, window.innerHeight]);

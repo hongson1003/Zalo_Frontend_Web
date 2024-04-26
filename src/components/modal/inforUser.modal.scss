@@ -58,6 +58,10 @@
                 resize: none;
                 padding: 10px 20px;
                 font-family: Verdana, Geneva, Tahoma, sans-serif;
+                &:focus {
+                    outline: #4cc2ff;
+                    border: 2px solid #a8c7fa;
+                }
             }
         }
         .editing-content {

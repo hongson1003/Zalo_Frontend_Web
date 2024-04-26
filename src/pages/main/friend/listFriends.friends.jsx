@@ -20,10 +20,10 @@ const ListFriends = ({ data }) => {
         if (data && data.length > 0) {
             const newData = data?.map(item => {
                 let user = null;
-                if (stateApp.userInfo.user.id === item.user1.id)
-                    user = item.user2;
+                if (stateApp.userInfo.user.id === item.sender.id)
+                    user = item.receiver;
                 else
-                    user = item.user1;
+                    user = item.sender;
                 return user;
             })
             setFriends(newData);

@@ -24,22 +24,6 @@ const HomeLayout = () => {
     await axios.put('/users/updateOnline', { time });
   }
 
-  const connectFriends = async () => {
-    const res = await axios.get(`/users/friends?page=${1}&limit=${5}`);
-    if (res.errCode === 0) {
-      socket.then((socket) => {
-        const data = res.data;
-        data.forEach(item => {
-          const friend = getFriend(state?.userInfo?.user, [item.user1, item.user2]);
-          socket.emit('join-room', friend.id);
-        })
-
-      })
-    } else {
-      toast.warn(res.message);
-    }
-  }
-
   // check authentication
   useEffect(() => {
     if (state.isLogin !== STATE.RESOLVE)
@@ -60,7 +44,6 @@ const HomeLayout = () => {
           if (state?.isConnectedSocket === false) {
             socket.emit('join-room', state?.userInfo?.user.id)
             dispatch(connectSocketSuccess());
-            connectFriends();
           }
 
         })
