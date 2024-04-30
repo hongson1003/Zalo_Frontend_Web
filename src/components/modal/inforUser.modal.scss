@@ -7,12 +7,39 @@
             background-color: #ffffff;
             padding: 10px;
         }
-        .modal-background {
-            display: block;
-            height: calc(100px + 5vw);
-            width: 100%;
-            object-fit: cover;
+        .background-cover {
+            position: relative;
+            &:hover {
+                .camara-bg-container {
+                    display: flex;
+                }
+            }
+            .modal-background {
+                display: block;
+                height: calc(100px + 5vw);
+                width: 100%;
+                object-fit: cover;
+            }
+            .camara-bg-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                justify-content: center;
+                align-items: center;
+                z-index: 1;
+                display: none;
+                border-radius: 50%;
+                padding: 15px;
+                background-color: #eef0f1;
+                i {
+                    color: rgb(45, 85, 255);
+                    font-size: 25px;
+                    cursor: pointer;
+                }
+            }
         }
+
         .modal-avatar {
             padding: 5px 20px;
             display: flex;
@@ -46,6 +73,9 @@
             .top-10px {
                 position: relative;
                 top: -10px;
+                span {
+                    font-size: 20px;
+                }
             }
         }
         .description-modal {

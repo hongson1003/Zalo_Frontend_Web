@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 
 const ChangePasswordModal = ({ children }) => {
 
-
     const [form] = Form.useForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [errors, setErrors] = useState([]);
@@ -26,7 +25,7 @@ const ChangePasswordModal = ({ children }) => {
                 const res = await axios.put('/auth/change-password', data);
                 if (res.errCode === 0) {
                     setIsModalOpen(false);
-                    toast.success('Change password successfully!');
+                    toast.success('Đổi mật khẩu thành công!');
                     return;
                 }
                 setErrors([{ name: 'currentPassword', errors: res.message }]);

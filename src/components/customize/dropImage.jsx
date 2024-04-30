@@ -22,7 +22,6 @@ function DragDrop({ children, fileTypes }) {
             onDragOver={onDragOver}
         >
             {React.cloneElement(children, { file, fileTypes })}
-
         </div>
     )
 }

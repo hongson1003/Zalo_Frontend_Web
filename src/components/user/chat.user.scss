@@ -1,5 +1,5 @@
 .chat-user-container {
-    padding: 15px 5px 20px 15px;
+    padding: 10px 5px 20px 15px;
     display: flex;
     align-items: center;
     width: 100%;
@@ -9,18 +9,21 @@
         display: flex;
         gap: 15px;
         align-items: center;
-        width: 80%;
+        width: 100%;
         .right {
             display: flex;
             flex-direction: column;
             justify-content: center;
             gap: 5px;
-            max-width: calc(100% - 60px);
+            width: 100%;
             .top {
+                display: flex;
+                align-items: center;
                 .name {
                     font-weight: 500;
                     font-size: 16px;
-                    display: -webkit-box; /* Thiết lập hiển thị theo kiểu box */
+                    max-width: calc(100% - 50px);
+                    display: -webkit-inline-box; /* Thiết lập hiển thị theo kiểu box */
                     -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
                     -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
                     overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
@@ -32,33 +35,30 @@
                     gap: 10px;
                     font-size: 16px;
                 }
+                p {
+                    display: inline;
+                    vertical-align: middle;
+                    &.pin {
+                        text-align: right;
+                        margin-left: 10px;
+                        flex: 1;
+                        padding: 0 8px;
+                    }
+                    i {
+                        color: #7589a3;
+                    }
+                }
             }
             .bottom {
                 p {
                     font-size: 14px;
-                    display: -webkit-box; /* Thiết lập hiển thị theo kiểu box */
-                    -webkit-line-clamp: 2; /* Giới hạn số dòng hiển thị */
+                    display: -webkit-inline-box; /* Thiết lập hiển thị theo kiểu box */
+                    vertical-align: middle;
+                    -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
                     -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
                     overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
                     text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá phần tử */
                 }
-            }
-        }
-    }
-
-    .ultils {
-        flex: 1;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        .ultils-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 30px;
-            height: 30px;
-            &:hover {
-                background-color: #dfe2e7;
             }
         }
     }

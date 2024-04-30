@@ -16,18 +16,27 @@ import { toast } from "react-toastify";
 import InforUserModal from "../modal/inforUser.modal";
 import WrapperItemSidebar from "./wrapperItem.sidebar";
 import { socket } from '../../utils/io';
-import { STATE } from "../../redux/types/type.app";
-import { notificationsFriends, fetchNotificationsfunc } from "../../redux/actions/user.action";
+import { notificationsFriends, fetchNotificationsFriendFunc, fetchNotificationChatFunc, notificationsChats } from "../../redux/actions/user.action";
 import SettingModal from "../modal/setting.modal";
+import { FRIEND_ITEM_MENU } from "../../pages/sidebar/friend.sidebar";
 
-const friends = () => {
-    const user = useSelector(state => state?.appReducer?.userInfo?.user);
+const Friends = () => {
+    const user = useSelector(state => state.appReducer?.userInfo?.user);
+    const app = useSelector(state => state.appReducer);
+
+
     const onlyRef = useRef(false);
     const stylePhoneBook = {
         fontSize: '24px',
     }
+
     const dispatch = useDispatch();
     const [count, setCount] = useState(0);
+
+    const handleReadNotifications = async (ids) => {
+        await axios.post('/users/notifications/friendShip', { ids });
+    }
+
     const fetchNotifications = async () => {
         const res = await axios.get(`/users/notifications/friendShip?userId=${user?.id}`);
         if (res.errCode === 0) {
@@ -37,21 +46,31 @@ const friends = () => {
             toast.warn('Có lỗi xảy ra !')
         }
     }
+
     useEffect(() => {
         if (onlyRef.current === false) {
             socket.then(socket => {
                 socket.on('need-accept-addFriend', (data) => {
-                    fetchNotifications();
+                    if (FRIEND_ITEM_MENU.INVITE_FRIEND === app?.subNav) {
+                        handleReadNotifications([data?.id]);
+                    } else {
+                        fetchNotifications();
+                    }
                 })
             })
-            dispatch(fetchNotificationsfunc(fetchNotifications));
+            dispatch(fetchNotificationsFriendFunc(fetchNotifications));
         }
         if (user)
             fetchNotifications();
         onlyRef.current = true;
-    }, [])
 
-
+        return () => {
+            onlyRef.current = false;
+            socket.then(socket => {
+                socket.off('need-accept-addFriend');
+            })
+        }
+    }, [app.subNav]);
 
     return (
         <WrapperItemSidebar count={count}>
@@ -60,7 +79,50 @@ const friends = () => {
     )
 }
 
-const items = [MessageOutlined, friends, CheckSquareOutlined, AntCloudOutlined].map(
+const Messages = () => {
+    const chat = useSelector(state => state.appReducer?.subNav);
+    const dispatch = useDispatch();
+
+    const onlyRef = useRef(false);
+    const [count, setCount] = useState(0);
+
+    const fetchChatNotRead = async () => {
+        const res = await axios.get('/chat/not-read');
+        if (res.errCode === 0) {
+            setCount(res.data.length);
+            dispatch(notificationsChats(res.data));
+        }
+    }
+
+    useEffect(() => {
+        if (onlyRef.current === false) {
+            fetchChatNotRead();
+            dispatch(fetchNotificationChatFunc(fetchChatNotRead));
+            onlyRef.current = true;
+        }
+    }, []);
+
+    useEffect(() => {
+        socket.then(socket => {
+            socket.on('receive-message', (data) => {
+                if (chat._id !== data?.chatId)
+                    fetchChatNotRead();
+            })
+        })
+    }, []);
+
+
+
+    return (
+        <WrapperItemSidebar
+            count={count}
+        >
+            <MessageOutlined />
+        </WrapperItemSidebar>
+    )
+}
+
+const items = [Messages, Friends, CheckSquareOutlined, AntCloudOutlined].map(
     (icon, index) => {
         return ({
             key: KEYITEMS[ITEMS[index]],

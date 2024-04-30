@@ -122,7 +122,9 @@ const ListFriend = () => {
                                 </Select>
 
                             </div>
-                            <ListFriends data={friends} />
+                            <ListFriends
+                                fetchFriends={fetchFriends}
+                                data={friends} />
                         </div>
                     </div>
                 ) :

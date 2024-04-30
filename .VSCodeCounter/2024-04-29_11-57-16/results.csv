@@ -1,0 +1,131 @@
+"filename", "language", "JavaScript JSX", "JavaScript", "JSON", "SCSS", "CSS", "comment", "blank", "total"
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\dropImage.jsx", "JavaScript JSX", 22, 0, 0, 0, 0, 1, 6, 29
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\dropImage.scss", "SCSS", 0, 0, 0, 7, 0, 0, 1, 8
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\inputSearchSticky.jsx", "JavaScript JSX", 59, 0, 0, 0, 0, 0, 8, 67
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\inputSearchSticky.scss", "SCSS", 0, 0, 0, 37, 0, 0, 2, 39
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\tym.css", "CSS", 0, 0, 0, 0, 60, 0, 6, 66
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\tym.jsx", "JavaScript JSX", 72, 0, 0, 0, 0, 0, 8, 80
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\customize\wrapperVideo.jsx", "JavaScript JSX", 23, 0, 0, 0, 0, 1, 4, 28
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\drawer\members.drawer.jsx", "JavaScript JSX", 136, 0, 0, 0, 0, 0, 14, 150
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\drawer\members.drawer.scss", "SCSS", 0, 0, 0, 78, 0, 0, 2, 80
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\login.jsx", "JavaScript JSX", 30, 0, 0, 0, 0, 1, 7, 38
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\login.scss", "SCSS", 0, 0, 0, 24, 0, 0, 1, 25
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\phone.login.jsx", "JavaScript JSX", 69, 0, 0, 0, 0, 0, 7, 76
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\phone.login.scss", "SCSS", 0, 0, 0, 13, 0, 0, 1, 14
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\qr.login.jsx", "JavaScript JSX", 82, 0, 0, 0, 0, 1, 6, 89
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\login\qr.login.scss", "SCSS", 0, 0, 0, 31, 0, 0, 1, 32
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\addFriend.modal.jsx", "JavaScript JSX", 91, 0, 0, 0, 0, 4, 11, 106
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\addFriend.modal.scss", "SCSS", 0, 0, 0, 8, 0, 0, 1, 9
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\addMember.modal.jsx", "JavaScript JSX", 117, 0, 0, 0, 0, 0, 12, 129
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\addMember.modal.scss", "SCSS", 0, 0, 0, 15, 0, 0, 1, 16
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\changeBackground.modal.jsx", "JavaScript JSX", 81, 0, 0, 0, 0, 1, 14, 96
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\changeBackground.modal.scss", "SCSS", 0, 0, 0, 47, 0, 1, 1, 49
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\changePassword.modal.jsx", "JavaScript JSX", 112, 0, 0, 0, 0, 1, 7, 120
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\chooseImage.modal.jsx", "JavaScript JSX", 121, 0, 0, 0, 0, 0, 16, 137
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\chooseImage.modal.scss", "SCSS", 0, 0, 0, 49, 0, 0, 3, 52
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\disbandGroup.modal.jsx", "JavaScript JSX", 93, 0, 0, 0, 0, 0, 10, 103
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\disbandGroup.modal.scss", "SCSS", 0, 0, 0, 20, 0, 0, 1, 21
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\forgotPassword.modal.jsx", "JavaScript JSX", 78, 0, 0, 0, 0, 0, 16, 94
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\forward.modal.jsx", "JavaScript JSX", 134, 0, 0, 0, 0, 0, 17, 151
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\forward.modal.scss", "SCSS", 0, 0, 0, 28, 0, 0, 1, 29
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\grant.modal.jsx", "JavaScript JSX", 74, 0, 0, 0, 0, 0, 7, 81
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\grant.modal.scss", "SCSS", 0, 0, 0, 24, 0, 0, 1, 25
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\infoGroup.modal.jsx", "JavaScript JSX", 177, 0, 0, 0, 0, 1, 17, 195
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\infoGroup.modal.scss", "SCSS", 0, 0, 0, 63, 0, 0, 3, 66
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\inforUser.modal.jsx", "JavaScript JSX", 409, 0, 0, 0, 0, 5, 28, 442
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\inforUser.modal.scss", "SCSS", 0, 0, 0, 195, 0, 1, 7, 203
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\leaveGroup.modal.jsx", "JavaScript JSX", 46, 0, 0, 0, 0, 0, 4, 50
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\mic.modal.jsx", "JavaScript JSX", 100, 0, 0, 0, 0, 6, 11, 117
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\mic.modal.scss", "SCSS", 0, 0, 0, 24, 0, 0, 1, 25
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\newGroupChat.modal.jsx", "JavaScript JSX", 288, 0, 0, 0, 0, 1, 24, 313
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\newGroupChat.modal.scss", "SCSS", 0, 0, 0, 130, 0, 0, 2, 132
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\pins.modal.jsx", "JavaScript JSX", 79, 0, 0, 0, 0, 0, 5, 84
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\pins.modal.scss", "SCSS", 0, 0, 0, 19, 0, 0, 1, 20
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\setting.modal.jsx", "JavaScript JSX", 165, 0, 0, 0, 0, 31, 20, 216
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\modal\setting.modal.scss", "SCSS", 0, 0, 0, 103, 0, 0, 4, 107
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\sidebar.jsx", "JavaScript JSX", 182, 0, 0, 0, 0, 0, 27, 209
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\sidebar.scss", "SCSS", 0, 0, 0, 41, 0, 0, 4, 45
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\wrapperItem.sidebar.jsx", "JavaScript JSX", 11, 0, 0, 0, 0, 0, 2, 13
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\navigator\wrapperItem.sidebar.scss", "SCSS", 0, 0, 0, 19, 0, 0, 1, 20
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\chat.popover.jsx", "JavaScript JSX", 77, 0, 0, 0, 0, 0, 14, 91
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\chat.popover.scss", "SCSS", 0, 0, 0, 18, 0, 0, 2, 20
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\chooseFileUpload.popover.jsx", "JavaScript JSX", 52, 0, 0, 0, 0, 0, 8, 60
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\chooseFileUpload.popover.scss", "SCSS", 0, 0, 0, 17, 0, 0, 1, 18
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\friend.popover.jsx", "JavaScript JSX", 36, 0, 0, 0, 0, 0, 5, 41
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\friend.popover.scss", "SCSS", 0, 0, 0, 13, 0, 0, 1, 14
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\sticky.popover.jsx", "JavaScript JSX", 86, 0, 0, 0, 0, 0, 13, 99
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\popover\sticky.popover.scss", "SCSS", 0, 0, 0, 17, 0, 0, 1, 18
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\resetPassword.component.jsx", "JavaScript JSX", 136, 0, 0, 0, 0, 0, 14, 150
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\resetPassword.component.scss", "SCSS", 0, 0, 0, 34, 0, 0, 5, 39
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\route\privateRoute.jsx", "JavaScript JSX", 10, 0, 0, 0, 0, 0, 1, 11
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\upload\file.upload.jsx", "JavaScript JSX", 46, 0, 0, 0, 0, 0, 4, 50
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\upload\file.upload.scss", "SCSS", 0, 0, 0, 123, 0, 0, 5, 128
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\avatar.jsx", "JavaScript JSX", 60, 0, 0, 0, 0, 0, 3, 63
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\chat.user.jsx", "JavaScript JSX", 95, 0, 0, 0, 0, 3, 5, 103
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\chat.user.scss", "SCSS", 0, 0, 0, 80, 0, 0, 3, 83
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\invited.user.jsx", "JavaScript JSX", 87, 0, 0, 0, 0, 0, 8, 95
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\invited.user.scss", "SCSS", 0, 0, 0, 55, 0, 0, 1, 56
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\status.user.jsx", "JavaScript JSX", 127, 0, 0, 0, 0, 0, 11, 138
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\user\status.user.scss", "SCSS", 0, 0, 0, 33, 0, 0, 1, 34
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\verify.component.jsx", "JavaScript JSX", 219, 0, 0, 0, 0, 8, 20, 247
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\components\verify.component.scss", "SCSS", 0, 0, 0, 115, 0, 4, 13, 132
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\index.scss", "SCSS", 0, 0, 0, 51, 0, 5, 8, 64
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeLayout.jsx", "JavaScript JSX", 119, 0, 0, 0, 0, 4, 13, 136
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeLayout.scss", "SCSS", 0, 0, 0, 5, 0, 0, 1, 6
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeSubLayout.jsx", "JavaScript JSX", 165, 0, 0, 0, 0, 2, 17, 184
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\homeSubLayout.scss", "SCSS", 0, 0, 0, 44, 0, 0, 1, 45
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\layouts\outsideLayout.jsx", "JavaScript JSX", 10, 0, 0, 0, 0, 0, 2, 12
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\main.jsx", "JavaScript JSX", 20, 0, 0, 0, 0, 4, 9, 33
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\mocks\users.json", "JSON", 0, 0, 19, 0, 0, 0, 0, 19
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\auth\auth.loginPage.jsx", "JavaScript JSX", 45, 0, 0, 0, 0, 1, 7, 53
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\auth\auth.loginPage.scss", "SCSS", 0, 0, 0, 36, 0, 2, 4, 42
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\error.page.jsx", "JavaScript JSX", 30, 0, 0, 0, 0, 0, 4, 34
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\chat.main.jsx", "JavaScript JSX", 1695, 0, 0, 0, 0, 42, 113, 1850
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\chat.main.scss", "SCSS", 0, 0, 0, 731, 0, 8, 12, 751
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\emoijPopup.chat.jsx", "JavaScript JSX", 103, 0, 0, 0, 0, 0, 12, 115
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\emoijPopup.chat.scss", "SCSS", 0, 0, 0, 21, 0, 5, 1, 27
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\message.chat.jsx", "JavaScript JSX", 368, 0, 0, 0, 0, 5, 31, 404
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\chat\message.chat.scss", "SCSS", 0, 0, 0, 257, 0, 1, 9, 267
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\content.main.jsx", "JavaScript JSX", 82, 0, 0, 0, 0, 0, 7, 89
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\group.friend.jsx", "JavaScript JSX", 15, 0, 0, 0, 0, 0, 2, 17
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\group.friend.scss", "SCSS", 0, 0, 0, 4, 0, 0, 1, 5
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\invited.friend.jsx", "JavaScript JSX", 113, 0, 0, 0, 0, 0, 12, 125
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\invited.friend.scss", "SCSS", 0, 0, 0, 52, 0, 0, 2, 54
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\list.friend.jsx", "JavaScript JSX", 126, 0, 0, 0, 0, 0, 14, 140
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\list.friend.scss", "SCSS", 0, 0, 0, 30, 0, 0, 3, 33
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\listFriends.friends.jsx", "JavaScript JSX", 68, 0, 0, 0, 0, 0, 7, 75
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\friend\listFriends.friends.scss", "SCSS", 0, 0, 0, 28, 0, 0, 2, 30
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\main.welcome.jsx", "JavaScript JSX", 85, 0, 0, 0, 0, 3, 5, 93
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\main\main.welcome.scss", "SCSS", 0, 0, 0, 96, 0, 0, 1, 97
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\notFound.page.jsx", "JavaScript JSX", 22, 0, 0, 0, 0, 0, 5, 27
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\notFound.page.scss", "SCSS", 0, 0, 0, 8, 0, 0, 2, 10
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\chat.sidebar.jsx", "JavaScript JSX", 179, 0, 0, 0, 0, 18, 22, 219
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\chat.sidebar.scss", "SCSS", 0, 0, 0, 50, 0, 0, 1, 51
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\friend.sidebar.jsx", "JavaScript JSX", 62, 0, 0, 0, 0, 0, 10, 72
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.message.search.jsx", "JavaScript JSX", 65, 0, 0, 0, 0, 0, 9, 74
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.message.search.scss", "SCSS", 0, 0, 0, 54, 0, 1, 2, 57
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.message.sidebar.scss", "SCSS", 0, 0, 0, 8, 0, 0, 1, 9
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\sidebar\home.sidebar.jsx", "JavaScript JSX", 38, 0, 0, 0, 0, 0, 7, 45
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\test.page.jsx", "JavaScript JSX", 33, 0, 0, 0, 0, 0, 6, 39
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\pages\test.page.scss", "SCSS", 0, 0, 0, 0, 0, 0, 1, 1
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\actions\app.action.js", "JavaScript", 0, 57, 0, 0, 0, 0, 13, 70
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\actions\user.action.js", "JavaScript", 0, 32, 0, 0, 0, 0, 6, 38
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\reducers\app.reducer.js", "JavaScript", 0, 97, 0, 0, 0, 0, 5, 102
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\reducers\user.reducer.js", "JavaScript", 0, 40, 0, 0, 0, 0, 7, 47
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\rootReducer.js", "JavaScript", 0, 7, 0, 0, 0, 0, 2, 9
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\store.js", "JavaScript", 0, 15, 0, 0, 0, 0, 4, 19
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\types\type.app.js", "JavaScript", 0, 31, 0, 0, 0, 0, 5, 36
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\redux\types\type.user.js", "JavaScript", 0, 88, 0, 0, 0, 0, 7, 95
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\route.jsx", "JavaScript JSX", 64, 0, 0, 0, 0, 1, 6, 71
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\type\rootCss.type.js", "JavaScript", 0, 4, 0, 0, 0, 0, 0, 4
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\axios.js", "JavaScript", 0, 61, 0, 0, 0, 14, 10, 85
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\checkAuth.js", "JavaScript", 0, 16, 0, 0, 0, 0, 3, 19
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\checkFriend.js", "JavaScript", 0, 9, 0, 0, 0, 0, 2, 11
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\firebase.js", "JavaScript", 0, 13, 0, 0, 0, 9, 7, 29
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\handleChat.js", "JavaScript", 0, 43, 0, 0, 0, 0, 9, 52
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\handleUltils.js", "JavaScript", 0, 86, 0, 0, 0, 6, 8, 100
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\io.js", "JavaScript", 0, 24, 0, 0, 0, 2, 2, 28
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\utils\keyMenuItem.js", "JavaScript", 0, 14, 0, 0, 0, 0, 0, 14
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\windows\videoCall.window.jsx", "JavaScript JSX", 161, 0, 0, 0, 0, 1, 29, 191
+"d:\CongNgheMoi\Zalo_ReactJS_Frontend\src\windows\videoCall.window.scss", "SCSS", 0, 0, 0, 108, 0, 0, 3, 111
+"Total", "-", 7550, 637, 19, 3063, 60, 205, 987, 12521

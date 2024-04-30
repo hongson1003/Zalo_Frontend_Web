@@ -39,7 +39,11 @@
         align-items: center;
         gap: 20px;
         button {
-            flex: 0.5;
+            flex: 1;
+            &:first-child {
+                background-color: #0091ff;
+                color: #ffffff;
+            }
         }
     }
 }

@@ -4,8 +4,8 @@ import { CALL, CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/type.user";
 
 const initialState = {
     notificationsFriends: [],
+    notificationsChats: [],
     sendMessageFunc: {},
-    message: null,
     callMembers: [],
 }
 
@@ -21,6 +21,13 @@ export default function userReducer(state = initialState, action) {
             stateNotificationsFriends.notificationsFriends = action.payload;
             return stateNotificationsFriends;
         }
+        case NOTIFICATIONS.CHAT: {
+            let stateNotificationsChats = { ...state };
+            stateNotificationsChats.notificationsChats = action.payload;
+            return stateNotificationsChats;
+        }
+
+
 
         case MESSAGES.SEND_MESSAGE_FUNC: {
             let stateSendMessageFunc = { ...state };
@@ -28,10 +35,16 @@ export default function userReducer(state = initialState, action) {
             return stateSendMessageFunc;
         }
 
-        case NOTIFICATIONS.FETCH_NOTIFICATIONS_FUNC: {
+        case NOTIFICATIONS.FETCH_NOTIFICATIONS_FRIENDS_FUNC: {
             let stateFetchNotificationsFunc = { ...state };
-            stateFetchNotificationsFunc.fetchNotificationsFunc = action.payload;
+            stateFetchNotificationsFunc.fetchNotificationsFriends = action.payload;
             return stateFetchNotificationsFunc;
+        }
+
+        case NOTIFICATIONS.FETCH_NOTIFICATIONS_CHAT_FUNC: {
+            let stateFetchNotificationsChatFunc = { ...state };
+            stateFetchNotificationsChatFunc.fetchNotificationChats = action.payload;
+            return stateFetchNotificationsChatFunc;
         }
 
         case CHAT_STATUS.FETCH: {

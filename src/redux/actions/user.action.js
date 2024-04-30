@@ -9,6 +9,13 @@ export function notificationsFriends(notifications) {
     }
 }
 
+export function notificationsChats(notifications) {
+    return {
+        type: NOTIFICATIONS.CHAT,
+        payload: notifications
+    }
+}
+
 export function accessChat(chat) {
     return {
         type: STATE.ACCESS_CHAT,
@@ -16,12 +23,22 @@ export function accessChat(chat) {
     }
 }
 
-export function fetchNotificationsfunc(func) {
+export function fetchNotificationsFriendFunc(func) {
     return {
-        type: NOTIFICATIONS.FETCH_NOTIFICATIONS_FUNC,
+        type: NOTIFICATIONS.FETCH_NOTIFICATIONS_FRIENDS_FUNC,
         payload: func
     }
 }
+
+export function fetchNotificationChatFunc(func) {
+    return {
+        type: NOTIFICATIONS.FETCH_NOTIFICATIONS_CHAT_FUNC,
+        payload: func
+    }
+
+}
+
+
 
 export function fetchChatsFunc(func) {
     return {

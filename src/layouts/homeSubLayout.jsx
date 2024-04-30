@@ -12,7 +12,7 @@ const homeSublayout = () => {
 
 
     const [sizes, setSizes] = useState([
-        '22%',
+        '25%',
         'auto',
     ]);
     const [visibleLeft, setVisibleLeft] = useState('d-show');
@@ -43,10 +43,10 @@ const homeSublayout = () => {
         } else {
             if (windowSize[0] > 800) {
                 setVisibleRight('d-show')
-                setSizes(['22%', 'auto'])
+                setSizes(['25%', 'auto'])
             }
         }
-    }, [windowSize, stateApp?.subNav]);
+    }, [windowSize, stateApp?.subNav?._id]);
 
     const handleOnDoubleClick = () => {
         if (sizes[0] !== '0px') {
@@ -82,7 +82,7 @@ const homeSublayout = () => {
                     setSizes(['0px', '100%'])
                     setVisibleLeft('d-none')
                 } else {
-                    setSizes(['22%', 'auto'])
+                    setSizes(['25%', 'auto'])
                     setVisibleLeft('d-show')
                 }
             }

@@ -21,6 +21,9 @@
             padding: 10px 0;
         }
     }
+    header {
+        justify-content: space-between;
+    }
 }
 
 .friend-ultils-container {
@@ -30,7 +33,6 @@
         border-bottom: 1px solid #e0e0e0;
         display: flex;
         align-items: center;
-        justify-content: space-between;
         padding: 0 20px;
         gap: 15px;
         background-color: #ffffff;
@@ -45,7 +47,7 @@
             }
         }
         .header-right {
-            width: 100px;
+            width: 150px;
         }
     }
 }

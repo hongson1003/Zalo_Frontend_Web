@@ -7,13 +7,12 @@ import { CHAT_STATUS, MESSAGES } from "../../redux/types/type.user";
 import { getFriend } from '../../utils/handleChat';
 import _ from 'lodash';
 
-const ChatUser = ({ chat, activeKey }) => {
+const ChatUser = ({ chat }) => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
-    const subNav = useSelector(state => state.appReducer.subNav);
 
 
     return (
-        <div className={`chat-user-container ${activeKey === subNav?._id && 'active-chat'}`} >
+        <div className={'chat-user-container'} >
             <div className="chat-left" >
                 {
                     chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
@@ -58,32 +57,40 @@ const ChatUser = ({ chat, activeKey }) => {
                                     <img style={{ width: '15px', height: '15px' }} src={'/groupPhoto/group.png'} />
                                     <span className="name">{chat?.name}</span>
                                 </div> :
-                                <p className="name">{getFriend(user, chat.participants)?.userName}</p>
-
+                                <>
+                                    <p className="name">{getFriend(user, chat.participants)?.userName}</p>
+                                    {
+                                        chat.listPin.includes(user.id) &&
+                                        <p className="pin">
+                                            <i className="fa-solid fa-thumbtack"></i>
+                                        </p>
+                                    }
+                                </>
                         }
                     </div>
-                    <div className="bottom">
-                        <p>
-                            {
-                                chat?.lastedMessage?.type === MESSAGES.TEXT ?
-                                    chat.lastedMessage?.content : (
-                                        chat.lastedMessage?.type === MESSAGES.IMAGES ? 'Đã gửi ảnh' : (
-                                            chat.lastedMessage?.type === MESSAGES.FILE_FOLDER ? 'Đã gửi file' : (
-                                                chat.lastedMessage?.type === MESSAGES.VIDEO ? 'Đã gửi video' : (
-                                                    chat.lastedMessage?.type === MESSAGES.STICKER ? 'Đã gửi sticker' : ''
+                    {
+                        chat.lastedMessage &&
+                        <div className="bottom">
+                            <p>
+                                {chat.lastedMessage?.sender?.userName}:
+                                <> </>
+                                {
+                                    chat?.lastedMessage?.type === MESSAGES.TEXT ?
+                                        chat.lastedMessage?.content : (
+                                            chat.lastedMessage?.type === MESSAGES.IMAGES ? 'Đã gửi ảnh' : (
+                                                chat.lastedMessage?.type === MESSAGES.FILE_FOLDER ? 'Đã gửi file' : (
+                                                    chat.lastedMessage?.type === MESSAGES.VIDEO ? 'Đã gửi video' : (
+                                                        chat.lastedMessage?.type === MESSAGES.STICKER ? 'Đã gửi sticker' : (
+                                                            chat.lastedMessage?.type === MESSAGES.AUDIO ? 'Đã gửi audio' : ''
+                                                        )
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
-                            }
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="ultils">
-                <div className="ultils-item">
-                    <i className="fa-solid fa-ellipsis-vertical"></i>
+                                }
+                            </p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

@@ -17,6 +17,7 @@ import ChooseImageModal from './chooseImage.modal';
 import { DatePicker, Radio } from 'antd'
 import dayjs from 'dayjs';
 import { editUser } from '../../redux/actions/app.action';
+import TrackSound from '../ultils/trackSound.utils.component';
 
 
 const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe, readOnly, refuseAction }) => {
@@ -34,6 +35,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const [image, setImage] = useState(null);
     const [editing, setEditing] = useState(STATE.PENDING);
     const dateFormat = 'YYYY/MM/DD';
+    const [backgroundCoverPreview, setBackgroundCoverPreview] = useState(null);
 
     //Handle date
     const [newInfo, setInfo] = useState({
@@ -48,6 +50,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         newDayInfo.dob = date;
         setInfo(newDayInfo);
     }
+
 
     useEffect(() => {
         setDescription(`Xin chào, tôi là ${user?.userName}`);
@@ -182,6 +185,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             socket.then(socket => {
                 socket.emit('send-add-friend', friendData);
             })
+            toast.success('Đã gửi lời mời kết bạn');
             handleCancel();
         } else {
             toast.warn(res.message);
@@ -244,9 +248,17 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             "status": true
         });
         if (res.errCode == 0 || res.errCode === 2) {
+            socket.then(socket => {
+                socket.emit('new-chat', res.data);
+            })
             dispatch(accessChat(res.data));
             handleCancel();
         }
+    };
+
+    const handleOnChangeBackgroundCover = (avatar, image) => {
+        setBackgroundCoverPreview(avatar);
+        setImage(image);
     }
 
 
@@ -279,23 +291,45 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
-                width={400}
+                width={450}
                 centered
                 footer={refuseAction ? null : renderFooter()}
                 style={{ borderRadius: "12px", overflow: "auto", padding: "0px" }}
                 className='modal-infor-user'
+                destroyOnClose
             >
                 {
                     friendData &&
-                    <Zoom>
-                        <img src={`${profile?.coverImage}`} className='modal-background' />
-                    </Zoom>
+                    <div className='background-cover'>
+                        <TrackSound
+                            fetchInfoUser={fetchInfoUser}
+                        />
+
+                        {
+                            !refuseAction &&
+                            <div className='camara-bg-container'>
+                                <ChooseImageModal
+                                    type='background-cover'
+                                    avatar={backgroundCoverPreview}
+                                    handleChangeAvatar={handleOnChangeBackgroundCover}
+                                    image={image}
+                                    fetchInfoUser={fetchInfoUser}
+                                >
+                                    <i className="fa-solid fa-camera"></i>
+                                </ChooseImageModal>
+                            </div>
+                        }
+                        <Zoom>
+                            <img src={`${profile?.coverImage}`} className='modal-background' />
+                        </Zoom>
+                    </div>
+
                 }
                 <div className='modal-avatar'>
                     <div className='modal-avatar-info'>
                         <AvatarUser
                             image={itsMe ? user?.avatar : friendData?.avatar}
-                            name={friendData?.userName}
+                            name={itsMe ? user?.userName : friendData?.userName}
                             zoom
                             size={50}
                         >

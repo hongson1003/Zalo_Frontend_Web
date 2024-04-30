@@ -21,7 +21,7 @@ import ChangeBackgroundModal from "../../../components/modal/changeBackground.mo
 import MessageChat from "./message.chat";
 import { customizeFile, getLinkDownloadFile, getPreviewImage, getTimeFromDate } from '../../../utils/handleUltils';
 import { useNavigate } from "react-router-dom";
-import { getFriend } from "../../../utils/handleChat";
+import { getFriend, sendNotifyToChatRealTime } from "../../../utils/handleChat";
 import { COLOR_BACKGROUND } from '../../../type/rootCss.type';
 import Zoom from 'react-medium-image-zoom';
 import InputSearchSticky from "../../../components/customize/inputSearchSticky";
@@ -50,7 +50,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
     const [show, setShow] = useState(true);
-    const [showEmoij, setShowEmoij] = useState(true);
+    const [showEmoij, setShowEmoij] = useState(false);
     const [messages, setMessages] = useState([]);
     const [limit, setLimit] = useState(30);
     const user = useSelector(state => state.appReducer?.userInfo?.user);
@@ -88,6 +88,31 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     // text để theo dõi thay đổi
     const [text, setText] = useState('');
     // Emoij
+
+    useEffect(() => {
+        if (messages.length === 0) {
+            fetchNotification();
+        }
+        if (chat.seenBy.includes(user?._id) === false) {
+            updateSeenBy();
+        }
+        return () => {
+        }
+    }, [messages.length]);
+
+    const updateSeenBy = async () => {
+        const res = await axios.put('/chat/seen', {
+            chatId: chat._id,
+        });
+        if (res.errCode === 0) {
+            userState.fetchChats();
+        }
+    }
+
+    const fetchNotification = async () => {
+        await updateSeenBy();
+        userState.fetchNotificationChats();
+    }
 
     useEffect(() => {
         if (!chat._id) {
@@ -176,31 +201,52 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     }, [chat, limit])
 
 
-
-
     // socket
     useEffect(() => {
         if (receiveOnly.current === false) {
             socket.then(socket => {
-                socket.on('typing', () => {
-                    setTyping(true);
+                socket.on('typing', (room) => {
+                    if (room === chat._id)
+                        setTyping(true);
                 })
-                socket.on('finish-typing', () => {
-                    setTyping(false);
+                socket.on('finish-typing', (room) => {
+                    if (room === chat._id)
+                        setTyping(false);
                 });
                 socket.on('receive-message', data => {
-                    userState.fetchChats();
-                    setMessages(prev => [...prev, data]);
-                    fetchMessagePaginate();
-                    scroolRef.current.scrollTop = scroolRef.current?.scrollHeight || 0;
+                    if (data._id && data.chat === chat._id) {
+                        setMessages(prev => [...prev, data]);
+                        fetchMessagePaginate();
+                        scroolRef.current.scrollTop = scroolRef.current?.scrollHeight || 0;
+                    }
                 })
                 socket.on('receive-modify-message', data => {
-                    handleModifyMessage(data);
+                    if (data._id && data.chat === chat._id) {
+                        handleModifyMessage(data);
+                    }
+                })
+                socket.on('change-background', data => {
+                    if (data.chatId === chat._id) {
+                        setBackgroundUrl(data.background.url);
+                        setHeaderColor(COLOR_BACKGROUND[data.background.headerColor]);
+                        setMessageColor(COLOR_BACKGROUND[data.background.messageColor]);
+                    }
                 })
             })
             receiveOnly.current = true;
         }
-    }, [messages])
+
+        return () => {
+            socket.then(socket => {
+                receiveOnly.current = false;
+                socket.off('typing');
+                socket.off('finish-typing');
+                socket.off('receive-message');
+                socket.off('receive-modify-message');
+                socket.off('change-background');
+            })
+        }
+    }, [messages, chat])
 
     // footer
     useEffect(() => {
@@ -275,7 +321,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (scroolRef.current.scrollTop < heightScroolTopRef.current / 1.5 && scroolToTopRef.current === false) {
+            if (scroolRef.current.scrollTop < heightScroolTopRef.current / 2.5 && scroolToTopRef.current === false) {
                 scroolToTopRef.current = true;
                 setIsLoadingFetch(true);
                 setLimit(prev => prev + 60);
@@ -420,7 +466,6 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         }))
     }
 
-
     const items = [
         {
             key: 'search',
@@ -481,7 +526,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
             setText('');
             return;
         }
-        setText('');
+        setHasText(false);
         if (textAreaRef.current) {
             textAreaRef.current.value = '';
         }
@@ -510,12 +555,12 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         } else if (type === MESSAGES.STICKER)
             createMessage.sticker = data;
         setMessages(prev => [...prev, createMessage]);
+        setText('');
         setOpenReply(false);
         setSent(STATE.PENDING);
         const res = await axios.post('/chat/message', {
             ...createMessage,
             chatId: chat._id,
-            sender: user.id
         });
         if (res.errCode === 0) {
             userState.fetchChats();
@@ -565,9 +610,9 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
     const handleSetText = _.debounce((value) => {
         setText(value);
-    }, 700)
+    }, 700);
 
-    const handleOnChange = (e) => {
+    const handleDebouceOnChange = _.debounce((e) => {
         let value = e.target.value;
         if (textAreaRef.current.value.length === 1) {
             textAreaRef.current.value = value.trim().toUpperCase();
@@ -582,10 +627,14 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         } else {
             setHasText(false);
         }
+        emitFinishTyping();
+    }, 700);
+
+    const handleOnChange = (e) => {
         if (sendTyping.current === false) {
             startTyping();
         }
-        emitFinishTyping();
+        handleDebouceOnChange(e);
     }
     const handleShowHideEmoij = () => {
         setShowEmoij(prev => !prev);
@@ -662,11 +711,16 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         textAreaRef.current.focus();
     }
 
-    const handleChangeBackground = (background) => {
+    const handleChangeBackground = async (background) => {
         if (background) {
             setBackgroundUrl(background.url);
             setHeaderColor(COLOR_BACKGROUND[background.headerColor]);
             setMessageColor(COLOR_BACKGROUND[background.messageColor]);
+            await sendNotifyToChatRealTime(chat._id, `Đã thay đổi hình nền`, MESSAGES.NOTIFY);
+            fetchMessagePaginate();
+            socket.then(socket => {
+                socket.emit('change-background', { chatId: chat._id, background });
+            })
         } else {
             setBackgroundUrl('');
             setHeaderColor(COLOR_BACKGROUND.BLACK);
@@ -909,6 +963,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
 
 
+
     return (
         <>
             <div className="chat-container"
@@ -939,7 +994,6 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             />
                         </div>
                     </header>
-
                     <div className="main-chat-content">
                         {
                             isSearching && (
@@ -1008,6 +1062,24 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     if (message.type === MESSAGES.NOTIFY) {
                                         return (
                                             <div className="notify-message" key={message._id}>
+                                                <p style={{ color: headerColor }}>{message.content}</p>
+                                            </div>
+                                        )
+                                    } else if (message.type === MESSAGES.NEW_FRIEND) {
+                                        return (
+                                            <div className="new-friend-message" key={message._id}>
+                                                <div className="group-avatar">
+                                                    <AvatarUser
+                                                        image={user?.avatar}
+                                                        name={user?.userName}
+                                                        size={80}
+                                                    />
+                                                    <AvatarUser
+                                                        image={getFriend(user, chat.participants).avatar}
+                                                        name={getFriend(user, chat.participants).userName}
+                                                        size={80}
+                                                    />
+                                                </div>
                                                 <p>{message.content}</p>
                                             </div>
                                         )
@@ -1043,7 +1115,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                                                         /> :
                                                                         (
                                                                             messages[index - 1].sender.id !== messages[index].sender.id &&
-                                                                            <AvatarUser
+                                                                            < AvatarUser
                                                                                 image={message?.sender?.avatar || '/images/user-dev.png'}
                                                                                 name={message?.sender?.userName || 'Người dùng'}
                                                                             />
@@ -1052,13 +1124,19 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                                             </div>
                                                         }
                                                         <div
-                                                            className={
-                                                                (message.type === MESSAGES.TEXT || message.isDelete === true) ? 'message' : (
-                                                                    (message.type === MESSAGES.IMAGES || message.type === MESSAGES.VIDEO ||
-                                                                        message.type === MESSAGES.AUDIO || message.type === MESSAGES.STICKER
-                                                                    ) ? 'message de-bg w-500' : 'message'
-                                                                )
-                                                            }
+                                                            // className={
+                                                            //     (message.type === MESSAGES.TEXT || message.isDelete === true) ? 'message' : (
+                                                            //         (message.type === MESSAGES.IMAGES || message.type === MESSAGES.VIDEO ||
+                                                            //             message.type === MESSAGES.AUDIO
+                                                            //         ) ? 'message de-bg w-500' : 'message'
+                                                            //     )
+                                                            // }
+                                                            className={(message.type === MESSAGES.TEXT || message.isDelete) ? 'message' : (
+                                                                (message.type === MESSAGES.AUDIO || message.type === MESSAGES.VIDEO)
+                                                                    ? 'message w-500 de-bg' : (
+                                                                        message.type === MESSAGES.FILE_FOLDER ? 'message' : 'message de-bg'
+                                                                    )
+                                                            )}
                                                         >
                                                             {
                                                                 messages[index - 1]?.sender?.id !== messages[index].sender.id &&
@@ -1481,8 +1559,10 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             <div style={listImage?.length > 0 ? { height: '170px' } : {}} className="footer" ref={footer}>
                                 <div className="footer-top footer-item">
                                     <StickyPopover >
-                                        <div className="item-icon"
-                                            onClick={() => handleDispatchSendMessageFunc()}>
+                                        <div
+                                            className="item-icon"
+                                            onClick={() => handleDispatchSendMessageFunc()}
+                                        >
                                             <img src="/images/sticker.png" />
                                         </div>
                                     </StickyPopover>
@@ -1784,8 +1864,6 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
                                 </div>
                             }
-
-
 
                         </div>
                     </div>

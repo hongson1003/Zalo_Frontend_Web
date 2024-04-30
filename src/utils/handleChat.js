@@ -1,4 +1,5 @@
 import axios from '../utils/axios';
+import { socket } from './io';
 
 export const getFriend = (user, participants) => {
     if (!user || !participants || participants.length < 0) return null;
@@ -16,13 +17,40 @@ export const getDetailListMembers = (listMembers) => {
     return { count, total: listMembers.length };
 }
 
-export const sendNotifyToChatRealTime = async (chatId, message) => {
+export const sendNotifyToChatRealTime = async (chatId, message, type) => {
     const res = await axios.post('/chat/notify', {
         chatId,
-        message
+        message,
+        type
     })
-    if (res.errCode === 0)
-        return true;
+    if (res.errCode === 0) {
+        socket.then(socket => {
+            socket.emit('send-message', res.data);
+            return true;
+        })
+    }
     return false;
 }
+
+export function formatTimeAgo(timestamp) {
+    const now = new Date();
+    const sentTime = new Date(timestamp);
+
+    const timeDifference = now - sentTime;
+    const secondsDifference = Math.floor(timeDifference / 1000);
+    const minutesDifference = Math.floor(secondsDifference / 60);
+    const hoursDifference = Math.floor(minutesDifference / 60);
+    const daysDifference = Math.floor(hoursDifference / 24);
+
+    if (secondsDifference < 60) {
+        return "Vài giây";
+    } else if (minutesDifference < 60) {
+        return `${minutesDifference} phút`;
+    } else if (hoursDifference < 24) {
+        return `${hoursDifference} giờ`;
+    } else {
+        return `${daysDifference} ngày`;
+    }
+}
+
 

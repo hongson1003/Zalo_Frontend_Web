@@ -19,6 +19,7 @@ const ForwardModal = ({ children, message, }) => {
     const [checkedList, setCheckedList] = useState([]);
     const [plainOptions, setPlainOptions] = useState([]);
 
+
     const showModal = () => {
         fetchChats();
         setIsModalOpen(true);

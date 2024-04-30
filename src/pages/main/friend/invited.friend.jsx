@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { items } from "../../sidebar/friend.sidebar";
 import InvitedUser from "../../../components/user/invited.user";
 import axios from "../../../utils/axios";
+import { socket } from "../../../utils/io";
 
 const headerData = items[2];
 const options = [
@@ -20,19 +21,33 @@ const options = [
 
 const InvitedFriend = () => {
     const stateUser = useSelector(state => state?.userReducer);
-    const dispatch = useDispatch();
     const [invitedFriends, setInvitedFriends] = React.useState([]);
     const [optionValue, setOptionValue] = React.useState('received');
 
     useEffect(() => {
+        socket.then(socket => {
+            socket.on('need-accept-addFriend', () => {
+                fetchInvitedFriends();
+            });
+        });
+    }, []);
+
+    useEffect(() => {
         const ids = stateUser.notificationsFriends.map(item => item?.id);
         handleReadNotifications(ids);
-        fetchInvitedFriends();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (optionValue === 'received') {
+            fetchInvitedFriends();
+        } else {
+            fetchSentInvitedFriends();
+        }
+    }, [optionValue]);
 
     const handleReadNotifications = async (ids) => {
         await axios.post('/users/notifications/friendShip', { ids });
-        stateUser.fetchNotificationsFunc();
+        stateUser.fetchNotificationsFriendFunc();
     }
 
     const fetchInvitedFriends = async () => {
@@ -44,6 +59,14 @@ const InvitedFriend = () => {
         }
     }
 
+    const fetchSentInvitedFriends = async () => {
+        const res = await axios.get('/users/notifications/friendShip/sentInvited');
+        if (res.errCode === 0) {
+            setInvitedFriends(res?.data);
+        } else {
+            toast.warn('Có lỗi xảy ra !')
+        }
+    }
     const onChange = (value) => {
         setOptionValue(value);
     }
@@ -81,10 +104,12 @@ const InvitedFriend = () => {
                                     return (
                                         <InvitedUser
                                             key={item?.id}
-                                            user={item?.friendShip?.sender}
+                                            user={item?.friendShip[optionValue === 'received' ? 'sender' : 'receiver']}
                                             content={item?.content}
                                             date={item?.updatedAt}
                                             fetchInvitedFriends={fetchInvitedFriends}
+                                            fetchSentInvitedFriends={fetchSentInvitedFriends}
+                                            isReceived={optionValue === 'received'}
                                         />
                                     )
 

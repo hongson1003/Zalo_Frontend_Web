@@ -8,21 +8,47 @@ import { accessChat, fetchChatsFunc } from "../../redux/actions/user.action";
 import { useDispatch, useSelector } from "react-redux";
 import _ from 'lodash';
 import { editGroup } from "../../redux/actions/app.action";
+import './chat.sidebar.scss';
+import { formatTimeAgo, getFriend } from "../../utils/handleChat";
+import ChatPopover from "../../components/popover/chat.popover";
+import { FILTER } from "../../redux/types/type.user";
 
-const ChatSidebar = () => {
+const ChatSidebar = ({ current: currentSearch, statusChat }) => {
+
+
     const [chats, setChats] = useState([]);
-    const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [status, setStatus] = useState(STATE.PENDING);
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const dispatch = useDispatch();
     const chat = useSelector(state => state.appReducer?.subNav);
     const [selectedChat, setSelectedChat] = useState(null);
+    const [isMouse, setIsMouse] = useState(null);
+    const userState = useSelector(state => state.userReducer);
+
+    useEffect(() => {
+        fetchChats();
+    }, [currentSearch, statusChat])
 
     const fetchChats = useCallback(async () => {
-        const res = await axios.get(`/chat/pagination?page=${page}&limit=${limit}`);
+        const res = await axios.get(`/chat/pagination?limit=${limit}`);
         if (res.errCode === 0) {
-            setChats(res.data);
+            // filter
+            let filterChats = res.data;
+
+            if (statusChat === FILTER.NOT_READ) {
+                filterChats = filterChats.filter(item => !item.seenBy.includes(user.id));
+            }
+
+            if (currentSearch) {
+                filterChats = filterChats.filter(item => {
+                    const friend = getFriend(user, item.participants);
+                    return (item.name || friend?.userName).toLowerCase().includes(currentSearch.toLowerCase());
+                })
+            }
+
+            setChats(filterChats);
+
             if (chat) {
                 const currentChat = res.data.find(item => item._id === chat._id);
                 dispatch(accessChat({ ...currentChat }));
@@ -31,25 +57,26 @@ const ChatSidebar = () => {
         } else {
             setStatus(STATE.REJECT);
         }
-    }, [chat])
+    }, [chat, currentSearch, statusChat]);
 
-    // lắng nghe sự kiện enter
-    useEffect(() => {
-        const handleKeyPress = (e) => {
-            if (e.key === 'Enter' && !chat) {
-                dispatch(accessChat(chats[0]));
-            }
-        }
-        if (chats.length) {
-            window.addEventListener('keypress', handleKeyPress)
-        }
-        return () => {
-            window.removeEventListener('keypress', handleKeyPress)
-        }
-    }, [chats.length, chat])
+    // // lắng nghe sự kiện enter
+    // useEffect(() => {
+    //     const handleKeyPress = (e) => {
+    //         if (e.key === 'Enter' && !chat) {
+    //             dispatch(accessChat(chats[0]));
+    //         }
+    //     }
+    //     if (chats.length) {
+    //         window.addEventListener('keypress', handleKeyPress)
+    //     }
+    //     return () => {
+    //         window.removeEventListener('keypress', handleKeyPress)
+    //     }
+    // }, [chats.length, chat])
 
     useEffect(() => {
         if (user) {
+            setSelectedChat(chat);
             fetchChats();
         }
     }, [chat?._id])
@@ -78,7 +105,7 @@ const ChatSidebar = () => {
                 console.log('Nhóm đã bị giải tán')
                 fetchChats();
             })
-            socket.on('new-group-chat', (data) => {
+            socket.on('new-chat', (data) => {
                 fetchChats();
                 setTimeout(() => {
                     socket.emit('join-room', data._id);
@@ -99,34 +126,95 @@ const ChatSidebar = () => {
             })
             socket.on('receive-message', data => {
                 fetchChats();
+                userState.fetchNotificationChats();
             })
-        })
-    }, []);
+        });
 
-    const handleSelectChat = (chat) => {
-        setSelectedChat(chat);
-        dispatch(accessChat(chat));
+        return () => {
+            socket.then(socket => {
+                socket.off('transfer-disband-group');
+                socket.off('new-chat');
+                socket.off('add-member');
+                socket.off('leave-group');
+                socket.off('grant');
+                socket.off('receive-message');
+            })
+        }
+
+    }, [userState]);
+
+    const handleSelectChat = (nextChat) => {
+        if ((chat?._id !== nextChat._id && selectedChat?._id !== nextChat._id) || !chat) {
+            dispatch(accessChat(nextChat));
+            setSelectedChat(nextChat);
+        }
     }
 
-    const handleSelectChatDebouce = _.debounce(handleSelectChat, 200)
+    const handleSelectChatDebouce = _.debounce(handleSelectChat, 150);
+
+    const handleOnMouseOver = (chat) => {
+        if (!isMouse)
+            setIsMouse(chat);
+    }
+
+    const handleOnMouseLeave = () => {
+        if (isMouse)
+            setIsMouse(null);
+    }
 
 
     return (
-        <div style={{ overflowY: 'scroll', height: 'calc(100vh - 100px)' }}>
+        <div className="chat-sidebar">
             {
                 chats?.length > 0 && status === STATE.RESOLVE &&
                 chats.map((chat, index) => {
                     return (
-                        <span key={chat._id}
-                            onClick={() => handleSelectChatDebouce(chat)}
+                        <div
+                            key={chat?._id}
+                            className={selectedChat?._id === chat?._id ? 'active-chat chat-box' : 'chat-box'}
+                            onMouseOver={() => handleOnMouseOver(chat)}
+                            onMouseLeave={handleOnMouseLeave}
                         >
-                            <ChatUser
-                                key={index}
-                                chat={chat}
-                                activeKey={chat._id}
-                                fetchChats={fetchChats}
-                            />
-                        </span>
+                            <div
+                                onClick={() => handleSelectChatDebouce(chat)}
+                                className="chat-user"
+                            >
+                                <ChatUser
+                                    key={index}
+                                    chat={chat}
+                                    activeKey={chat._id}
+                                    fetchChats={fetchChats}
+                                />
+                            </div>
+                            <div className="chat-right">
+                                {
+                                    isMouse && isMouse._id === chat?._id ?
+                                        <ChatPopover
+                                            // options
+                                            chat={chat}
+                                        >
+                                            <div className="ultils">
+                                                <div className="ultils-item">
+                                                    <i className="fa-solid fa-ellipsis-vertical"></i>
+                                                </div>
+                                            </div>
+                                        </ChatPopover>
+                                        :
+                                        <p className="time">
+                                            {
+                                                // handle time
+                                                formatTimeAgo(chat?.updatedAt)
+                                            }
+                                        </p>
+                                }
+                                {
+                                    chat.lastedMessage && !chat?.seenBy.includes(user?.id) &&
+                                    <div className="notify">
+                                        <i className="fa-solid fa-bell"></i>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     )
                 })
             }

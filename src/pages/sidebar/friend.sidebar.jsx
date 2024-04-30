@@ -55,7 +55,7 @@ const FriendSideBar = () => {
             dispatch(changeKeySubMenu(FRIEND_ITEM_MENU.LIST_FRIENDS))
             setCurrent(FRIEND_ITEM_MENU.LIST_FRIENDS)
         }
-    }, [])
+    }, [windowSize[0]])
 
     return (
         <Menu

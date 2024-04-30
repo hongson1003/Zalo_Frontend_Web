@@ -29,7 +29,7 @@ const VerifyComponent = (props) => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (state?.isLogin === true) {
+        if (state?.isLogin === STATE.RESOLVE) {
             navigate('/');
         }
         if (state?.userInfo) {

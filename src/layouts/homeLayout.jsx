@@ -87,7 +87,6 @@ const HomeLayout = () => {
             const height = 500; // Độ cao của cửa sổ mới
             const left = (window.screen.width - width) / 2; // Tính toán vị trí trung tâm theo trục X
             const top = (window.screen.height - height) / 2; // Tính toán vị trí trung tâm theo trục Y
-            console.log('open')
             const newWindow = window.open(`/video-call?chat=${data.room}&isCalled=true`, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
             if (newWindow) {
               // Thực hiện các hành động cần thiết khi cửa sổ mới được mở

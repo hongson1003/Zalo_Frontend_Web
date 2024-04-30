@@ -47,12 +47,20 @@ const StatusUser = ({ chat }) => {
                     }
                 });
                 socket.on('offline', (data) => {
-                    setStatusUser({
-                        ...statusUser,
-                        lastedOnline: (new Date()).toISOString()
-                    });
+                    if (data === statusUser.id) {
+                        setStatusUser({
+                            ...statusUser,
+                            lastedOnline: new Date()
+                        });
+                    }
                 });
             })
+        }
+        return () => {
+            socket.then(socket => {
+                socket.off('online');
+                socket.off('offline');
+            });
         }
     }, [statusUser]);
 
@@ -66,6 +74,7 @@ const StatusUser = ({ chat }) => {
                         friendData={getFriend(user, chat.participants)}
                         type={'button'}
                         friendShipData={friendShipData}
+                        refuseAction
                     >
                         <AvatarUser
                             image={getFriend(user, chat.participants)?.avatar}

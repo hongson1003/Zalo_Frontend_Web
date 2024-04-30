@@ -70,7 +70,7 @@ const NewGroupChatModal = ({ children }) => {
             const members = [];
             list.forEach(item => {
                 if (item.checked) {
-                    members.push(item.user1Id === user.id ? item.user2.id : item.user1.id);
+                    members.push(item.sender.id === user.id ? item.receiver.id : item.sender.id);
                 }
             })
             if (members.length < 2) {
@@ -139,7 +139,7 @@ const NewGroupChatModal = ({ children }) => {
             setSelected(true);
         }
         const newList = list.map(i => {
-            if (i.user1Id === item.user1Id && i.user2Id === item.user2Id) {
+            if (i.sender.id === item.sender.id && i.receiver.id === item.receiver.id) {
                 i.checked = !i.checked;
             }
             return i;
@@ -166,7 +166,7 @@ const NewGroupChatModal = ({ children }) => {
 
     const removeMember = (item) => {
         const newList = list.map(i => {
-            if (i.user1Id === item.user1Id && i.user2Id === item.user2Id) {
+            if (i.sender.id === item.sender.id && i.receiver.id === item.receiver.id) {
                 i.checked = false;
             }
             return i;
@@ -236,19 +236,19 @@ const NewGroupChatModal = ({ children }) => {
                         {
                             list && list.length > 0 && list.map((item, index) => {
                                 return (
-                                    <div key={item.user1Id + '' + item.user2Id} className='item-friend'>
+                                    <div key={item.sender.id + '' + item.receiver.id} className='item-friend'>
                                         <Radio
                                             onClick={() => handleCheckFriend(item)}
                                             checked={item.checked}
                                         >
                                             <AvatarUser
-                                                image={getFriend(user, [item.user1, item.user2])?.avatar}
+                                                image={getFriend(user, [item.sender, item.receiver])?.avatar}
                                                 size={50}
-                                                name={getFriend(user, [item.user1, item.user2])?.userName}
+                                                name={getFriend(user, [item.sender, item.receiver])?.userName}
                                             />
                                         </Radio>
                                         <span className='username'>
-                                            {getFriend(user, [item.user1, item.user2])?.userName}
+                                            {getFriend(user, [item.sender, item.receiver])?.userName}
                                         </span>
                                     </div>
                                 )
@@ -281,14 +281,14 @@ const NewGroupChatModal = ({ children }) => {
                                         {
                                             list && list.length > 0 && list.map((item, index) =>
                                                 item.checked && (
-                                                    <div key={item.user1Id + '' + item.user2Id + 'dachon'} className='item-dachon'>
+                                                    <div key={item.sender.id + '' + item.receiver.id + 'dachon'} className='item-dachon'>
                                                         <AvatarUser
-                                                            image={getFriend(user, [item.user1, item.user2])?.avatar}
+                                                            image={getFriend(user, [item.sender, item.receiver])?.avatar}
                                                             size={20}
-                                                            name={getFriend(user, [item.user1, item.user2])?.userName}
+                                                            name={getFriend(user, [item.sender, item.receiver])?.userName}
                                                         />
                                                         <span className='username'>
-                                                            {getFriend(user, [item.user1, item.user2])?.userName}
+                                                            {getFriend(user, [item.sender, item.receiver])?.userName}
                                                         </span>
                                                         <p className='action'>
                                                             <i className="fa-regular fa-circle-xmark"

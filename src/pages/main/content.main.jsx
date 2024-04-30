@@ -27,9 +27,6 @@ const ContentMain = ({ drawerMethods }) => {
         }
     }, [])
 
-    useEffect(() => {
-    }, [stateUser])
-
     const getRightSplitPane = () => {
         const nav = stateApp?.nav;
         const subNav = stateApp?.subNav;
@@ -55,8 +52,10 @@ const ContentMain = ({ drawerMethods }) => {
                 case 'ms':
                     if (subNav?.key === STATE.ACCESS_CHAT) {
                         return (
-                            <DragDrop fileTypes={["JPG", "PNG", "GIF"]}>
-                                <ChatMain drawerMethods={drawerMethods} />
+                            <DragDrop
+                                fileTypes={["JPG", "PNG", "GIF"]}>
+                                <ChatMain
+                                    drawerMethods={drawerMethods} />
                             </DragDrop>
                         )
                     }

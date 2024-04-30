@@ -8,29 +8,39 @@ import AddFriendModal from '../../components/modal/addFriend.modal';
 import { KEYITEMS } from "../../utils/keyMenuItem";
 import { useSelector } from "react-redux";
 import NewGroupChatModal from "../../components/modal/newGroupChat.modal";
+import { FILTER } from "../../redux/types/type.user";
 
 
 const items1 = [
     {
         label: <span>Tất cả</span>,
-        key: 'all',
+        key: FILTER.ALL,
     },
     {
         label: <span>Chưa đọc</span>,
-        key: 'not-all',
+        key: FILTER.NOT_READ,
     },
 ]
 
 const { Search } = Input;
 
-const SearchMessage = () => {
-    const onSearch = (value, _e, info) => console.log(info?.source, value);
-    const [current, setCurrent] = useState('all');
+const SearchMessage = ({ setCurrent: setSearchCurrent, setStatusChat, statusChat }) => {
+
     const state = useSelector(state => state?.appReducer);
 
-    const onClick = (e) => {
-        setCurrent(e.key);
+    const onSearch = (value, _e, info) => {
+        setSearchCurrent(value);
     };
+
+    const onClick = (e) => {
+        setStatusChat(e.key);
+    };
+
+    const handleOnChange = (value) => {
+        if (!value) {
+            setSearchCurrent('');
+        }
+    }
 
     return (
         <div className="sidebar-nav">
@@ -38,6 +48,8 @@ const SearchMessage = () => {
                 <Search
                     placeholder="Tìm kiếm"
                     onSearch={onSearch}
+                    spellCheck={false}
+                    onChange={(e) => handleOnChange(e.target.value)}
                 />
                 <div className="btn-group">
                     <AddFriendModal>
@@ -47,7 +59,7 @@ const SearchMessage = () => {
                         <Button
                             style={{ border: 'none', boxShadow: 'none', width: '20%' }}
                             icon={<UsergroupAddOutlined />}
-                        ></Button>
+                        />
                     </NewGroupChatModal>
                 </div>
             </div>
@@ -56,7 +68,7 @@ const SearchMessage = () => {
                 <div className="sidebar-nav-classify">
                     <Menu
                         onClick={onClick}
-                        selectedKeys={[current]}
+                        selectedKeys={[statusChat]}
                         mode="horizontal"
                         items={items1}
                     />

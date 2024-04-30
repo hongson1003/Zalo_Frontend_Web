@@ -52,7 +52,7 @@ const AddMemberModal = ({ children, chat }) => {
             const data = res.data;
             const friends = [];
             data.forEach(item => {
-                friends.push(getFriend(user, [item.user1, item.user2]));
+                friends.push(getFriend(user, [item.sender, item.receiver]));
             })
             setPlainOptions(friends);
         }
