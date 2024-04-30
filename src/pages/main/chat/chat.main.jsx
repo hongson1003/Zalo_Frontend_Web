@@ -45,6 +45,10 @@ import InforGroupModal from "../../../components/modal/infoGroup.modal";
 import MemberDrawer from "../../../components/drawer/members.drawer";
 import DisbandGroupModal from "../../../components/modal/disbandGroup.modal";
 import GrantModal from "../../../components/modal/grant.modal";
+import ViewAllPicturesModal from "../../../components/modal/viewAllPictures.modal";
+import ViewAllFilesModal from "../../../components/modal/viewAllFile.modal";
+import ViewAllLinksModal from "../../../components/modal/viewAllLink.modal";
+import ViewSettingModal from "../../../components/modal/securitySetting.modal";
 
 const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const chat = useSelector(state => state.appReducer.subNav);
@@ -66,6 +70,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const dispatchRef = useRef(false);
     const navigate = useNavigate();
     const [isLoadingFetch, setIsLoadingFetch] = useState(false);
+    const [listImageMessage, setListImageMessage] = useState([]);
     // Menu
     const [current, setCurrent] = useState('');
     const [headerColor, setHeaderColor] = useState(COLOR_BACKGROUND.BLACK);
@@ -114,6 +119,28 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         userState.fetchNotificationChats();
     }
 
+
+    // get all images
+    const getAllImagesMessage = async () => {
+        try{
+            console.log('chat', chat._id);
+            const res = await axios.get('/chat/message/getAllPicture', {
+                params: {
+                    chatId: chat?._id,
+                    limit: 10
+                }
+            });
+            if(res.errCode === 0) {
+                console.log('Oke', chat._id);
+                setListImageMessage(res.data);
+            } else {
+                console.log('Fail', chat._id);
+            }
+        } catch(err) {
+            console.log(err);
+        }
+
+    }
     useEffect(() => {
         if (!chat._id) {
             dispatch(changeKeySubMenu(''));
@@ -200,6 +227,12 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         }
     }, [chat, limit])
 
+    // Get all message img
+    useEffect(() => {
+        if (chat?._id) {
+            getAllImagesMessage();
+        }
+    }, [chat?._id])
 
     // socket
     useEffect(() => {
@@ -1809,9 +1842,6 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     </MemberDrawer>
                                 </div>
                             }
-
-
-
                             {
                                 chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="info-list">
@@ -1821,7 +1851,39 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     </button>
                                 </div>
                             }
-
+                            <div className="hyphen"></div>
+                            {
+                                listImageMessage.length > 0 &&
+                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
+                                <div className="view-all-image">
+                                    <ViewAllPicturesModal message = {listImageMessage}>
+                                    </ViewAllPicturesModal>
+                                </div>
+                            }
+                            <div className="hyphen"></div>
+                            {
+                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
+                                <div className="view-all-file">
+                                    <ViewAllFilesModal files = {{}}> 
+                                    </ViewAllFilesModal>
+                                </div>
+                            }
+                            <div className="hyphen"></div>
+                            {
+                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
+                                <div className="view-all-link">
+                                    <ViewAllLinksModal links = {{}}>
+                                    </ViewAllLinksModal>
+                                </div>
+                            }
+                            <div className="hyphen"></div>
+                            {
+                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
+                                <div className="security-setting">
+                                    <ViewSettingModal>
+                                    </ViewSettingModal>
+                                </div>
+                            }
                             <div className="hyphen"></div>
 
                             {
