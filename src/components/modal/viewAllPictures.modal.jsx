@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { DownOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Image } from 'antd';
 import './viewAllPictures.modal.scss';
-import { FixedSizeList as List } from 'react-window';
 
 const ViewAllPicturesModal = ({ message }) => {
 
@@ -11,16 +10,7 @@ const ViewAllPicturesModal = ({ message }) => {
     console.log(message);
     setExpanded(!expanded);
   };
-  const Image = ({url, sender}) => (
-    <div className="image">
-      <img src={url} alt={sender} />
-    </div>
-  );
-  const Row = ({ index, style }) => (
-    <div style={style}>
-      <Image url={message[index].urls[0]} sender={message[index].sender} />
-    </div>
-  );
+  
   return (
     <div className="view-images">
       <div className = 'header'>
@@ -33,16 +23,22 @@ const ViewAllPicturesModal = ({ message }) => {
       </div>
       {/* Content */}
       {expanded && (
-        <div style={{ marginTop: '10px' }}>
-          <List
-            height={200} // Chiều cao của list
-            itemCount={message.length} // Số lượng phần tử trong list
-            itemSize={120} // Chiều cao của mỗi phần tử trong list
-            width={300} // Chiều rộng của list
+        <div style={{ marginTop: '10px', marginLeft: '10px', flexDirection: 'column', alignItems: 'center' }}>
+          <Image.PreviewGroup
+                preview={{
+                  onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                }}
           >
-            {Row}
-          </List>
-          <Button style={{ marginTop: '10px' }}>Xem tất cả</Button> 
+                {message.map((item, index) => (
+                  <Image
+                    key={index}
+                    width={80}
+                    src={item.urls}
+                    alt={item.sender}
+                  />
+                ))}
+          </Image.PreviewGroup>
+          <Button style = {{width: '95%', backgroundColor: '#F5F5F5', marginTop: '10px'}}>Xem tất cả</Button>
         </div>
       )}                
                       

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { DownOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { DownOutlined, FileOutlined, FileTextOutlined, FilePdfOutlined, FileExcelOutlined, FileWordOutlined } from '@ant-design/icons';
+import { Button} from 'antd';
 import { FixedSizeList as List } from 'react-window';
 import './viewAllFiles.modal.scss'; 
 const ViewAllFilesModal = ({ files }) => {
@@ -9,19 +9,35 @@ const ViewAllFilesModal = ({ files }) => {
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
-
-  const File = ({ name, size }) => (
-    <div className="file">
-      <p>{name}</p>
-      <p>{size}</p>
-    </div>
-  );
-
-  const Row = ({ index, style }) => (
-    <div style={style}>
-      <File name={files[index].name} size={files[index].size} />
-    </div>
-  );
+  const getFileIcon = (fileExtension) => {
+    switch (fileExtension) {
+        case 'txt':
+            return <FileWordOutlined />;
+        case 'doc':
+            return <FileWordOutlined />;
+        case 'docx':
+            return <FileTextOutlined />;
+        case 'pdf':
+            return <FilePdfOutlined />;
+        case 'xls':
+        case 'xlsx':
+            return <FileExcelOutlined />;
+        default:
+            return <FileOutlined />;
+    }
+  };
+  const FileItem = ({ file }) => {
+    const url = file.urls[0]; // Lấy URL đầu tiên từ mảng urls
+    const fileExtension = url.substring(url.lastIndexOf('.') + 1).toLowerCase(); // Lấy phần mở rộng của tệp từ URL
+    const IconComponent = getFileIcon(fileExtension);
+    const fileName = url.substring(url.lastIndexOf('/') + 1).toLowerCase();
+    return (
+        <div>
+            {IconComponent}
+            <span>{fileName}</span>
+        </div>
+    );
+  };
 
   return (
     <div className="view-files">
@@ -32,16 +48,18 @@ const ViewAllFilesModal = ({ files }) => {
         </div>
       </div>
       {expanded && (
-        <div style={{ marginTop: '10px' }}>
-          <List
+         <div style={{ marginTop: '10px', marginLeft: '10px', flexDirection: 'column', alignItems: 'center' }}>
+          {/* <List
             height={200}
             itemCount={files.length}
             itemSize={80}
             width={300}
-          >
-            {Row}
-          </List>
-          <Button style={{ marginTop: '10px' }}>View All</Button> 
+          > */}
+             {files.map((item, index) => (
+                  <FileItem key={index} file={item} />
+              ))}
+          {/* </List> */}
+          <Button style = {{width: '95%', backgroundColor: '#F5F5F5', marginTop: '10px'}}>Xem tất cả</Button>
         </div>
       )}                
     </div>

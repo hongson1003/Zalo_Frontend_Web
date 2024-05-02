@@ -33,7 +33,7 @@ const ViewAllLinksModal = ({ links }) => {
         </div>
       </div>
       {expanded && (
-        <div style={{ marginTop: '10px' }}>
+         <div style={{ marginTop: '10px', marginLeft: '10px', flexDirection: 'column', alignItems: 'center' }}>
           <List
             height={200}
             itemCount={links.length}
@@ -42,7 +42,7 @@ const ViewAllLinksModal = ({ links }) => {
           >
             {Row}
           </List>
-          <Button style={{ marginTop: '10px' }}>View All</Button> 
+          <Button style = {{width: '95%', backgroundColor: '#F5F5F5', marginTop: '10px'}}>Xem tất cả</Button>
         </div>
       )}                
     </div>

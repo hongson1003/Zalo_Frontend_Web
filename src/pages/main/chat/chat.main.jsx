@@ -50,6 +50,7 @@ import ViewAllFilesModal from "../../../components/modal/viewAllFile.modal";
 import ViewAllLinksModal from "../../../components/modal/viewAllLink.modal";
 import ViewSettingModal from "../../../components/modal/securitySetting.modal";
 
+
 const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
@@ -71,6 +72,8 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const navigate = useNavigate();
     const [isLoadingFetch, setIsLoadingFetch] = useState(false);
     const [listImageMessage, setListImageMessage] = useState([]);
+    const [listFileMessage, setListFileMessage] = useState([]);
+    const [listLinkMessage, setListLinkMessage] = useState([]);
     // Menu
     const [current, setCurrent] = useState('');
     const [headerColor, setHeaderColor] = useState(COLOR_BACKGROUND.BLACK);
@@ -123,24 +126,51 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     // get all images
     const getAllImagesMessage = async () => {
         try{
-            console.log('chat', chat._id);
-            const res = await axios.get('/chat/message/getAllPicture', {
-                params: {
-                    chatId: chat?._id,
-                    limit: 10
-                }
-            });
+            //console.log('chat', chat._id);
+            const limit = 10;
+            console.log('Params', limit, chat._id);
+            const res = await axios.get(`/chat/message/getAllPicture?chatId=${chat._id}&limit=${limit}`);
+            
             if(res.errCode === 0) {
-                console.log('Oke', chat._id);
-                setListImageMessage(res.data);
+                console.log('Oke');
+                setListImageMessage(res?.data);
             } else {
-                console.log('Fail', chat._id);
+                setListImageMessage([]);
             }
         } catch(err) {
             console.log(err);
         }
 
     }
+    // get all files
+    const getAllFilesMessage = async () => {
+        try{
+            const limit = 10;
+            const res = await axios.get(`/chat/message/getAllFile?chatId=${chat._id}&limit=${limit}`);
+            if(res.errCode === 0) {
+                setListFileMessage(res?.data);
+            } else {
+                setListFileMessage([]);
+            }
+        } catch(err) {
+            console.log(err);
+        }
+    }
+    // get all links
+    const getAllLinksMessage = async () => {
+        try{
+            const limit = 10;
+            const res = await axios.get(`/chat/message/getAllLink?chatId=${chat._id}&limit=${limit}`);
+            if(res.errCode === 0) {
+                setListLinkMessage(res?.data);
+            } else {
+                setListLinkMessage([]);
+            }
+        } catch(err) {
+            console.log(err);
+        }
+    }
+    
     useEffect(() => {
         if (!chat._id) {
             dispatch(changeKeySubMenu(''));
@@ -227,13 +257,22 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         }
     }, [chat, limit])
 
-    // Get all message img
+    // Get all message img, files, links
     useEffect(() => {
         if (chat?._id) {
             getAllImagesMessage();
         }
-    }, [chat?._id])
-
+    }, [messages])
+    useEffect(() => {
+        if (chat?._id) {
+            getAllFilesMessage();
+        }
+    }, [messages])
+    useEffect(() => {
+        if (chat?._id) {
+            getAllLinksMessage();
+        }
+    }, [messages])
     // socket
     useEffect(() => {
         if (receiveOnly.current === false) {
@@ -1862,9 +1901,10 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             }
                             <div className="hyphen"></div>
                             {
+                                listFileMessage.length > 0 &&
                                 chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="view-all-file">
-                                    <ViewAllFilesModal files = {{}}> 
+                                    <ViewAllFilesModal files = {listFileMessage}> 
                                     </ViewAllFilesModal>
                                 </div>
                             }
