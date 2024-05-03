@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { DownOutlined, FileOutlined, FileTextOutlined, FilePdfOutlined, FileExcelOutlined, FileWordOutlined } from '@ant-design/icons';
-import { Button} from 'antd';
-import { FixedSizeList as List } from 'react-window';
+import { Button, Image} from 'antd';
 import './viewAllFiles.modal.scss'; 
 const ViewAllFilesModal = ({ files }) => {
   const [expanded, setExpanded] = useState(false);
@@ -12,30 +11,40 @@ const ViewAllFilesModal = ({ files }) => {
   const getFileIcon = (fileExtension) => {
     switch (fileExtension) {
         case 'txt':
-            return <FileWordOutlined />;
+            return <Image width={40} src={"public/images/txt.jpg"} />;
         case 'doc':
-            return <FileWordOutlined />;
+            return <Image width={40} src={"public/images/word.jpg"} />;
         case 'docx':
-            return <FileTextOutlined />;
+            return <Image width={40} src={"public/images/word.jpg"} />;
         case 'pdf':
-            return <FilePdfOutlined />;
+            return <Image width={40} src={"public/images/pdf.jpg"} />;
         case 'xls':
+            return <Image width={40} src={"public/images/excel.jpg"} />;
         case 'xlsx':
-            return <FileExcelOutlined />;
+            return <Image width={40} src={"public/images/excel.jpg"} />;
         default:
-            return <FileOutlined />;
+            return <Image width={40} src={"public/images/txt.jpg"} />;
     }
   };
   const FileItem = ({ file }) => {
     const url = file.urls[0]; // Lấy URL đầu tiên từ mảng urls
     const fileExtension = url.substring(url.lastIndexOf('.') + 1).toLowerCase(); // Lấy phần mở rộng của tệp từ URL
     const IconComponent = getFileIcon(fileExtension);
-    const fileName = url.substring(url.lastIndexOf('/') + 1).toLowerCase();
+    let fileName = url.substring(url.lastIndexOf('/') + 1).toLowerCase();
+    fileName = fileName.length > 30 ? fileName.substring(0, 30) + "..." : fileName;
+    // return (
+    //     <div>
+    //         {IconComponent}
+    //         <span style = {{marginLeft: '10px'}}>{fileName}</span>
+    //     </div>
+    // );
     return (
-        <div>
-            {IconComponent}
-            <span>{fileName}</span>
-        </div>
+      <div className="info-list">
+        <button className="common-group" style={{ display: 'flex', alignItems: 'center' }}>
+          {IconComponent}
+          <span style={{ marginLeft: '10px', textAlign: 'left' }}>{fileName}</span>
+        </button>
+      </div>
     );
   };
 
@@ -49,16 +58,9 @@ const ViewAllFilesModal = ({ files }) => {
       </div>
       {expanded && (
          <div style={{ marginTop: '10px', marginLeft: '10px', flexDirection: 'column', alignItems: 'center' }}>
-          {/* <List
-            height={200}
-            itemCount={files.length}
-            itemSize={80}
-            width={300}
-          > */}
              {files.map((item, index) => (
                   <FileItem key={index} file={item} />
               ))}
-          {/* </List> */}
           <Button style = {{width: '95%', backgroundColor: '#F5F5F5', marginTop: '10px'}}>Xem tất cả</Button>
         </div>
       )}                
