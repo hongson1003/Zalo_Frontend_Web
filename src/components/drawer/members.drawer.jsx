@@ -77,8 +77,12 @@ const MemberDrawer = ({ children, chat }) => {
                 {children}
             </span>
             <Drawer
-                title="Thành viên" onClose={onClose} open={open}
+                title="Thành viên"
+                onClose={onClose}
+                open={open}
                 className='member-drawer'
+                destroyOnClose
+                getContainer={false}
             >
                 <div className='member-group-container'>
                     <AddMemberModal
@@ -92,7 +96,7 @@ const MemberDrawer = ({ children, chat }) => {
 
                     <div className='list-members'>
                         <p className="title">Danh sách thành viên ({chat?.participants?.length})</p>
-                        <div className='content'>
+                        <div className='content-member'>
                             {participants?.length > 0 && participants?.map((participant, index) => {
                                 return (
                                     <div className='member-box' key={participant?.id} >

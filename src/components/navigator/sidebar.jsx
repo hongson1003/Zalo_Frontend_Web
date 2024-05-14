@@ -8,7 +8,6 @@ import {
 import './sidebar.scss'
 import { Popover } from 'antd';
 import { useDispatch, useSelector } from "react-redux";
-import { ConfigProvider } from 'antd';
 import { changeKeyMenu, changeKeySubMenu, logoutSuccess } from "../../redux/actions/app.action";
 import { useNavigate } from "react-router-dom";
 import axios from '../../utils/axios';
@@ -82,6 +81,7 @@ const Friends = () => {
 const Messages = () => {
     const chat = useSelector(state => state.appReducer?.subNav);
     const dispatch = useDispatch();
+    const appState = useSelector(state => state.appReducer);
 
     const onlyRef = useRef(false);
     const [count, setCount] = useState(0);
@@ -102,14 +102,27 @@ const Messages = () => {
         }
     }, []);
 
+    const handleReceiveMessageSocket = (data) => {
+        if (chat?._id !== data?.chat) {
+            fetchChatNotRead();
+        }
+    };
+
+
     useEffect(() => {
-        socket.then(socket => {
-            socket.on('receive-message', (data) => {
-                if (chat._id !== data?.chatId)
-                    fetchChatNotRead();
-            })
-        })
-    }, []);
+        if (appState.isConnectedSocket) {
+            socket.then((socket) => {
+                socket.on('receive-message', handleReceiveMessageSocket);
+            });
+        }
+
+        return () => {
+            socket.then((socket) => {
+                socket.off('receive-message', handleReceiveMessageSocket);
+            });
+        };
+    }, [appState, chat]);
+
 
 
 

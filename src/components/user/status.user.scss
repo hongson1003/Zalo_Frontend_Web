@@ -19,6 +19,7 @@
         flex-direction: column;
         justify-content: center;
         gap: 5px;
+        color: #333;
         .username {
             font-weight: 600;
         }
@@ -28,6 +29,11 @@
             align-items: center;
             justify-content: flex-start;
             gap: 5px;
+            &:hover {
+                cursor: pointer;
+                color: #0f0e0e;
+                font-weight: 600;
+            }
         }
     }
 }

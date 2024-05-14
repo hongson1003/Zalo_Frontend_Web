@@ -50,6 +50,7 @@ const ChooseFileUploadPopover = ({ children, sendFileOrFolder, sendVideo, sendAu
             <Popover
                 content={React.createElement(content, { sendFileOrFolder, sendVideo, sendAudio })}
                 forceRender
+                trigger={"click"}
             >
                 <span>{children}</span>
             </Popover>

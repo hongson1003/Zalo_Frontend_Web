@@ -12,7 +12,7 @@ const homeSublayout = () => {
 
 
     const [sizes, setSizes] = useState([
-        '25%',
+        '280px',
         'auto',
     ]);
     const [visibleLeft, setVisibleLeft] = useState('d-show');
@@ -21,32 +21,32 @@ const homeSublayout = () => {
 
     const [windowSize, setWindowSize] = useState([0, 0]);
 
-    useLayoutEffect(() => {
-        function updateSize() {
-            setWindowSize([window.innerWidth, window.innerHeight]);
-        }
-        window.addEventListener('resize', updateSize);
-        updateSize();
-        return () => window.removeEventListener('resize', updateSize);
-    }, []);
+    // useLayoutEffect(() => {
+    //     function updateSize() {
+    //         setWindowSize([window.innerWidth, window.innerHeight]);
+    //     }
+    //     window.addEventListener('resize', updateSize);
+    //     updateSize();
+    //     return () => window.removeEventListener('resize', updateSize);
+    // }, []);
 
-    useEffect(() => {
-        setVisibleLeft('d-show')
-        if (windowSize[0] < 750 && windowSize[0]) {
-            if (!stateApp?.subNav) {
-                setVisibleRight('d-none')
-                setSizes(['100%', '0.75%'])
-            } else {
-                setVisibleRight('d-show')
-                setSizes(['0px', '100%'])
-            }
-        } else {
-            if (windowSize[0] > 800) {
-                setVisibleRight('d-show')
-                setSizes(['25%', 'auto'])
-            }
-        }
-    }, [windowSize, stateApp?.subNav?._id]);
+    // useEffect(() => {
+    //     setVisibleLeft('d-show')
+    //     if (windowSize[0] < 750 && windowSize[0]) {
+    //         if (!stateApp?.subNav) {
+    //             setVisibleRight('d-none')
+    //             setSizes(['100%', '0.75%'])
+    //         } else {
+    //             setVisibleRight('d-show')
+    //             setSizes(['0px', '100%'])
+    //         }
+    //     } else {
+    //         if (windowSize[0] > 800) {
+    //             setVisibleRight('d-show')
+    //             setSizes(['25%', 'auto'])
+    //         }
+    //     }
+    // }, [windowSize, stateApp?.subNav?._id]);
 
     const handleOnDoubleClick = () => {
         if (sizes[0] !== '0px') {
@@ -56,17 +56,17 @@ const homeSublayout = () => {
         }
     }
 
-    useEffect(() => {
-        const split = document.getElementsByClassName('split-sash-content')[0];
-        if (split) {
-            split.addEventListener('dblclick', handleOnDoubleClick)
-        }
-        return () => {
-            if (split) {
-                split.removeEventListener('dblclick', handleOnDoubleClick)
-            }
-        }
-    }, [sizes[0]])
+    // useEffect(() => {
+    //     const split = document.getElementsByClassName('split-sash-content')[0];
+    //     if (split) {
+    //         split.addEventListener('dblclick', handleOnDoubleClick)
+    //     }
+    //     return () => {
+    //         if (split) {
+    //             split.removeEventListener('dblclick', handleOnDoubleClick)
+    //         }
+    //     }
+    // }, [sizes[0]])
 
     const handleOnChange = (size) => {
         // handle resize event
@@ -122,7 +122,7 @@ const homeSublayout = () => {
                 sizes={sizes}
                 onChange={size => handleOnChange(size)}
             >
-                <Pane className={`${visibleLeft}`} minSize={280} >
+                <Pane className={`${visibleLeft}`} minSize={280} maxSize={400}>
                     <SidebarHome />
                     <Drawer
                         title="Kết quả tìm kiếm"

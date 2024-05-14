@@ -42,7 +42,7 @@ const content = ({ chat, handleOpenChange }) => {
 
     };
     const cancel = () => {
-        toast.warn('Hủy xóa hộp thoại');
+
     };
 
 

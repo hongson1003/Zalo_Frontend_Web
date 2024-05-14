@@ -22,7 +22,7 @@
                 .name {
                     font-weight: 500;
                     font-size: 16px;
-                    max-width: calc(100% - 50px);
+                    // max-width: calc(100% - 50px);
                     display: -webkit-inline-box; /* Thiết lập hiển thị theo kiểu box */
                     -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
                     -webkit-box-orient: vertical; /* Hướng hiển thị dọc */

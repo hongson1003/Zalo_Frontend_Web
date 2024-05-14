@@ -1,0 +1,48 @@
+.ant-drawer-content-wrapper {
+    width: 100% !important;
+    height: 100%;
+}
+.my-drawer-images {
+    width: 100% !important;
+    .images-drawer-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        i {
+            cursor: pointer;
+        }
+    }
+    .drawer-body {
+        .ant-tabs-nav-wrap {
+            .ant-tabs-nav-operations {
+            }
+            .ant-tabs-nav-list {
+                width: 100%;
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+                gap: 20px;
+                .ant-tabs-tab {
+                    flex: 1;
+                    margin: 0;
+                    .ant-tabs-tab-btn {
+                        width: 100%;
+                        text-align: center;
+                    }
+                }
+            }
+        }
+        .list-images {
+            display: flex;
+            flex-wrap: wrap;
+            height: fit-content;
+            overflow-y: auto;
+            overflow-x: hidden;
+            gap: 10px;
+            .image-item {
+                display: inline-block;
+                width: 30%;
+            }
+        }
+    }
+}

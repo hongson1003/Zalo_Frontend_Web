@@ -22,7 +22,6 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const dispatch = useDispatch();
     const chat = useSelector(state => state.appReducer?.subNav);
-    const [selectedChat, setSelectedChat] = useState(null);
     const [isMouse, setIsMouse] = useState(null);
     const userState = useSelector(state => state.userReducer);
 
@@ -59,28 +58,6 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
         }
     }, [chat, currentSearch, statusChat]);
 
-    // // lắng nghe sự kiện enter
-    // useEffect(() => {
-    //     const handleKeyPress = (e) => {
-    //         if (e.key === 'Enter' && !chat) {
-    //             dispatch(accessChat(chats[0]));
-    //         }
-    //     }
-    //     if (chats.length) {
-    //         window.addEventListener('keypress', handleKeyPress)
-    //     }
-    //     return () => {
-    //         window.removeEventListener('keypress', handleKeyPress)
-    //     }
-    // }, [chats.length, chat])
-
-    useEffect(() => {
-        if (user) {
-            setSelectedChat(chat);
-            fetchChats();
-        }
-    }, [chat?._id])
-
 
     useEffect(() => {
         if (chats && chats.length > 0) {
@@ -90,7 +67,7 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
                 })
             })
         }
-    }, [chats.length])
+    }, [chats.length]);
 
     // bắn chat đầu tiên
     useEffect(() => {
@@ -99,58 +76,71 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
         }
     }, [fetchChats]);
 
+    const handleTransferDisbandGroupSocket = () => {
+        console.log('Nhóm đã bị giải tán');
+        fetchChats();
+    };
+
+    const handleNewChatSocket = (data) => {
+        fetchChats();
+        setTimeout(() => {
+            socket.emit('join-room', data?._id);
+        }, 500);
+    };
+
+    const handleAddMemberSocket = (data) => {
+        if (chat?._id === data._id) {
+            dispatch(editGroup(data));
+        }
+        fetchChats();
+    };
+
+    const handleLeaveGroupSocket = (data) => {
+        console.log('Nó rời nhóm');
+        fetchChats();
+    };
+
+    const handleGrantSocket = (data) => {
+        fetchChats();
+    };
+
+    const handleReceiveMessageSocket = (data) => {
+        if (chat?._id !== data?.chat) {
+            fetchChats();
+            userState.fetchNotificationChats();
+        }
+    };
+
     useEffect(() => {
-        socket.then(socket => {
-            socket.on('transfer-disband-group', (data) => {
-                console.log('Nhóm đã bị giải tán')
-                fetchChats();
-            })
-            socket.on('new-chat', (data) => {
-                fetchChats();
-                setTimeout(() => {
-                    socket.emit('join-room', data._id);
-                }, 500);
-            })
-            socket.on('add-member', (data) => {
-                if (chat?._id === data._id) {
-                    dispatch(editGroup(data));
-                }
-                fetchChats();
-            })
-            socket.on('leave-group', data => {
-                console.log('nó rời nhóm')
-                fetchChats();
-            })
-            socket.on('grant', data => {
-                fetchChats();
-            })
-            socket.on('receive-message', data => {
-                fetchChats();
-                userState.fetchNotificationChats();
-            })
-        });
+        if (userState.fetchNotificationChats) {
+            socket.then((socket) => {
+                socket.on('transfer-disband-group', handleTransferDisbandGroupSocket);
+                socket.on('new-chat', handleNewChatSocket);
+                socket.on('add-member', handleAddMemberSocket);
+                socket.on('leave-group', handleLeaveGroupSocket);
+                socket.on('grant', handleGrantSocket);
+                socket.on('receive-message', handleReceiveMessageSocket);
+            });
+        }
 
         return () => {
-            socket.then(socket => {
-                socket.off('transfer-disband-group');
-                socket.off('new-chat');
-                socket.off('add-member');
-                socket.off('leave-group');
-                socket.off('grant');
-                socket.off('receive-message');
-            })
-        }
-
+            socket.then((socket) => {
+                socket.off('transfer-disband-group', handleTransferDisbandGroupSocket);
+                socket.off('new-chat', handleNewChatSocket);
+                socket.off('add-member', handleAddMemberSocket);
+                socket.off('leave-group', handleLeaveGroupSocket);
+                socket.off('grant', handleGrantSocket);
+                socket.off('receive-message', handleReceiveMessageSocket);
+            });
+        };
     }, [userState]);
 
+
     const handleSelectChat = (nextChat) => {
-        if ((chat?._id !== nextChat._id && selectedChat?._id !== nextChat._id) || !chat) {
-            dispatch(accessChat(nextChat));
-            setSelectedChat(nextChat);
-        }
+        dispatch(accessChat(nextChat));
     }
 
-    const handleSelectChatDebouce = _.debounce(handleSelectChat, 150);
+    const handleSelectChatDebouce = _.debounce(handleSelectChat, 270);
 
     const handleOnMouseOver = (chat) => {
         if (!isMouse)
@@ -167,28 +157,28 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
         <div className="chat-sidebar">
             {
                 chats?.length > 0 && status === STATE.RESOLVE &&
-                chats.map((chat, index) => {
+                chats.map((item, index) => {
                     return (
                         <div
-                            key={chat?._id}
-                            className={selectedChat?._id === chat?._id ? 'active-chat chat-box' : 'chat-box'}
-                            onMouseOver={() => handleOnMouseOver(chat)}
+                            key={item?._id}
+                            className={item?._id === chat?._id ? 'active-chat chat-box' : 'chat-box'}
+                            onMouseOver={() => handleOnMouseOver(item)}
                             onMouseLeave={handleOnMouseLeave}
                         >
                             <div
-                                onClick={() => handleSelectChatDebouce(chat)}
+                                onClick={() => handleSelectChatDebouce(item)}
                                 className="chat-user"
                             >
                                 <ChatUser
                                     key={index}
-                                    chat={chat}
-                                    activeKey={chat._id}
+                                    chat={item}
+                                    activeKey={item._id}
                                     fetchChats={fetchChats}
                                 />
                             </div>
                             <div className="chat-right">
                                 {
-                                    isMouse && isMouse._id === chat?._id ?
+                                    isMouse && isMouse._id === item?._id ?
                                         <ChatPopover
                                             // options
                                             chat={chat}
@@ -203,12 +193,12 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
                                         <p className="time">
                                             {
                                                 // handle time
-                                                formatTimeAgo(chat?.updatedAt)
+                                                formatTimeAgo(item?.updatedAt)
                                             }
                                         </p>
                                 }
                                 {
-                                    chat.lastedMessage && !chat?.seenBy.includes(user?.id) &&
+                                    item.lastedMessage && !item?.seenBy.includes(user?.id) &&
                                     <div className="notify">
                                         <i className="fa-solid fa-bell"></i>
                                     </div>
