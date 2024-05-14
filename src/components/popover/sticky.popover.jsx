@@ -18,8 +18,8 @@ const content = ({ handleClose, openStore, setOpenStore }) => {
     const handleStickerClick = async (stickerData) => {
         const { url } = stickerData;
         const { sendMessageFunc } = userState;
-        await sendMessageFunc(url, MESSAGES.STICKER);
         handleClose();
+        await sendMessageFunc(url, MESSAGES.STICKER);
     };
 
     const handleStoreClick = async (value) => {
@@ -42,7 +42,7 @@ const content = ({ handleClose, openStore, setOpenStore }) => {
                         stickerClick={handleStickerClick}
                         onClose={handleClose}
                         storeClick={handleStoreClick}
-                        
+
                     />
                 ) : (
                     <StoreComponent

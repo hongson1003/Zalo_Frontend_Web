@@ -21,52 +21,56 @@
             font-weight: 600;
             padding: 15px;
         }
-        .member-box {
+        .content-member {
             display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 5px 10px;
-            span {
-                display: inline-block;
-                flex: 1;
-                .member {
-                    padding: 10px;
+            flex-direction: column;
+            .member-box {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                padding: 5px 10px;
+                span {
+                    display: inline-block;
+                    flex: 1;
+                    .member {
+                        padding: 10px;
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        cursor: pointer;
+                        padding: 15px;
+                        &:hover {
+                            background-color: #eaedf0;
+                        }
+                        .name {
+                            font-size: 14px;
+                        }
+                        .role {
+                            font-size: 13px;
+                            font-weight: 590;
+                        }
+                    }
+                }
+
+                .utils {
+                    width: 16%;
                     display: flex;
+                    justify-content: flex-end;
                     align-items: center;
-                    gap: 15px;
+                    min-height: 50px;
                     cursor: pointer;
-                    padding: 15px;
+                    svg {
+                        width: 25px;
+                        height: 25px;
+                    }
+                    span {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
                     &:hover {
                         background-color: #eaedf0;
                     }
-                    .name {
-                        font-size: 14px;
-                    }
-                    .role {
-                        font-size: 13px;
-                        font-weight: 590;
-                    }
-                }
-            }
-
-            .utils {
-                width: 16%;
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-                min-height: 50px;
-                cursor: pointer;
-                svg {
-                    width: 25px;
-                    height: 25px;
-                }
-                span {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-                &:hover {
-                    background-color: #eaedf0;
                 }
             }
         }

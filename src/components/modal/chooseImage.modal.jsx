@@ -86,6 +86,7 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
     }
 
     const uploadAvatar = async (base64) => {
+        console.log('base64', base64)
         const res = await axios.put('/users/avatar', { avatar: base64 });
         if (res.errCode === 0) {
             dispatch(editUser(res.data));

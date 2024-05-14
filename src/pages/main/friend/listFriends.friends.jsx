@@ -37,7 +37,6 @@ const ListFriends = ({ data, fetchFriends }) => {
             "status": true
         });
         if (res.errCode !== -1) {
-            console.log(res)
             dispatch(changeKeyMenu(KEYITEMS.MESSAGE));
             dispatch(accessChat(res.data));
         }

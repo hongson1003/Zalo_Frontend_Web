@@ -125,52 +125,48 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
     // get all images
     const getAllImagesMessage = async () => {
-        try{
-            //console.log('chat', chat._id);
-            const limit = 10;
-            console.log('Params', limit, chat._id);
+        try {
+            const limit = 8;
             const res = await axios.get(`/chat/message/getAllPicture?chatId=${chat._id}&limit=${limit}`);
-            
-            if(res.errCode === 0) {
-                console.log('Oke');
+            if (res.errCode === 0) {
                 setListImageMessage(res?.data);
             } else {
                 setListImageMessage([]);
             }
-        } catch(err) {
+        } catch (err) {
             console.log(err);
         }
 
     }
     // get all files
     const getAllFilesMessage = async () => {
-        try{
+        try {
             const limit = 10;
             const res = await axios.get(`/chat/message/getAllFile?chatId=${chat._id}&limit=${limit}`);
-            if(res.errCode === 0) {
+            if (res.errCode === 0) {
                 setListFileMessage(res?.data);
             } else {
                 setListFileMessage([]);
             }
-        } catch(err) {
+        } catch (err) {
             console.log(err);
         }
     }
     // get all links
     const getAllLinksMessage = async () => {
-        try{
+        try {
             const limit = 10;
             const res = await axios.get(`/chat/message/getAllLink?chatId=${chat._id}&limit=${limit}`);
-            if(res.errCode === 0) {
+            if (res.errCode === 0) {
                 setListLinkMessage(res?.data);
             } else {
                 setListLinkMessage([]);
             }
-        } catch(err) {
+        } catch (err) {
             console.log(err);
         }
     }
-    
+
     useEffect(() => {
         if (!chat._id) {
             dispatch(changeKeySubMenu(''));
@@ -262,63 +258,76 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         if (chat?._id) {
             getAllImagesMessage();
         }
-    }, [messages])
+    }, [chat._id]);
+
     useEffect(() => {
         if (chat?._id) {
             getAllFilesMessage();
         }
-    }, [messages])
-    useEffect(() => {
-        if (chat?._id) {
-            getAllLinksMessage();
-        }
-    }, [messages])
+    }, [chat._id]);
+
+    // useEffect(() => {
+    //     if (chat?._id) {
+    //         getAllLinksMessage();
+    //     }
+    // }, [chat._id]);
+
     // socket
-    useEffect(() => {
-        if (receiveOnly.current === false) {
-            socket.then(socket => {
-                socket.on('typing', (room) => {
-                    if (room === chat._id)
-                        setTyping(true);
-                })
-                socket.on('finish-typing', (room) => {
-                    if (room === chat._id)
-                        setTyping(false);
-                });
-                socket.on('receive-message', data => {
-                    if (data._id && data.chat === chat._id) {
-                        setMessages(prev => [...prev, data]);
-                        fetchMessagePaginate();
-                        scroolRef.current.scrollTop = scroolRef.current?.scrollHeight || 0;
-                    }
-                })
-                socket.on('receive-modify-message', data => {
-                    if (data._id && data.chat === chat._id) {
-                        handleModifyMessage(data);
-                    }
-                })
-                socket.on('change-background', data => {
-                    if (data.chatId === chat._id) {
-                        setBackgroundUrl(data.background.url);
-                        setHeaderColor(COLOR_BACKGROUND[data.background.headerColor]);
-                        setMessageColor(COLOR_BACKGROUND[data.background.messageColor]);
-                    }
-                })
-            })
-            receiveOnly.current = true;
+    const handleTypingSocket = (room) => {
+        if (room === chat._id) {
+            setTyping(true);
         }
+    };
+
+    const handleFinishTypingSocket = (room) => {
+        if (room === chat._id) {
+            setTyping(false);
+        }
+    };
+
+    const handleReceiveMessageSocket = (data) => {
+        console.log('chat.main.jsx', data);
+        if (data._id && data.chat === chat._id) {
+            setMessages((prev) => [...prev, data]);
+            fetchMessagePaginate();
+            scroolRef.current.scrollTop = scroolRef.current?.scrollHeight || 0;
+        }
+    };
+
+    const handleReceiveModifyMessageSocket = (data) => {
+        if (data._id && data.chat === chat._id) {
+            handleModifyMessage(data);
+        }
+    };
+
+    const handleChangeBackgroundSocket = (data) => {
+        if (data.chatId === chat._id) {
+            setBackgroundUrl(data.background.url);
+            setHeaderColor(COLOR_BACKGROUND[data.background.headerColor]);
+            setMessageColor(COLOR_BACKGROUND[data.background.messageColor]);
+        }
+    };
+
+    useEffect(() => {
+        socket.then((socket) => {
+            socket.on('typing', handleTypingSocket);
+            socket.on('finish-typing', handleFinishTypingSocket);
+            socket.on('receive-message', handleReceiveMessageSocket);
+            socket.on('receive-modify-message', handleReceiveModifyMessageSocket);
+            socket.on('change-background', handleChangeBackgroundSocket);
+        });
 
         return () => {
-            socket.then(socket => {
-                receiveOnly.current = false;
-                socket.off('typing');
-                socket.off('finish-typing');
-                socket.off('receive-message');
-                socket.off('receive-modify-message');
-                socket.off('change-background');
-            })
-        }
-    }, [messages, chat])
+            socket.then((socket) => {
+                socket.off('typing', handleTypingSocket);
+                socket.off('finish-typing', handleFinishTypingSocket);
+                socket.off('receive-message', handleReceiveMessageSocket);
+                socket.off('receive-modify-message', handleReceiveModifyMessageSocket);
+                socket.off('change-background', handleChangeBackgroundSocket);
+            });
+        };
+    }, [chat]);
+
 
     // footer
     useEffect(() => {
@@ -839,6 +848,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         setSent(STATE.RESOLVE);
         if (res.errCode === 0) {
             userState.fetchChats();
+            getAllImagesMessage();
             socket.then(socket => {
                 setSent(STATE.RESOLVE);
                 socket.emit('send-message', res.data);
@@ -1041,7 +1051,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
             <div className="chat-container"
             >
                 <div className="left chat-item">
-                    <header style={{ color: headerColor }}>
+                    <header>
                         {
                             isLoadingFetch &&
                             <ReactLoading
@@ -1055,7 +1065,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                         <div className="friend-info">
                             <StatusUser chat={chat} />
                         </div>
-                        <div className="tools" style={{ color: headerColor }}>
+                        <div className="tools" >
                             <Menu
                                 onClick={onClick}
                                 selectedKeys={[current]}
@@ -1134,7 +1144,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     if (message.type === MESSAGES.NOTIFY) {
                                         return (
                                             <div className="notify-message" key={message._id}>
-                                                <p style={{ color: headerColor }}>{message.content}</p>
+                                                <p>{message.content}</p>
                                             </div>
                                         )
                                     } else if (message.type === MESSAGES.NEW_FRIEND) {
@@ -1744,7 +1754,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                 {
                     show &&
                     <div className="right chat-item" ref={moreInfoRef}>
-                        <header style={{ color: headerColor }}>
+                        <header>
                             {
                                 chat?.type === CHAT_STATUS.PRIVATE_CHAT ?
                                     <h3 className="title">Thông tin trò chuyện</h3> :
@@ -1890,54 +1900,54 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     </button>
                                 </div>
                             }
-                            <div className="hyphen"></div>
                             {
                                 listImageMessage.length > 0 &&
-                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="view-all-image">
-                                    <ViewAllPicturesModal message = {listImageMessage}>
+                                    <div className="hyphen"></div>
+                                    <ViewAllPicturesModal
+                                        message={listImageMessage}
+                                    >
                                     </ViewAllPicturesModal>
                                 </div>
                             }
-                            <div className="hyphen"></div>
                             {
                                 listFileMessage.length > 0 &&
-                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="view-all-file">
-                                    <ViewAllFilesModal files = {listFileMessage}> 
+                                    <div className="hyphen"></div>
+                                    <ViewAllFilesModal files={listFileMessage}>
                                     </ViewAllFilesModal>
                                 </div>
                             }
-                            <div className="hyphen"></div>
                             {
-                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="view-all-link">
-                                    <ViewAllLinksModal links = {{}}>
+                                    <div className="hyphen"></div>
+                                    <ViewAllLinksModal links={{}}>
                                     </ViewAllLinksModal>
                                 </div>
                             }
-                            <div className="hyphen"></div>
                             {
                                 chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="security-setting">
+                                    <div className="hyphen"></div>
                                     <ViewSettingModal>
                                     </ViewSettingModal>
                                 </div>
                             }
-                            <div className="hyphen"></div>
 
                             {
                                 chat.type === CHAT_STATUS.GROUP_CHAT &&
                                 chat.administrator === user.id &&
-                                <div className="grant-adminstrator">
-                                    <GrantModal
-                                        chat={chat}
-                                    >
-                                        <Button>Chuyền trưởng nhóm</Button>
-                                    </GrantModal>
-                                </div>
+                                <>
+                                    <div className="hyphen"></div>
+                                    <div className="grant-adminstrator">
+                                        <GrantModal
+                                            chat={chat}
+                                        >
+                                            <Button>Chuyền trưởng nhóm</Button>
+                                        </GrantModal>
+                                    </div>
+                                </>
                             }
-
 
                             {
                                 chat.type === CHAT_STATUS.GROUP_CHAT &&
