@@ -8,7 +8,7 @@ import { InstagramOutlined, EditOutlined } from '@ant-design/icons';
 import 'react-medium-image-zoom/dist/styles.css'
 import moment from 'moment';
 import Zoom from 'react-medium-image-zoom'
-import { STATE } from '../../redux/types/type.app';
+import { STATE } from '../../redux/types/app.type';
 import { useDispatch, useSelector } from 'react-redux';
 import { socket } from '../../utils/io';
 import { toast } from 'react-toastify';
@@ -17,8 +17,8 @@ import ChooseImageModal from './chooseImage.modal';
 import { DatePicker, Radio } from 'antd'
 import dayjs from 'dayjs';
 import { editUser } from '../../redux/actions/app.action';
-import TrackSound from '../ultils/trackSound.utils.component';
-
+import { sendNotifyToChatRealTime } from '../../utils/handleChat';
+import { MESSAGES } from '../../redux/types/user.type';
 
 const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: myHandleOk, fetchFriendShip, itsMe, readOnly, refuseAction }) => {
     const [profile, setProfile] = useState(null);
@@ -77,14 +77,19 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     };
 
     const fetchInfoUser = async (userId) => {
-        let res = await axios.get(`/users/profile?userId=${userId}`)
-        if (res.errCode === 0) {
-            setInfo(pre => ({
-                ...pre,
-                gender: profile?.gender,
-                dob: res.data?.birthdate && dayjs(res.data.birthdate)
-            }))
-            setProfile(res.data);
+        try {
+            let res = await axios.get(`/users/profile?userId=${userId}`)
+            if (res.errCode === 0) {
+                setInfo(pre => ({
+                    ...pre,
+                    gender: profile?.gender,
+                    dob: res.data?.birthdate && dayjs(res.data.birthdate)
+                }))
+                setProfile(res.data);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -117,23 +122,28 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     }
 
     const handleUpdate = async () => {
-        const data = {
-            id: user?.id,
-            userName: newInfo.name,
-            gender: newInfo.gender,
-            birthdate: newInfo.dob
+        try {
+            const data = {
+                id: user?.id,
+                userName: newInfo.name,
+                gender: newInfo.gender,
+                birthdate: newInfo.dob
+            }
+            const res = await axios.put('/users/updateInfor', data);
+            if (res.errCode === 0) {
+                toast.success('Cập nhật thông tin thành công');
+                dispatch(editUser({
+                    ...user,
+                    userName: data?.userName,
+                }));
+                fetchInfoUser(user?.id);
+            } else
+                toast.error(res.message);
+            setEditing(STATE.PENDING);
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
-        const res = await axios.put('/users/updateInfor', data);
-        if (res.errCode === 0) {
-            toast.success('Cập nhật thông tin thành công');
-            dispatch(editUser({
-                ...user,
-                userName: data?.userName,
-            }));
-            fetchInfoUser(user?.id);
-        } else
-            toast.error(res.message);
-        setEditing(STATE.PENDING);
     }
 
     const renderFooter = () => {
@@ -177,18 +187,23 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     }
 
     const handleAddFriend = async () => {
-        const res = await axios.post('/users/friendShip',
-            { userId: friendData?.id, content: description }
-        );
-        if (res.errCode === 0) {
-            fetchFriendShip(friendData?.id);
-            socket.then(socket => {
-                socket.emit('send-add-friend', friendData);
-            })
-            toast.success('Đã gửi lời mời kết bạn');
-            handleCancel();
-        } else {
-            toast.warn(res.message);
+        try {
+            const res = await axios.post('/users/friendShip',
+                { userId: friendData?.id, content: description }
+            );
+            if (res.errCode === 0) {
+                fetchFriendShip(friendData?.id);
+                socket.then(socket => {
+                    socket.emit('send-add-friend', friendData);
+                })
+                toast.success('Đã gửi lời mời kết bạn');
+                handleCancel();
+            } else {
+                toast.warn(res.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -229,36 +244,78 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     }
 
     const handleRecallAddFriend = async () => {
-        const res = await axios.post('/users/friendShip',
-            { userId: friendData?.id, content: description }
-        );
-        if (res.errCode === 3) {
-            fetchFriendShip(friendData?.id);
-        } else {
-            toast.warn(res.message);
+        try {
+            const res = await axios.post('/users/friendShip',
+                { userId: friendData?.id, content: description }
+            );
+            if (res.errCode === 3) {
+                fetchFriendShip(friendData?.id);
+            } else {
+                toast.warn(res.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
     const handleJoinChat = async () => {
         // return;
         // validate
-        const res = await axios.post('/chat/access', {
-            "type": "PRIVATE_CHAT",
-            "participants": [user?.id, friendData?.id],
-            "status": true
-        });
-        if (res.errCode == 0 || res.errCode === 2) {
-            socket.then(socket => {
-                socket.emit('new-chat', res.data);
-            })
-            dispatch(accessChat(res.data));
-            handleCancel();
+        try {
+            const res = await axios.post('/chat/access', {
+                "type": "PRIVATE_CHAT",
+                "participants": [user?.id, friendData?.id],
+                "status": true
+            });
+            if (res.errCode == 0 || res.errCode === 2) {
+                socket.then(socket => {
+                    socket.emit('new-chat', res.data);
+                })
+                dispatch(accessChat(res.data));
+                handleCancel();
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     };
 
     const handleOnChangeBackgroundCover = (avatar, image) => {
         setBackgroundCoverPreview(avatar);
         setImage(image);
+    }
+
+    const handleAcceptAddFriend = async () => {
+        try {
+            const res = await axios.put('/users/friendShip', {
+                userId: friendData?.id,
+            });
+            if (res.errCode === 0) {
+                fetchFriendShip(friendData?.id);
+                const accessRes = await axios.post('/chat/access', {
+                    type: "PRIVATE_CHAT",
+                    participants: [user?.id, friendData?.id],
+                });
+                if (accessRes.errCode === 0) {
+                    await sendNotifyToChatRealTime(
+                        accessRes.data._id,
+                        'Hai bạn đã trở thành bạn bè, hãy nhắn tin cho nhau để hiểu rõ nhau hơn ╮ (. ❛ ᴗ ❛.) ╭',
+                        MESSAGES.NEW_FRIEND);
+                    socket.then(socket => {
+                        socket.emit('join-room', accessRes.data._id);
+                        socket.emit('new-chat', accessRes.data);
+                    })
+                    dispatch(accessChat(accessRes.data));
+                }
+                toast.success('Chấp nhận lời mời kết bạn thành công');
+            } else {
+                toast.error(res.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+        }
     }
 
 
@@ -301,9 +358,9 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 {
                     friendData &&
                     <div className='background-cover'>
-                        <TrackSound
+                        {/* <TrackSound
                             fetchInfoUser={fetchInfoUser}
-                        />
+                        /> */}
 
                         {
                             !refuseAction &&
@@ -417,12 +474,12 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                                 friendShipData?.status === STATE.RESOLVE ?
                                     <Button type='default'>Gọi điện</Button> :
                                     (
-                                        friendShipData?.status === STATE.REJECT || !friendShipData?.status ?
+                                        friendShipData?.status === STATE.REJECT || !friendShipData?.status || friendShipData?.status === STATE.OLD_FRIEND ?
                                             <Button type='default' onClick={() => handleNeedAddFriend()}>Thêm bạn</Button> :
                                             (
                                                 friendShipData?.status === STATE.PENDING && friendShipData?.sender?.id === user?.id ?
                                                     <Button type='default' onClick={() => handleRecallAddFriend()}>Thu hồi lời mời</Button> :
-                                                    <Button type='default' onClick={() => handleAddFriend()}>Chấp nhận kết bạn</Button>
+                                                    <Button type='default' onClick={() => handleAcceptAddFriend()}>Chấp nhận kết bạn</Button>
                                             )
                                     )
                             }

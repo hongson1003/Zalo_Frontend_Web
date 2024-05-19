@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import axios from '../utils/axios';
 import { socket } from './io';
 
@@ -18,18 +19,24 @@ export const getDetailListMembers = (listMembers) => {
 }
 
 export const sendNotifyToChatRealTime = async (chatId, message, type) => {
-    const res = await axios.post('/chat/notify', {
-        chatId,
-        message,
-        type
-    })
-    if (res.errCode === 0) {
-        socket.then(socket => {
-            socket.emit('send-message', res.data);
-            return true;
+    try {
+        const res = await axios.post('/chat/notify', {
+            chatId,
+            message,
+            type
         })
+        if (res.errCode === 0) {
+            socket.then(socket => {
+                socket.emit('send-message', res.data);
+                return res;
+            })
+        }
+        return res;
+    } catch (error) {
+        console.log(error);
+        toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+        return null;
     }
-    return false;
 }
 
 export function formatTimeAgo(timestamp) {

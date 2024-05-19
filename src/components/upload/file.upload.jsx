@@ -1,7 +1,7 @@
 import React from "react";
 import './file.upload.scss';
 import { Button } from 'antd';
-import { FILE_TYPE } from "../../redux/types/type.user";
+import { FILE_TYPE } from "../../redux/types/user.type";
 
 const File = ({ url, name, children, type, size, className }) => {
     return (

@@ -16,10 +16,11 @@ import { Input } from 'antd';
 import LeaveGroupModal from './leaveGroup.modal';
 import DisbandGroupModal from './disbandGroup.modal';
 import { getDetailListMembers } from '../../utils/handleChat';
+import { toast } from 'react-toastify';
 
 const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
 
-const InforGroupModal = ({ children }) => {
+const InforGroupModal = ({ children, selectChat }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const chat = useSelector(state => state.appReducer?.subNav);
     const dispatch = useDispatch();
@@ -30,6 +31,7 @@ const InforGroupModal = ({ children }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [name, setName] = useState(chat?.name || '');
     const user = useSelector(state => state.appReducer?.userInfo?.user);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchGroupPhotos = async () => {
@@ -51,34 +53,42 @@ const InforGroupModal = ({ children }) => {
     };
 
     const handleOk = async () => {
-        let url = '';
-        if (file) {
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-                method: 'POST',
-                body: file,
+        try {
+            setIsLoading(true);
+            let url = '';
+            if (file) {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+                    method: 'POST',
+                    body: file,
+                });
+                const { secure_url } = await response.json();
+                setGroupPhoto(secure_url);
+                url = secure_url;
+            } else {
+                url = groupPhoto;
+            }
+            if (!url && name === chat?.name) {
+                setIsModalOpen(false);
+                return;
+            }
+            // save to db
+            const res = await axios.put('/chat/group', {
+                _id: chat._id,
+                groupPhoto: url,
+                name
             });
-            const { secure_url } = await response.json();
-            setGroupPhoto(secure_url);
-            url = secure_url;
-        } else {
-            url = groupPhoto;
-        }
-        if (!url && name === chat?.name) {
+            if (res.errCode === 0) {
+                dispatch(editGroup(res.data));
+                stateUser.fetchChats();
+            }
+            setIsLoading(false);
+            setIsEditing(false);
             setIsModalOpen(false);
-            return;
+        } catch (error) {
+            console.log(error);
+            setIsLoading(false);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
-        // save to db
-        const res = await axios.put('/chat/group', {
-            _id: chat._id,
-            groupPhoto: url,
-            name
-        });
-        if (res.errCode === 0) {
-            dispatch(editGroup(res.data));
-            stateUser.fetchChats();
-        }
-        setIsEditing(false);
-        setIsModalOpen(false);
     };
 
     const handleCancel = () => {
@@ -86,7 +96,7 @@ const InforGroupModal = ({ children }) => {
     };
 
     const handleOnSend = () => {
-        dispatch(accessChat(chat));
+        dispatch(accessChat(selectChat || chat));
         handleCancel();
     }
 
@@ -94,9 +104,6 @@ const InforGroupModal = ({ children }) => {
         setIsEditing(prev => !prev);
     }
 
-    const handleLeaveGroup = () => {
-        console.log('leave group');
-    }
 
 
     return (
@@ -108,14 +115,24 @@ const InforGroupModal = ({ children }) => {
                     }, 50);
                 }}
             >{children}</span >
-            <Modal title="Thông tin nhóm" open={isModalOpen}
+            <Modal
+                title="Thông tin nhóm"
+                open={isModalOpen}
                 onOk={handleOk} onCancel={handleCancel} width={400} centered
                 style={{ borderRadius: "12px", overflow: "auto", padding: "0px" }}
+                footer={!selectChat && [
+                    <Button key="back" onClick={handleCancel}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleOk} loading={isLoading}>
+                        Lưu
+                    </Button>,
+                ]}
             >
                 <div className='info-group-container'>
                     <div className='header'>
                         <AvatarUser
-                            image={groupPhoto || chat?.groupPhoto || '/images/group.png'}
+                            image={selectChat?.groupPhoto || groupPhoto || chat?.groupPhoto || '/images/group.png'}
                             size={50}
                             zoom
                         >
@@ -136,11 +153,11 @@ const InforGroupModal = ({ children }) => {
                                     onChange={(e) => setName(e.target.value)}
                                     spellCheck={false}
                                 /> :
-                                <p>{name}</p>
+                                <p>{selectChat?.name || name}</p>
                         }
                         <p>
                             {
-                                !isEditing ?
+                                !selectChat && !isEditing ?
                                     <i className="fa-solid fa-pen-to-square" onClick={handleEditName}></i> :
                                     <i className="fa-solid fa-check" onClick={handleEditName}></i>
                             }
@@ -168,23 +185,28 @@ const InforGroupModal = ({ children }) => {
                         </div>
                     </div>
 
-                    <div className='setting-group-item'>
-                        <i className="fa-solid fa-gear"></i>
-                        <p>Quản lý nhóm</p>
-                    </div>
+                    {
+                        !selectChat &&
+                        <>
+                            <div className='setting-group-item'>
+                                <i className="fa-solid fa-gear"></i>
+                                <p>Quản lý nhóm</p>
+                            </div>
 
-                    <div className='out-group-item'>
-                        <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                        {
-                            user?.id === chat?.administrator ?
-                                <DisbandGroupModal>
-                                    <p onClick={handleLeaveGroup}>Rời nhóm</p>
-                                </DisbandGroupModal> :
-                                <LeaveGroupModal>
-                                    <p onClick={handleLeaveGroup}>Rời nhóm</p>
-                                </LeaveGroupModal>
-                        }
-                    </div>
+                            <div className='out-group-item'>
+                                <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                                {
+                                    user?.id === chat?.administrator ?
+                                        <DisbandGroupModal>
+                                            <p>Giải tán nhóm</p>
+                                        </DisbandGroupModal> :
+                                        <LeaveGroupModal>
+                                            <p >Rời nhóm</p>
+                                        </LeaveGroupModal>
+                                }
+                            </div>
+                        </>
+                    }
                 </div>
 
             </Modal >

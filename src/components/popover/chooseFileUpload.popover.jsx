@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Button, Popover } from 'antd';
 import './chooseFileUpload.popover.scss';
+import { toast } from "react-toastify";
 
 
 const content = ({ sendFileOrFolder, sendVideo, sendAudio }) => {
@@ -15,6 +16,11 @@ const content = ({ sendFileOrFolder, sendVideo, sendAudio }) => {
         } else {
             sendFileOrFolder(files);
         }
+
+    }
+
+    const handleChooseFolder = () => {
+        toast.warn("Chức năng chưa được hỗ trợ")
     }
 
     return (
@@ -32,7 +38,7 @@ const content = ({ sendFileOrFolder, sendVideo, sendAudio }) => {
                     <span>Chọn File</span>
                 </div>
             </label>
-            <div className="folder-item item">
+            <div className="folder-item item" onClick={handleChooseFolder}>
                 <span>
                     <i className="fa-regular fa-folder"></i>
                 </span>
@@ -50,11 +56,11 @@ const ChooseFileUploadPopover = ({ children, sendFileOrFolder, sendVideo, sendAu
             <Popover
                 content={React.createElement(content, { sendFileOrFolder, sendVideo, sendAudio })}
                 forceRender
-                trigger={"click"}
+                trigger={['click', 'hover']}
             >
                 <span>{children}</span>
             </Popover>
-        </React.Fragment>
+        </React.Fragment >
     );
 }
 

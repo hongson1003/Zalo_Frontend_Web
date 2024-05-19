@@ -1,14 +1,9 @@
 import { Popover } from "antd";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { SearchComponent, PickerComponent, StoreComponent, UnifiedComponent } from 'stipop-react-sdk'
-import { MESSAGES } from "../../redux/types/type.user";
+import { StoreComponent, UnifiedComponent } from 'stipop-react-sdk'
+import { MESSAGES } from "../../redux/types/user.type";
 import './sticky.popover.scss';
-const TYPE_STICKER = {
-    PICKER: 'PICKER',
-    STORE: 'STORE',
-    SEARCH: 'SEARCH',
-}
 
 
 const content = ({ handleClose, openStore, setOpenStore }) => {
@@ -23,6 +18,7 @@ const content = ({ handleClose, openStore, setOpenStore }) => {
     };
 
     const handleStoreClick = async (value) => {
+        // toast.warn('Chức năng đang phát triển');
         if (value && !openStore) {
             setOpenStore(true);
         }
@@ -42,7 +38,6 @@ const content = ({ handleClose, openStore, setOpenStore }) => {
                         stickerClick={handleStickerClick}
                         onClose={handleClose}
                         storeClick={handleStoreClick}
-
                     />
                 ) : (
                     <StoreComponent
@@ -51,16 +46,11 @@ const content = ({ handleClose, openStore, setOpenStore }) => {
                             userId: user?.id,
                             countryCode: 'VN',
                             lang: 'vi',
+                            animated: 'N',
                         }}
-                        downloadParams={
-                            {
-                                apikey: import.meta.env.VITE_APP_API_KEY_STIPOP,
-                                userId: user?.id,
-                                countryCode: 'VN',
-                                lang: 'vi',
-                                isPurchase: false,
-                            }
-                        }
+                        downloadParams={{
+                            isPurchase: 'N',
+                        }}
                         onClose={() => setOpenStore(false)}
                     />
                 )

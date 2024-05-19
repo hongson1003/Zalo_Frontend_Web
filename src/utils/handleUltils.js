@@ -1,4 +1,4 @@
-import { FILE_TYPE } from "../redux/types/type.user";
+import { FILE_TYPE } from "../redux/types/user.type";
 
 export const compareSizes = (sizes1, sizes2) => {
     const m1 = +sizes1.split('px')[0];

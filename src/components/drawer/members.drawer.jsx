@@ -8,6 +8,10 @@ import axios from '../../utils/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { editGroup } from '../../redux/actions/app.action';
+import { socket } from '../../utils/io';
+import { sendNotifyToChatRealTime } from '../../utils/handleChat';
+import { MESSAGES } from '../../redux/types/user.type';
+import { toast } from 'react-toastify';
 
 const Content = ({ friendData, friendShipData, handleRemoveMember }) => {
 
@@ -55,19 +59,33 @@ const MemberDrawer = ({ children, chat }) => {
     }, [chat]);
 
     const handleRemoveMember = async (member) => {
-        const res = await axios.put('/chat/message/deleteMemer', {
-            chatId: chat._id,
-            memberId: member.id
-        });
-        if (res.errCode === 0) {
-            dispatch(editGroup(res.data));
-            setParticipants(participants.filter(participant => participant.id !== member.id));
+        try {
+            const res = await axios.put('/chat/message/deleteMemer', {
+                chatId: chat._id,
+                memberId: member.id
+            });
+            if (res.errCode === 0) {
+                sendNotifyToChatRealTime(chat._id, `${user.userName} đã xóa ${member.userName} ra khỏi nhóm !`, MESSAGES.NOTIFY);
+                socket.then(socket => {
+                    socket.emit('delete-member', res.data);
+                })
+                dispatch(editGroup(res.data));
+                setParticipants(participants.filter(participant => participant.id !== member.id));
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Đã có lỗi xảy ra');
         }
     }
 
     const handleselectedFriendShipMember = async (member) => {
-        const res = await axios.get('/users/friendShip?userId=' + member.id);
-        setSelectedFriendShipMember(res.data);
+        try {
+            const res = await axios.get('/users/friendShip?userId=' + member.id);
+            setSelectedFriendShipMember(res.data);
+        } catch (error) {
+            console.log(error);
+            toast.error('Đã có lỗi xảy ra');
+        }
     }
 
 

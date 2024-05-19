@@ -6,9 +6,10 @@ import { useSearchParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import axios from '../utils/axios';
 import { getFriend } from "../utils/handleChat";
-import { STATE } from "../redux/types/type.app";
+import { STATE } from "../redux/types/app.type";
 import { getFirstLetters } from "../utils/handleUltils";
 import { Howl, Howler } from 'howler';
+import { toast } from "react-toastify";
 
 var sound = new Howl({
     src: ['/videos/chuong-apple.mp3']
@@ -29,11 +30,16 @@ const VideoCallWindow = () => {
     const answerButtonRef = useRef(null);
 
     const fetchFriend = async () => {
-        const res = await axios.get(`/chat/access?chatId=${chatRef.current}`);
-        if (res.errCode === 0) {
-            const data = res.data;
-            const friend = getFriend(user, data.participants);
-            setFriend(friend);
+        try {
+            const res = await axios.get(`/chat/access?chatId=${chatRef.current}`);
+            if (res.errCode === 0) {
+                const data = res.data;
+                const friend = getFriend(user, data.participants);
+                setFriend(friend);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -45,7 +51,6 @@ const VideoCallWindow = () => {
         }
         if (onlyRef.current === false) {
             peer = new Peer(user.peerId);
-
             peer.on('open', id => {
                 socket.then(socket => {
                     socket.emit('join-call', {
@@ -72,24 +77,21 @@ const VideoCallWindow = () => {
                         peer.on('call', call => {
                             setIncommingCall(call);
                             sound.play();
+                            answerButtonRef.current.addEventListener('click', handleAnswer);
 
-                            const handleAnswer = () => {
+                            function handleAnswer() {
                                 call.answer(stream);
+                                setState(STATE.RESOLVE);
                                 call.on('stream', userVideoStream => {
-                                    remoteVideoRef.current.srcObject = userVideoStream;
+                                    setTimeout(() => {
+                                        remoteVideoRef.current.srcObject = userVideoStream;
+                                    }, 500);
                                 })
                                 sound.stop();
                                 setTimeout(() => {
                                     setState(STATE.RESOLVE);
                                 }, 100);
-                                socket.on('reject-call', data => {
-                                    handleRejectCall();
-                                })
-
                             }
-
-                            answerButtonRef.current.addEventListener('click', handleAnswer);
-
                         })
 
                         socket.on('user-connected', peerId => {
@@ -101,9 +103,17 @@ const VideoCallWindow = () => {
             });
             onlyRef.current = true;
         }
+        return () => {
+            // peer.destroy();
+        }
     }, []);
 
     const connectToNewUser = (peerId, stream) => {
+        socket.then(socket => {
+            socket.on('reject-call', data => {
+                window.close();
+            })
+        })
         const call = peer.call(peerId, stream);
         call.on('stream', userVideoStream => {
             setState(STATE.RESOLVE);
@@ -116,7 +126,6 @@ const VideoCallWindow = () => {
 
 
     const handleRejectCall = () => {
-        console.log('reject');
         // Tắt kết nối
         socket.then(socket => {
             socket.emit('reject-call', {
@@ -165,11 +174,19 @@ const VideoCallWindow = () => {
                     </div>
                     {
                         isCalled.current === 'true' && state === STATE.PENDING ?
-                            <div className='item phone-accept'
-                                ref={answerButtonRef}
-                            >
-                                <i className="fa-solid fa-phone"></i>
-                            </div> :
+                            <>
+                                <div
+                                    className='item phone-accept'
+                                    ref={answerButtonRef}
+                                >
+                                    <i className="fa-solid fa-phone"></i>
+                                </div>
+                                <div className='item phone-reject'
+                                    onClick={() => handleRejectCall()}
+                                >
+                                    <i className="fa-solid fa-phone"></i>
+                                </div>
+                            </> :
                             <div className='item phone-reject'
                                 onClick={() => handleRejectCall()}
                             >

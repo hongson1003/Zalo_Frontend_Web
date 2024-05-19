@@ -1,5 +1,5 @@
-import { CALL, CHAT_STATUS, NOTIFICATIONS } from "../types/type.user";
-import { STATE } from '../types/type.app';
+import { CALL, CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/user.type";
+import { STATE } from '../types/app.type';
 
 
 export function notificationsFriends(notifications) {
@@ -45,6 +45,14 @@ export function fetchChatsFunc(func) {
         type: CHAT_STATUS.FETCH,
         payload: func
     }
+}
+
+export function fetchMessages(func) {
+    return {
+        type: MESSAGES.FETCH_MESSAGES_FUNC,
+        payload: func
+    }
+
 }
 
 export function addMemberCall(member) {

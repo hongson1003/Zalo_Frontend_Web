@@ -1,4 +1,4 @@
-import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from '../types/type.app';
+import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from '../types/app.type';
 
 export function loginStart(userInfo) {
     return {

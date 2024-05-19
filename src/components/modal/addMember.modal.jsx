@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Modal } from 'antd';
 import './addMember.modal.scss';
-import { Checkbox } from 'antd';
+import { Checkbox, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 const CheckboxGroup = Checkbox.Group;
 import axios from '../../utils/axios';
@@ -9,6 +9,8 @@ import { getFriend, sendNotifyToChatRealTime } from '../../utils/handleChat';
 import AvatarUser from '../user/avatar';
 import { editGroup } from '../../redux/actions/app.action';
 import { socket } from '../../utils/io';
+import { MESSAGES } from '../../redux/types/user.type';
+import { toast } from 'react-toastify';
 
 const AddMemberModal = ({ children, chat }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,41 +22,58 @@ const AddMemberModal = ({ children, chat }) => {
     const [plainOptions, setPlainOptions] = useState([]);
 
     const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(false);
 
 
     const showModal = () => {
         setIsModalOpen(true);
     };
     const handleOk = async () => {
-        const res = await axios.put('/chat/addMembers', {
-            chatId: chat._id,
-            members: checkedList.map(item => JSON.parse(item).id)
-        })
-        const kq = await sendNotifyToChatRealTime(chat._id,
-            `${user?.userName} đã thêm thành viên vào nhóm.`
-        )
-        if (res.errCode === 0 && kq === true) {
-            dispatch(editGroup(res.data));
-            socket.then(socket => {
-                socket.emit('add-member', res.data);
-                stateUser.fetchChats();
-            })
+        try {
+            setIsLoading(true);
+            const res = await axios.put('/chat/addMembers', {
+                chatId: chat._id,
+                members: checkedList.map(item => JSON.parse(item).id)
+            });
+            const contentMessage = checkedList.map(item => JSON.parse(item).userName).join(', ');
+            await sendNotifyToChatRealTime(
+                chat._id,
+                `${user?.userName} đã thêm ${contentMessage} vào nhóm.`,
+                MESSAGES.NOTIFY
+            )
+            if (res.errCode === 0) {
+                dispatch(editGroup(res.data));
+                socket.then(socket => {
+                    socket.emit('add-member', res.data);
+                    stateUser.fetchChats();
+                })
+            }
+            setIsLoading(false);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error('Failed to add member:', error);
+            setIsLoading(false);
+            toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!');
         }
-        setIsModalOpen(false);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
     };
 
     const fetchFriends = async () => {
-        const res = await axios.get('/users/friends?page=1&limit=10');
-        if (res.errCode === 0) {
-            const data = res.data;
-            const friends = [];
-            data.forEach(item => {
-                friends.push(getFriend(user, [item.sender, item.receiver]));
-            })
-            setPlainOptions(friends);
+        try {
+            const res = await axios.get('/users/friends?page=1&limit=10');
+            if (res.errCode === 0) {
+                const data = res.data;
+                const friends = [];
+                data.forEach(item => {
+                    friends.push(getFriend(user, [item.sender, item.receiver]));
+                })
+                setPlainOptions(friends);
+            }
+        } catch (error) {
+            console.error('Failed to fetch friends:', error);
+            toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!');
         }
     }
 
@@ -63,6 +82,7 @@ const AddMemberModal = ({ children, chat }) => {
         const members = [];
         participants.forEach(item => {
             if (user.id !== item.id) {
+                delete item.lastedOnline;
                 members.push(JSON.stringify(item));
             }
         })
@@ -77,8 +97,7 @@ const AddMemberModal = ({ children, chat }) => {
     useEffect(() => {
         fetchFriends();
         handleCheckMembersChat();
-    }, [chat._id])
-
+    }, [chat])
 
 
     return (
@@ -91,7 +110,19 @@ const AddMemberModal = ({ children, chat }) => {
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
-                forceRender={true}
+                footer={[
+                    <Button key="back" onClick={handleCancel}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary"
+                        onClick={handleOk}
+                        loading={isLoading}
+                        disabled={disableMembers === checkedList}
+                    >
+                        Xác nhận
+                    </Button>,
+                ]}
+                destroyOnClose
             >
                 <div className='add-member-modal'>
                     <header>
@@ -102,6 +133,7 @@ const AddMemberModal = ({ children, chat }) => {
                             plainOptions && plainOptions.length > 0 &&
                             <CheckboxGroup
                                 options={plainOptions.map(item => {
+                                    delete item.lastedOnline;
                                     return {
                                         label:
                                             <div className='group-friend'>

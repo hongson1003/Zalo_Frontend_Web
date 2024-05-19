@@ -5,6 +5,7 @@ import { Tabs } from 'antd';
 import axios from '../../utils/axios';
 import { useSelector } from 'react-redux';
 import { Image } from 'antd';
+import { toast } from 'react-toastify';
 
 
 const items = [
@@ -32,9 +33,14 @@ function ListImages() {
     const chat = useSelector(state => state.appReducer?.subNav);
 
     const fetchAllImages = async () => {
-        const res = await axios.get(`/chat/message/getAllPicture?chatId=${chat._id}&limit=${limit}`);
-        if (res.errCode === 0) {
-            setImages(res.data);
+        try {
+            const res = await axios.get(`/chat/message/getAllPicture?chatId=${chat._id}&limit=${limit}`);
+            if (res.errCode === 0) {
+                setImages(res.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch images:', error);
+            toast.error('Đã có lỗi xảy ra');
         }
     }
 

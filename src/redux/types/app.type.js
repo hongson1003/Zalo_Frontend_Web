@@ -23,6 +23,7 @@ export const STATE = {
     ACCESS_CHAT: 'ACCESS_CHAT',
     EDIT_USER: 'EDIT_USER',
     EDIT_GROUP: 'EDIT_GROUP',
+    OLD_FRIEND: 'OLD_FRIEND',
 }
 
 export const SOCKET = {

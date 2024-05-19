@@ -33,6 +33,8 @@ const MicModal = ({ children, sendAudio }) => {
     };
     const handleCancel = () => {
         setIsModalOpen(false);
+        setIsRecording(false);
+        setFile(null);
     };
 
     const handleOnClick = () => {
@@ -87,6 +89,7 @@ const MicModal = ({ children, sendAudio }) => {
                         Gửi
                     </Button>,
                 ]}
+                destroyOnClose
             >
                 <div className="mic-container">
                     <div className="mic-item" onClick={handleOnClick}>

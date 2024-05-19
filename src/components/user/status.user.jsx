@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import AvatarUser from './avatar';
 import "./status.user.scss";
 import InforUserModal from "../modal/inforUser.modal";
-import { CHAT_STATUS } from "../../redux/types/type.user";
+import { CHAT_STATUS } from "../../redux/types/user.type";
 import InfoGroupModal from "../modal/infoGroup.modal";
 import { getDetailListMembers, getFriend } from "../../utils/handleChat";
 import { useSelector } from "react-redux";
 import axios from '../../utils/axios';
 import { socket } from "../../utils/io";
 import { accessTimeBefore } from "../../utils/handleUltils";
+import { toast } from "react-toastify";
 
 const StatusUser = ({ chat }) => {
     const user = useSelector(state => state.appReducer.userInfo.user);
@@ -16,9 +17,14 @@ const StatusUser = ({ chat }) => {
     const [statusUser, setStatusUser] = useState(null);
 
     const fetchFriendShip = async (userId) => {
-        const res = await axios.get(`/users/friendShip?userId=${userId}`);
-        if (res.errCode === 0) {
-            setFriendShipData(res.data);
+        try {
+            const res = await axios.get(`/users/friendShip?userId=${userId}`);
+            if (res.errCode === 0) {
+                setFriendShipData(res.data);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Có lỗi xảy ra khi lấy thông tin bạn bè");
         }
     }
 

@@ -10,7 +10,7 @@ import axios, { setAuthorizationAxios } from '../utils/axios';
 import { loginSuccess } from '../redux/actions/app.action';
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
-import { STATE } from "../redux/types/type.app";
+import { STATE } from "../redux/types/app.type";
 import AvatarUser from '../components/user/avatar';
 
 
@@ -124,12 +124,17 @@ const VerifyComponent = (props) => {
     }
 
     const verifyUser = async (id, phoneNumber) => {
-        let rs = await axios.post('/auth/verify', {
-            id, phoneNumber
-        });
-        if (rs.errCode === 0) {
-            setAuthorizationAxios(rs.data.access_token);
-            return loginSuccess(rs.data);
+        try {
+            let rs = await axios.post('/auth/verify', {
+                id, phoneNumber
+            });
+            if (rs.errCode === 0) {
+                setAuthorizationAxios(rs.data.access_token);
+                return loginSuccess(rs.data);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Đã có lỗi xảy ra');
         }
     }
 

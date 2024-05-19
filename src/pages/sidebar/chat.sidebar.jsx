@@ -3,7 +3,7 @@ import axios from '../../utils/axios';
 import ChatUser from "../../components/user/chat.user";
 import { socket } from "../../utils/io";
 import { toast } from "react-toastify";
-import { STATE } from "../../redux/types/type.app";
+import { STATE } from "../../redux/types/app.type";
 import { accessChat, fetchChatsFunc } from "../../redux/actions/user.action";
 import { useDispatch, useSelector } from "react-redux";
 import _ from 'lodash';
@@ -11,10 +11,9 @@ import { editGroup } from "../../redux/actions/app.action";
 import './chat.sidebar.scss';
 import { formatTimeAgo, getFriend } from "../../utils/handleChat";
 import ChatPopover from "../../components/popover/chat.popover";
-import { FILTER } from "../../redux/types/type.user";
+import { FILTER } from "../../redux/types/user.type";
 
-const ChatSidebar = ({ current: currentSearch, statusChat }) => {
-
+const ChatSidebar = ({ current: currentSearch, statusChat, setStatusChat }) => {
 
     const [chats, setChats] = useState([]);
     const [limit, setLimit] = useState(10);
@@ -24,39 +23,80 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
     const chat = useSelector(state => state.appReducer?.subNav);
     const [isMouse, setIsMouse] = useState(null);
     const userState = useSelector(state => state.userReducer);
+    const [visible, setVisible] = useState(false);
+    const containerRef = useRef(null);
 
-    useEffect(() => {
-        fetchChats();
-    }, [currentSearch, statusChat])
+    const handleOpenPopover = (e) => {
+        setVisible(true);
+    }
 
+    const handleClosePopover = () => {
+        setVisible(false);
+    }
+
+    const handleRightClick = (e) => {
+        if (e) {
+            e.preventDefault();
+            handleOpenPopover();
+        }
+    }
+
+    const handleMouseOut = (e) => {
+        if (e?.relatedTarget?.className !== 'chat-popover')
+            handleClosePopover();
+    }
     const fetchChats = useCallback(async () => {
-        const res = await axios.get(`/chat/pagination?limit=${limit}`);
-        if (res.errCode === 0) {
-            // filter
-            let filterChats = res.data;
+        try {
+            const res = await axios.get(`/chat/pagination?limit=${limit}`);
+            if (res.errCode === 0) {
+                // filter
+                let filterChats = res.data;
 
-            if (statusChat === FILTER.NOT_READ) {
-                filterChats = filterChats.filter(item => !item.seenBy.includes(user.id));
+                if (statusChat === FILTER.NOT_READ) {
+                    filterChats = filterChats.filter(item => !item.seenBy.includes(user.id));
+                }
+
+                if (currentSearch) {
+                    filterChats = filterChats.filter(item => {
+                        const friend = getFriend(user, item.participants);
+                        return (item.name || friend?.userName).toLowerCase().includes(currentSearch.toLowerCase());
+                    })
+                }
+
+                setChats(filterChats);
+                setStatus(STATE.RESOLVE);
+            } else {
+                setStatus(STATE.REJECT);
             }
-
-            if (currentSearch) {
-                filterChats = filterChats.filter(item => {
-                    const friend = getFriend(user, item.participants);
-                    return (item.name || friend?.userName).toLowerCase().includes(currentSearch.toLowerCase());
-                })
-            }
-
-            setChats(filterChats);
-
-            if (chat) {
-                const currentChat = res.data.find(item => item._id === chat._id);
-                dispatch(accessChat({ ...currentChat }));
-            }
-            setStatus(STATE.RESOLVE);
-        } else {
+        } catch (error) {
             setStatus(STATE.REJECT);
+            console.log('error', error);
+            toast.error('Có lỗi xảy ra');
         }
     }, [chat, currentSearch, statusChat]);
+
+
+    useEffect(() => {
+        if (statusChat === FILTER.NOT_READ && chats.length === 0) {
+            setStatusChat(FILTER.ALL);
+        }
+    }, [chats]);
+
+
+    useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.addEventListener('contextmenu', handleRightClick);
+            containerRef.current.addEventListener('mouseleave', handleMouseOut);
+        }
+
+        return () => {
+            if (containerRef.current) {
+                containerRef.current.removeEventListener('contextmenu', handleRightClick);
+                containerRef.current.removeEventListener('mouseleave', handleMouseOut);
+            }
+
+        }
+    }, [visible])
 
 
     useEffect(() => {
@@ -76,6 +116,10 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
         }
     }, [fetchChats]);
 
+    useEffect(() => {
+        fetchChats();
+    }, [fetchChats, statusChat])
+
     const handleTransferDisbandGroupSocket = () => {
         console.log('Nhóm đã bị giải tán');
         fetchChats();
@@ -83,9 +127,9 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
 
     const handleNewChatSocket = (data) => {
         fetchChats();
-        setTimeout(() => {
+        socket.then(socket => {
             socket.emit('join-room', data?._id);
-        }, 500);
+        });
     };
 
     const handleAddMemberSocket = (data) => {
@@ -96,7 +140,6 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
     };
 
     const handleLeaveGroupSocket = (data) => {
-        console.log('Nó rời nhóm');
         fetchChats();
     };
 
@@ -111,6 +154,33 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
         }
     };
 
+    const handleOnChangeBackgroundSocket = (data) => {
+        const chatId = data?.chatId;
+        const background = data?.background;
+        const prevChats = [...chats];
+        const index = prevChats.findIndex(item => item._id === chatId);
+        if (index !== -1) {
+            prevChats[index].background = background;
+            setChats(prevChats);
+        }
+    }
+
+    const handleDeletedMemberSocket = (data) => {
+        if (chat?._id === data._id) {
+            const participants = data.participants;
+            if (!participants.find(item => item.id === user.id)) {
+                dispatch(accessChat(null));
+                fetchChats();
+                toast.warn('Bạn đã bị xóa khỏi nhóm ' + data.name);
+            } else {
+                dispatch(editGroup(data));
+            }
+        } else {
+            toast.warn('Bạn đã bị xóa khỏi nhóm ' + data.name);
+            fetchChats();
+        }
+    }
+
     useEffect(() => {
         if (userState.fetchNotificationChats) {
             socket.then((socket) => {
@@ -120,6 +190,8 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
                 socket.on('leave-group', handleLeaveGroupSocket);
                 socket.on('grant', handleGrantSocket);
                 socket.on('receive-message', handleReceiveMessageSocket);
+                socket.on('change-background', handleOnChangeBackgroundSocket);
+                socket.on('delete-member', handleDeletedMemberSocket);
             });
         }
 
@@ -131,6 +203,8 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
                 socket.off('leave-group', handleLeaveGroupSocket);
                 socket.off('grant', handleGrantSocket);
                 socket.off('receive-message', handleReceiveMessageSocket);
+                socket.off('change-background', handleOnChangeBackgroundSocket);
+                socket.off('delete-member', handleDeletedMemberSocket);
             });
         };
     }, [userState]);
@@ -140,7 +214,7 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
         dispatch(accessChat(nextChat));
     }
 
-    const handleSelectChatDebouce = _.debounce(handleSelectChat, 270);
+    const handleSelectChatDebouce = useCallback(_.debounce(handleSelectChat, 250), []);
 
     const handleOnMouseOver = (chat) => {
         if (!isMouse)
@@ -154,7 +228,7 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
 
 
     return (
-        <div className="chat-sidebar">
+        <div className="chat-sidebar" ref={containerRef}>
             {
                 chats?.length > 0 && status === STATE.RESOLVE &&
                 chats.map((item, index) => {
@@ -181,7 +255,10 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
                                     isMouse && isMouse._id === item?._id ?
                                         <ChatPopover
                                             // options
-                                            chat={chat}
+                                            chat={item}
+                                            visible={visible}
+                                            onClose={handleClosePopover}
+                                            onOpen={handleOpenPopover}
                                         >
                                             <div className="ultils">
                                                 <div className="ultils-item">
@@ -198,7 +275,7 @@ const ChatSidebar = ({ current: currentSearch, statusChat }) => {
                                         </p>
                                 }
                                 {
-                                    item.lastedMessage && !item?.seenBy.includes(user?.id) &&
+                                    !item?.seenBy.includes(user?.id) &&
                                     <div className="notify">
                                         <i className="fa-solid fa-bell"></i>
                                     </div>

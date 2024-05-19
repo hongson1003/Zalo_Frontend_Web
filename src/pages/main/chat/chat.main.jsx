@@ -13,10 +13,9 @@ import { socket } from "../../../utils/io";
 import { toast } from "react-toastify";
 import _ from 'lodash';
 import ReactLoading from 'react-loading';
-import { STATE } from "../../../redux/types/type.app";
+import { STATE } from "../../../redux/types/app.type";
 import TextareaAutosize from 'react-textarea-autosize';
-import StickyPopover from '../../../components/popover/sticky.popover';
-import { CHAT_STATUS, FILE_TYPE, MESSAGES } from "../../../redux/types/type.user";
+import { CHAT_STATUS, FILE_TYPE, MESSAGES } from "../../../redux/types/user.type";
 import ChangeBackgroundModal from "../../../components/modal/changeBackground.modal";
 import MessageChat from "./message.chat";
 import { customizeFile, getLinkDownloadFile, getPreviewImage, getTimeFromDate } from '../../../utils/handleUltils';
@@ -49,12 +48,16 @@ import ViewAllPicturesModal from "../../../components/modal/viewAllPictures.moda
 import ViewAllFilesModal from "../../../components/modal/viewAllFile.modal";
 import ViewAllLinksModal from "../../../components/modal/viewAllLink.modal";
 import ViewSettingModal from "../../../components/modal/securitySetting.modal";
+import LeaveGroupModal from "../../../components/modal/leaveGroup.modal";
+import ChatTogetherDrawer from "../../../components/drawer/chatTogether.drawer";
+import LinkJoinGroupModal from "../../../components/modal/linkJoinGroup.modal";
+import { fetchMessages } from "../../../redux/actions/user.action";
 
 
 const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const chat = useSelector(state => state.appReducer.subNav);
     const moreInfoRef = useRef(null);
-    const [show, setShow] = useState(true);
+    const [show, setShow] = useState(localStorage.getItem('show') === 'true' ? true : false);
     const [showEmoij, setShowEmoij] = useState(false);
     const [messages, setMessages] = useState([]);
     const [limit, setLimit] = useState(30);
@@ -73,7 +76,6 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const [isLoadingFetch, setIsLoadingFetch] = useState(false);
     const [listImageMessage, setListImageMessage] = useState([]);
     const [listFileMessage, setListFileMessage] = useState([]);
-    const [listLinkMessage, setListLinkMessage] = useState([]);
     // Menu
     const [current, setCurrent] = useState('');
     const [headerColor, setHeaderColor] = useState(COLOR_BACKGROUND.BLACK);
@@ -85,35 +87,52 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     const [hasText, setHasText] = useState(false);
     const [listImage, setListImage] = useState([]);
     const userState = useSelector(state => state.userReducer);
-    const listMessageIsPinRef = useRef([]);
-    const [listMessageIsPinState, setListMessageIsPinState] = useState(listMessageIsPinRef.current);
-    const [hasPin, setHasPin] = useState(false);
+    const [listMessageIsPinState, setListMessageIsPinState] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const searchRef = useRef(null);
     const [openReply, setOpenReply] = useState(false);
     const [messageReply, setMessageReply] = useState(null);
+    const [totalChatTogethers, setTotalChatTogethers] = useState([]);
+    const leftRef = useRef(null);
+    const [windowSize, setWindowSize] = useState(window.innerWidth);
 
     // text để theo dõi thay đổi
     const [text, setText] = useState('');
     // Emoij
 
     useEffect(() => {
-        if (messages.length === 0) {
+        // filter is Pin
+        let messagesIsPin = messages.filter(item => {
+            return item.isPin === true && item.ref;
+        });
+        if (messagesIsPin.length > 0) {
+            setListMessageIsPinState(messagesIsPin);
+        } else {
+            setListMessageIsPinState([]);
+        }
+    }, [messages]);
+
+
+    useEffect(() => {
+        if (chat?._id && messages.length === 0) {
             fetchNotification();
         }
-        if (chat.seenBy.includes(user?._id) === false) {
+        if (chat?._id && chat.seenBy.includes(user?.id) === false) {
             updateSeenBy();
         }
-        return () => {
-        }
-    }, [messages.length]);
+    }, [messages.length, chat, userState.fetchChats]);
 
     const updateSeenBy = async () => {
-        const res = await axios.put('/chat/seen', {
-            chatId: chat._id,
-        });
-        if (res.errCode === 0) {
-            userState.fetchChats();
+        try {
+            const res = await axios.put('/chat/seen', {
+                chatId: chat._id,
+            });
+            if (res.errCode === 0 && userState.fetchChats) {
+                userState.fetchChats();
+            }
+        } catch (error) {
+            console.log(error);
+            toast.warn('Có lỗi xảy ra, không thể cập nhật trạng thái đã xem');
         }
     }
 
@@ -153,19 +172,19 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         }
     }
     // get all links
-    const getAllLinksMessage = async () => {
-        try {
-            const limit = 10;
-            const res = await axios.get(`/chat/message/getAllLink?chatId=${chat._id}&limit=${limit}`);
-            if (res.errCode === 0) {
-                setListLinkMessage(res?.data);
-            } else {
-                setListLinkMessage([]);
-            }
-        } catch (err) {
-            console.log(err);
-        }
-    }
+    // const getAllLinksMessage = async () => {
+    //     try {
+    //         const limit = 10;
+    //         const res = await axios.get(`/chat/message/getAllLink?chatId=${chat._id}&limit=${limit}`);
+    //         if (res.errCode === 0) {
+    //             setListLinkMessage(res?.data);
+    //         } else {
+    //             setListLinkMessage([]);
+    //         }
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // }
 
     useEffect(() => {
         if (!chat._id) {
@@ -174,25 +193,42 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         textAreaRef.current.focus();
     }, [chat]);
 
+    const handleReceiveReaction = (data) => {
+        handleModifyMessage(data);
+    };
+
+    const handleTransferDisbandGroup = (data) => {
+        fetchMessagePaginate();
+        dispatch(editGroup(data));
+    };
+
+    const handleLeaveGroup = (data) => {
+        if (chat?._id === data.chatId) {
+            const participants = chat.participants.filter(item => item.id !== data.userId);
+            dispatch(editGroup({ ...chat, participants }));
+        }
+    };
+
+    const handleGrant = (data) => {
+        dispatch(editGroup(data));
+    };
+
     useEffect(() => {
         socket.then(socket => {
-            socket.on('receive-reaction', (data) => {
-                handleModifyMessage(data);
-            })
-            socket.on('transfer-disband-group', (data) => {
-                fetchMessagePaginate();
-                dispatch(editGroup(data));
-            })
-            socket.on('leave-group', data => {
-                if (chat?._id === data.chatId) {
-                    const participants = chat.participants.filter(item => item.id !== data.userId);
-                    dispatch(editGroup({ ...chat, participants }));
-                }
-            })
-            socket.on('grant', data => {
-                dispatch(editGroup(data));
-            })
+            socket.on('receive-reaction', handleReceiveReaction);
+            socket.on('transfer-disband-group', handleTransferDisbandGroup);
+            socket.on('leave-group', handleLeaveGroup);
+            socket.on('grant', handleGrant);
         });
+
+        return () => {
+            socket.then(socket => {
+                socket.off('receive-reaction', handleReceiveReaction);
+                socket.off('transfer-disband-group', handleTransferDisbandGroup);
+                socket.off('leave-group', handleLeaveGroup);
+                socket.off('grant', handleGrant);
+            });
+        }
     }, [])
     // get file
     useEffect(() => {
@@ -227,10 +263,25 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                 event.preventDefault();
                 handleClickMoreInfor();;
             }
+            if (event.ctrlKey && event.key === 'M' && event.ctrlKey) {
+                event.preventDefault();
+                handleClickMoreInfor();
+            }
+
+            if (key === ' ' && event.ctrlKey) {
+                event.preventDefault();
+                textAreaRef.current.focus();
+            }
+        }
+        const handleFocusTextArea = (e) => {
+            if (e.ctrlKey && e.key === ' ')
+                textAreaRef.current.focus();
         }
         document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keydown', handleFocusTextArea);
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keydown', handleFocusTextArea);
         }
     }, [])
 
@@ -286,7 +337,6 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     };
 
     const handleReceiveMessageSocket = (data) => {
-        console.log('chat.main.jsx', data);
         if (data._id && data.chat === chat._id) {
             setMessages((prev) => [...prev, data]);
             fetchMessagePaginate();
@@ -302,11 +352,16 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
     const handleChangeBackgroundSocket = (data) => {
         if (data.chatId === chat._id) {
-            setBackgroundUrl(data.background.url);
-            setHeaderColor(COLOR_BACKGROUND[data.background.headerColor]);
-            setMessageColor(COLOR_BACKGROUND[data.background.messageColor]);
+            setBackgroundUrl(data.background?.url);
+        } else {
+            setBackgroundUrl('');
         }
     };
+
+    const handlePinMessageSocket = (data) => {
+        if (data._id === chat._id)
+            fetchMessagePaginate();
+    }
 
     useEffect(() => {
         socket.then((socket) => {
@@ -315,6 +370,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
             socket.on('receive-message', handleReceiveMessageSocket);
             socket.on('receive-modify-message', handleReceiveModifyMessageSocket);
             socket.on('change-background', handleChangeBackgroundSocket);
+            socket.on('pin-message', handlePinMessageSocket);
         });
 
         return () => {
@@ -324,6 +380,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                 socket.off('receive-message', handleReceiveMessageSocket);
                 socket.off('receive-modify-message', handleReceiveModifyMessageSocket);
                 socket.off('change-background', handleChangeBackgroundSocket);
+                socket.off('pin-message', handlePinMessageSocket);
             });
         };
     }, [chat]);
@@ -419,104 +476,88 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         }
     }, [scroolRef.current]);
 
-    useEffect(() => {
-        if (moreInfoRef.current) {
-            const width = moreInfoRef.current.clientWidth;
-            if (width < 300) {
-                setShow(false);
-            } else {
-                setShow(true);
-            }
-
-        }
-    }, [moreInfoRef.current])
-
-    useEffect(() => {
-
-        if (listMessageIsPinRef.current.length !== listMessageIsPinState.length ||
-            listMessageIsPinRef.current.some(item => (item.ref === null || !item.ref))
-        ) {
-            // lọc lại các ref !== null
-            listMessageIsPinRef.current = listMessageIsPinRef.current.filter(item => item.ref !== null);
-            setListMessageIsPinState(listMessageIsPinRef.current);
-            if (listMessageIsPinRef.length > 0) {
-                setHasPin(true);
-            } else {
-                setHasPin(false);
-            }
-        }
-    }, [listMessageIsPinRef.current]);
-
     // handle file
     const sendImage = async (preview, file) => {
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type: MESSAGES.IMAGES,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            urls: [preview],
-            unViewList: [],
-            isDelete: false,
-            reactions: []
-        };
-        setMessages(prev => [...prev, createMessage]);
-        setSent(STATE.PENDING);
-        // upload ảnh lên cloudinary
-        const url = await uploadToCloudiry(file);
-        // save vào db
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            urls: [url]
-        });
-        setSent(STATE.RESOLVE);
-        if (res.errCode === 0) {
-            userState.fetchChats();
-            socket.then(socket => {
-                setSent(STATE.RESOLVE);
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
-        } else {
+        try {
+            const ObjectId = objectId();
+            const createMessage = {
+                _id: ObjectId,
+                chat: chat,
+                type: MESSAGES.IMAGES,
+                sender: user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                urls: [preview],
+                unViewList: [],
+                isDelete: false,
+                reactions: []
+            };
+            setMessages(prev => [...prev, createMessage]);
+            setSent(STATE.PENDING);
+            // upload ảnh lên cloudinary
+            const url = await uploadToCloudiry(file);
+            // save vào db
+            const res = await axios.post('/chat/message', {
+                ...createMessage,
+                urls: [url]
+            });
+            setSent(STATE.RESOLVE);
+            if (res.errCode === 0) {
+                userState.fetchChats();
+                socket.then(socket => {
+                    setSent(STATE.RESOLVE);
+                    socket.emit('send-message', res.data);
+                    socket.emit('finish-typing', chat._id);
+                })
+            } else {
+                setSent(STATE.REJECT);
+                toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            }
+        } catch (error) {
+            console.log(error);
             setSent(STATE.REJECT);
-            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            toast.warn('Không thể gửi tin nhắn, ' + error.message);
+
         }
     }
 
     const sendImagesFromBase64 = async (urls) => {
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type: MESSAGES.IMAGES,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            urls: urls,
-            unViewList: [],
-            isDelete: false,
-            reactions: []
-        };
-        setMessages(prev => [...prev, createMessage]);
-        setSent(STATE.PENDING);
-        // save ảnh vào db
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            urls
-        });
-        setSent(STATE.RESOLVE);
-        if (res.errCode === 0) {
-            userState.fetchChats();
-            socket.then(socket => {
-                setSent(STATE.RESOLVE);
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
-        } else {
+        try {
+            const ObjectId = objectId();
+            const createMessage = {
+                _id: ObjectId,
+                chat: chat,
+                type: MESSAGES.IMAGES,
+                sender: user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                urls: urls,
+                unViewList: [],
+                isDelete: false,
+                reactions: []
+            };
+            setMessages(prev => [...prev, createMessage]);
+            setSent(STATE.PENDING);
+            // save ảnh vào db
+            const res = await axios.post('/chat/message', {
+                ...createMessage,
+                urls
+            });
+            setSent(STATE.RESOLVE);
+            if (res.errCode === 0) {
+                userState.fetchChats();
+                socket.then(socket => {
+                    socket.emit('send-message', res.data);
+                    socket.emit('finish-typing', chat._id);
+                })
+            } else {
+                setSent(STATE.REJECT);
+                toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            }
+        } catch (error) {
+            console.log(error);
             setSent(STATE.REJECT);
-            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            toast.warn('Không thể gửi tin nhắn, ' + error.message);
         }
     }
 
@@ -526,14 +567,25 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
 
 
     const fetchMessagePaginate = async () => {
-        if (!chat._id) return;
-        const res = await axios.get(`/chat/message/pagination?chatId=${chat._id}&limit=${limit}`);
-        if (res.errCode === 0) {
-            setMessages(res?.data);
-        } else {
+        try {
+            if (!chat._id) return;
+            const res = await axios.get(`/chat/message/pagination?chatId=${chat._id}&limit=${limit}`);
+            if (res.errCode === 0) {
+                const data = res.data;
+                setMessages(data);
+            } else {
+                setMessages([]);
+            }
+        } catch (error) {
+            console.log(error);
             setMessages([]);
+            toast.warn('Có lỗi xảy ra, không thể lấy tin nhắn');
         }
     }
+
+    useEffect(() => {
+        dispatch(fetchMessages(fetchMessagePaginate));
+    }, [chat?._id])
 
     const handleModifyMessage = (message) => {
         setMessages(prev => prev.map(item => {
@@ -597,70 +649,100 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     }
 
     const sendMessage = async (data, type) => {
-        if (!data.trim()) {
-            if (listImage.length === 0)
-                return;
-            else {
-                sendImagesFromBase64(listImage);
-            }
-            setListImage([]);
-            setText('');
-            return;
-        }
-        setHasText(false);
-        if (textAreaRef.current) {
-            textAreaRef.current.value = '';
-        }
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            unViewList: [],
-            isDelete: false,
-            reactions: []
-        }
-        if (openReply) {
-            createMessage.reply = messageReply;
-        }
-        if (type === MESSAGES.TEXT) {
-            createMessage.content = data;
-            if (listImage.length > 0) {
-                createMessage.urls = [...listImage];
+        try {
+            if (!data.trim()) {
+                if (listImage.length === 0)
+                    return;
+                else {
+                    sendImagesFromBase64(listImage);
+                }
                 setListImage([]);
+                setText('');
+                return;
             }
-
-        } else if (type === MESSAGES.STICKER)
-            createMessage.sticker = data;
-        setMessages(prev => [...prev, createMessage]);
-        setText('');
-        setOpenReply(false);
-        setSent(STATE.PENDING);
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            chatId: chat._id,
-        });
-        if (res.errCode === 0) {
-            userState.fetchChats();
-            scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
-            socket.then(socket => {
-                setSent(STATE.RESOLVE);
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
-            // fetchMessagePaginate();
-        } else {
+            setHasText(false);
+            if (textAreaRef.current) {
+                textAreaRef.current.value = '';
+            }
+            const ObjectId = objectId();
+            const createMessage = {
+                _id: ObjectId,
+                chat: chat,
+                type,
+                sender: user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                unViewList: [],
+                isDelete: false,
+                reactions: []
+            }
+            if (openReply) {
+                createMessage.reply = messageReply;
+            }
+            if (type === MESSAGES.TEXT) {
+                createMessage.content = data;
+                if (listImage.length > 0) {
+                    createMessage.urls = [...listImage];
+                    setListImage([]);
+                }
+            } else if (type === MESSAGES.STICKER)
+                createMessage.sticker = data;
+            setMessages(prev => [...prev, createMessage]);
+            setText('');
+            setOpenReply(false);
+            setSent(STATE.PENDING);
+            const res = await axios.post('/chat/message', {
+                ...createMessage,
+                chatId: chat._id,
+            });
+            if (res.errCode === 0) {
+                socket.then(socket => {
+                    socket.emit('send-message', res.data);
+                    socket.emit('finish-typing', chat._id);
+                    setSent(STATE.RESOLVE);
+                    userState.fetchChats();
+                    scroolRef.current.scrollTop = scroolRef.current.scrollHeight;
+                })
+                // fetchMessagePaginate();
+            } else {
+                setSent(STATE.REJECT);
+                toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            }
+        } catch (error) {
+            console.log(error);
             setSent(STATE.REJECT);
-            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            toast.warn('Không thể gửi tin nhắn, ' + error.message);
         }
     }
 
     function handleClickMoreInfor() {
         setShow(prev => !prev);
+        localStorage.setItem('show', !show);
     }
+
+    useEffect(() => {
+        if (chat) {
+            if (windowSize < 768) {
+                if (show) {
+                    leftRef.current.style.display = 'none';
+                    leftRef.current.style.width = '0px';
+                    moreInfoRef.current.style.width = '100%';
+                    moreInfoRef.current.style.maxWidth = '100%';
+                } else {
+                    leftRef.current.style.display = 'block';
+                    leftRef.current.style.width = '100%';
+                    moreInfoRef.current.style.width = '0px';
+                    moreInfoRef.current.style.maxWidth = '0px';
+                }
+            } else {
+                if (show) {
+                    moreInfoRef.current.style.width = '100%';
+                } else {
+                    moreInfoRef.current.style.width = '0px';
+                }
+            }
+        }
+    }, [show])
 
 
     const handleResize = (size, meta) => {
@@ -799,99 +881,109 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
             setMessageColor(COLOR_BACKGROUND[background.messageColor]);
             await sendNotifyToChatRealTime(chat._id, `Đã thay đổi hình nền`, MESSAGES.NOTIFY);
             fetchMessagePaginate();
-            socket.then(socket => {
-                socket.emit('change-background', { chatId: chat._id, background });
-            })
         } else {
             setBackgroundUrl('');
-            setHeaderColor(COLOR_BACKGROUND.BLACK);
-            setMessageColor(COLOR_BACKGROUND.BLACK);
-        }
+        };
+        socket.then(socket => {
+            socket.emit('change-background', { chatId: chat._id, background });
+        })
     }
 
 
     const handleOnChangeMessageImage = async (e) => {
-        const files = e.target.files;
-        const previews = [];
-        if (files.length > 0) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                previews.push(getPreviewImage(file));
+        try {
+            const files = e.target.files;
+            const previews = [];
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    previews.push(getPreviewImage(file));
+                }
             }
-        }
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type: MESSAGES.IMAGES,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            urls: previews,
-            unViewList: [],
-            isDelete: false,
-            reactions: []
-        };
-        setMessages(prev => [...prev, createMessage]);
-        setSent(STATE.PENDING);
-        // upload ảnh lên cloudinary
-        const urls = [];
-        for (let i = 0; i < files.length; i++) {
-            const url = await uploadToCloudiry(files[i]);
-            urls.push(url);
-        }
-        // save vào db
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            urls: urls
-        });
-        setSent(STATE.RESOLVE);
-        if (res.errCode === 0) {
-            userState.fetchChats();
-            getAllImagesMessage();
-            socket.then(socket => {
-                setSent(STATE.RESOLVE);
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
-        } else {
+            const ObjectId = objectId();
+            const createMessage = {
+                _id: ObjectId,
+                chat: chat,
+                type: MESSAGES.IMAGES,
+                sender: user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                urls: previews,
+                unViewList: [],
+                isDelete: false,
+                reactions: []
+            };
+            setMessages(prev => [...prev, createMessage]);
+            setSent(STATE.PENDING);
+            // upload ảnh lên cloudinary
+            const urls = [];
+            for (let i = 0; i < files.length; i++) {
+                const url = await uploadToCloudiry(files[i]);
+                urls.push(url);
+            }
+            // save vào db
+            const res = await axios.post('/chat/message', {
+                ...createMessage,
+                urls: urls
+            });
+            setSent(STATE.RESOLVE);
+            if (res.errCode === 0) {
+                userState.fetchChats();
+                getAllImagesMessage();
+                socket.then(socket => {
+                    setSent(STATE.RESOLVE);
+                    socket.emit('send-message', res.data);
+                    socket.emit('finish-typing', chat._id);
+                })
+            } else {
+                setSent(STATE.REJECT);
+                toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            }
+        } catch (error) {
+            console.log(error);
             setSent(STATE.REJECT);
-            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            toast.warn('Không thể gửi tin nhắn, ' + error.message);
         }
     }
 
     const sendAudio = async (file) => {
         // preview
-        const preview = getPreviewImage(file);
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type: MESSAGES.AUDIO,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            urls: [preview],
-            unViewList: [],
-            isDelete: false,
-            reactions: []
-        };
-        setMessages(prev => [...prev, createMessage]);
-        setSent(STATE.PENDING);
-        // upload
-        const url = await uploadToCloudiry(file);
-        // save
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            urls: [url]
-        });
-        setSent(STATE.RESOLVE);
-        if (res.errCode === 0) {
-            socket.then(socket => {
-                setSent(STATE.RESOLVE);
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
+        try {
+            const preview = getPreviewImage(file);
+            const ObjectId = objectId();
+            const createMessage = {
+                _id: ObjectId,
+                chat: chat,
+                type: MESSAGES.AUDIO,
+                sender: user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                urls: [preview],
+                unViewList: [],
+                isDelete: false,
+                reactions: []
+            };
+            setMessages(prev => [...prev, createMessage]);
+            setSent(STATE.PENDING);
+            // upload
+            const url = await uploadToCloudiry(file);
+            // save
+            const res = await axios.post('/chat/message', {
+                ...createMessage,
+                urls: [url]
+            });
+            setSent(STATE.RESOLVE);
+            if (res.errCode === 0) {
+                socket.then(socket => {
+                    setSent(STATE.RESOLVE);
+                    socket.emit('send-message', res.data);
+                    socket.emit('finish-typing', chat._id);
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            setSent(STATE.REJECT);
+            toast.warn('Không thể gửi tin nhắn, ' + error.message);
         }
     }
 
@@ -921,89 +1013,111 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     }
 
     const sendFileOrFolder = async (filesOrFolders) => {
-        const dataFiles = [];
-        for (let i = 0; i < filesOrFolders.length; i++) {
-            dataFiles.push(customizeFile(filesOrFolders[i]));
-        }
-
-        const previews = [];
-        if (filesOrFolders.length > 0) {
+        try {
+            const dataFiles = [];
             for (let i = 0; i < filesOrFolders.length; i++) {
-                const file = filesOrFolders[i];
-                previews.push(getPreviewImage(file));
+                dataFiles.push(customizeFile(filesOrFolders[i]));
             }
-        }
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type: MESSAGES.FILE_FOLDER,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            urls: previews,
-            content: JSON.stringify(dataFiles),
-            unViewList: [],
-            isDelete: false,
-            reactions: []
-        };
-        setMessages(prev => [...prev, createMessage]);
-        // const data = await uploadToCloudiry(filesOrFolders[0]);
-        //save
-        const urls = [];
-        for (let i = 0; i < filesOrFolders.length; i++) {
-            const url = await uploadToCloudiry(filesOrFolders[i]);
-            urls.push(url);
-        };
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            urls,
-            content: JSON.stringify(dataFiles)
-        });
-        if (res.errCode === 0) {
-            userState.fetchChats();
-            socket.then(socket => {
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
-        } else {
-            toast.warn('Không thể gửi tin nhắn, ' + res.message);
+
+            const previews = [];
+            if (filesOrFolders.length > 0) {
+                for (let i = 0; i < filesOrFolders.length; i++) {
+                    const file = filesOrFolders[i];
+                    previews.push(getPreviewImage(file));
+                }
+            }
+            const ObjectId = objectId();
+            const createMessage = {
+                _id: ObjectId,
+                chat: chat,
+                type: MESSAGES.FILE_FOLDER,
+                sender: user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                urls: previews,
+                content: JSON.stringify(dataFiles),
+                unViewList: [],
+                isDelete: false,
+                reactions: []
+            };
+            setMessages(prev => [...prev, createMessage]);
+            // const data = await uploadToCloudiry(filesOrFolders[0]);
+            //save
+            const urls = [];
+            for (let i = 0; i < filesOrFolders.length; i++) {
+                const url = await uploadToCloudiry(filesOrFolders[i]);
+                urls.push(url);
+            };
+            const res = await axios.post('/chat/message', {
+                ...createMessage,
+                urls,
+                content: JSON.stringify(dataFiles)
+            });
+            if (res.errCode === 0) {
+                userState.fetchChats();
+                socket.then(socket => {
+                    socket.emit('send-message', res.data);
+                    socket.emit('finish-typing', chat._id);
+                })
+            } else {
+                toast.warn('Không thể gửi tin nhắn, ' + res.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.warn('Không thể gửi tin nhắn, ' + error.message);
         }
     }
 
     const sendVideo = async (file) => {
-        const preview = getPreviewImage(file);
-        const ObjectId = objectId();
-        const createMessage = {
-            _id: ObjectId,
-            chat: chat,
-            type: MESSAGES.VIDEO,
-            sender: user,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            urls: [preview],
-            unViewList: [],
-            isDelete: false,
-            reactions: []
-        };
+        try {
+            const preview = getPreviewImage(file);
+            const ObjectId = objectId();
+            const createMessage = {
+                _id: ObjectId,
+                chat: chat,
+                type: MESSAGES.VIDEO,
+                sender: user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                urls: [preview],
+                unViewList: [],
+                isDelete: false,
+                reactions: []
+            };
 
-        setMessages(prev => [...prev, createMessage]);
-        setSent(STATE.PENDING);
-        // upload
-        const url = await uploadToCloudiry(file);
-        // save
-        const res = await axios.post('/chat/message', {
-            ...createMessage,
-            urls: [url]
-        });
-        setSent(STATE.RESOLVE);
-        if (res.errCode === 0) {
-            userState.fetchChats();
-            socket.then(socket => {
-                setSent(STATE.RESOLVE);
-                socket.emit('send-message', res.data);
-                socket.emit('finish-typing', chat._id);
-            })
+            setMessages(prev => [...prev, createMessage]);
+            setSent(STATE.PENDING);
+            // upload
+            let url = '';
+            try {
+                url = await uploadToCloudiry(file);
+                if (!url) {
+                    setSent(STATE.REJECT);
+                    toast.warn('Không thể gửi tin nhắn, ' + 'Lỗi không xác định');
+                    return;
+                }
+            } catch (error) {
+                setSent(STATE.REJECT);
+                toast.warn('Không thể gửi tin nhắn, ' + error.message);
+            }
+            // save
+            const res = await axios.post('/chat/message', {
+                ...createMessage,
+                urls: [url]
+            });
+            setSent(STATE.RESOLVE);
+            if (res.errCode === 0) {
+                userState.fetchChats();
+                socket.then(socket => {
+                    setSent(STATE.RESOLVE);
+                    socket.emit('send-message', res.data);
+                    socket.emit('finish-typing', chat._id);
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            setSent(STATE.REJECT);
+            toast.warn('Không thể gửi tin nhắn, ' + error.message);
         }
     }
 
@@ -1015,6 +1129,23 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         drawerMethods.setSearchDrawer(value);
     }, 500);
 
+    const handlePin = async () => {
+        try {
+            const res = await axios.put('/chat/pin', { chatId: chat._id });
+            if (res.errCode === 0) {
+                toast.success('Đã ghim hộp thoại thành công');
+            } else if (res.errCode === 3) {
+                toast.success('Đã bỏ ghim hộp thoại thành công');
+            } else {
+                toast.warn('Ghim hộp thoại thất bại');
+            }
+            userState.fetchChats();
+        } catch (error) {
+            console.log(error);
+            toast.warn('Ghim hộp thoại thất bại');
+        }
+    }
+
     const Content = () => {
         return (
             <div className="reply-content">
@@ -1022,7 +1153,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                 {
                     (messageReply?.sticker ||
                         (messageReply?.urls?.length > 0 && messageReply.type === MESSAGES.IMAGES)) ?
-                        <img src={messageReply?.sticker} ></img> : (
+                        <img src={messageReply?.sticker || messageReply?.urls[0]} ></img> : (
                             messageReply?.urls?.length > 0 && messageReply.type === MESSAGES.VIDEO &&
                             <video src={messageReply?.urls[0]} />
                         )
@@ -1043,14 +1174,29 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         textAreaRef.current.value = '';
     }
 
+    const handleGetToTalChatTogethers = async () => {
+        try {
+            const friend = getFriend(user, chat.participants);
+            const res = await axios.get(`/chat/total-together?friendId=${friend.id}`)
+            setTotalChatTogethers(res.data);
+        } catch (error) {
+            console.log(error);
+            toast.warn('Không thể lấy số lượng tin nhắn chung');
+        }
+    }
 
+    useEffect(() => {
+        if (chat?._id && chat.type === CHAT_STATUS.PRIVATE_CHAT) {
+            handleGetToTalChatTogethers();
+        }
+    }, [chat])
 
 
     return (
         <>
             <div className="chat-container"
             >
-                <div className="left chat-item">
+                <div className="left chat-item" ref={leftRef}>
                     <header>
                         {
                             isLoadingFetch &&
@@ -1072,7 +1218,6 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                 mode="horizontal"
                                 items={items}
                                 className="menu-header"
-                                style={{ color: headerColor }}
                             />
                         </div>
                     </header>
@@ -1097,21 +1242,23 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             )
                         }
                         {
-                            hasPin && !isSearching &&
+                            listMessageIsPinState.length > 0 && !isSearching &&
                             <div className="pin-container">
                                 <div className="pin-icon-item">
                                     <i className="fa-regular fa-message"></i>
                                 </div>
-                                <div className="pin-content-item" onClick={() => handleFindMessageFirst(listMessageIsPinRef.current?.[0].ref)}>
+                                <div className="pin-content-item"
+                                    onClick={() => handleFindMessageFirst(listMessageIsPinState[0].ref)}
+                                >
                                     <p className="title">Tin nhắn</p>
                                     <div className="content">
-                                        <span>{listMessageIsPinRef.current?.[0]?.message?.sender?.userName}:</span>
+                                        <span>{listMessageIsPinState[0]?.sender?.userName}:</span>
                                         {
-                                            listMessageIsPinRef.current?.[0]?.message?.type === MESSAGES.TEXT ?
-                                                <span>{listMessageIsPinRef.current?.[0]?.message?.content}</span> : (
-                                                    listMessageIsPinRef?.current?.[0]?.message?.type === MESSAGES.IMAGES ?
+                                            listMessageIsPinState[0].type === MESSAGES.TEXT ?
+                                                <span>{listMessageIsPinState[0]?.content}</span> : (
+                                                    listMessageIsPinState[0]?.type === MESSAGES.IMAGES ?
                                                         <span>Đã gửi ảnh</span> : (
-                                                            listMessageIsPinRef.current?.[0]?.message?.type === MESSAGES.FILE_FOLDER ?
+                                                            listMessageIsPinState[0]?.type === MESSAGES.FILE_FOLDER ?
                                                                 <span>File</span> : <span>Sticker</span>
                                                         )
                                                 )
@@ -1125,17 +1272,21 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                         data={listMessageIsPinState}
                                         handleFindMessageFirst={handleFindMessageFirst}
                                         fetchChats={userState.fetchChats}
+                                        fetchMessagePaginate={fetchMessagePaginate}
                                     >
                                         <i className="fa-solid fa-circle-info"></i>
                                     </PinsModal>
                                 </div>
                             </div>
                         }
-                        <div className={`content-chat-messages ${(hasPin || isSearching) ? 'pt-50' : ''}`} ref={scroolRef}
+                        <div
+                            className={`content-chat-messages ${(listMessageIsPinState.length > 0 || isSearching) ? 'pt-50' : ''}`}
+                            ref={scroolRef}
                             style={{
                                 height: `calc(100% - ${footerHeight - 10}px)`,
                                 color: messageColor,
-                            }}>
+                            }}
+                        >
                             {
                                 messages && messages.length > 0 && messages.map((message, index) => {
                                     if (message.unViewList.includes(user.id)) {
@@ -1171,16 +1322,13 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                             {
                                                 // no current user
                                                 user?.id !== message.sender.id ?
-                                                    <div className="group-message"
+                                                    <div className={`group-message ${message.type === MESSAGES.TEXT ? 'bg-white' : ''}`}
                                                         style={{
                                                             marginBottom: message?.reactions?.length > 0 ? '10px' : '0px',
                                                         }}
                                                         ref={(ref) => {
                                                             if (message.isPin === true) {
-                                                                listMessageIsPinRef.current = _.unionBy([{ message: message, ref }], listMessageIsPinRef.current, 'message._id');
-                                                                if (hasPin === false) {
-                                                                    setHasPin(true);
-                                                                }
+                                                                message.ref = ref;
                                                             }
                                                             if (drawerMethods.searchDrawer.toLowerCase().trim() !== '' && message?.content?.toLowerCase().includes(drawerMethods.searchDrawer.toLowerCase().trim())) {
                                                                 drawerMethods.listMessageRef.current = _.unionBy([{ message: message, ref }], drawerMethods.listMessageRef.current, 'message._id');
@@ -1190,13 +1338,13 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                                         {
                                                             <div className="avatar">
                                                                 {
-                                                                    index == 0 ?
+                                                                    index === 1 ?
                                                                         <AvatarUser
                                                                             image={message?.sender?.avatar || '/images/user-dev.png'}
                                                                             name={message?.sender?.userName || 'Người dùng'}
                                                                         /> :
                                                                         (
-                                                                            messages[index - 1].sender.id !== messages[index].sender.id &&
+                                                                            messages[index - 1]?.sender.id !== messages[index]?.sender.id &&
                                                                             < AvatarUser
                                                                                 image={message?.sender?.avatar || '/images/user-dev.png'}
                                                                                 name={message?.sender?.userName || 'Người dùng'}
@@ -1400,10 +1548,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                                         )}
                                                         ref={(ref) => {
                                                             if (message.isPin === true) {
-                                                                listMessageIsPinRef.current = _.unionBy([{ message: message, ref }], listMessageIsPinRef.current, 'message._id');
-                                                                if (hasPin === false) {
-                                                                    setHasPin(true);
-                                                                }
+                                                                message.ref = ref;
                                                             }
                                                             if (drawerMethods.searchDrawer.toLowerCase().trim() !== '' && message?.content?.toLowerCase().includes(drawerMethods.searchDrawer.toLowerCase().trim())) {
                                                                 drawerMethods.listMessageRef.current = _.unionBy([{ message: message, ref }], drawerMethods.listMessageRef.current, 'message._id');
@@ -1640,14 +1785,14 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                         >
                             <div style={listImage?.length > 0 ? { height: '170px' } : {}} className="footer" ref={footer}>
                                 <div className="footer-top footer-item">
-                                    <StickyPopover >
+                                    {/* <StickyPopover >
                                         <div
                                             className="item-icon"
                                             onClick={() => handleDispatchSendMessageFunc()}
                                         >
                                             <img src="/images/sticker.png" />
                                         </div>
-                                    </StickyPopover>
+                                    </StickyPopover> */}
                                     <label htmlFor="message-inpt-image">
                                         <div className="item-icon">
                                             <i className="fa-regular fa-image"></i>
@@ -1752,16 +1897,18 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                 </div >
 
                 {
-                    show &&
                     <div className="right chat-item" ref={moreInfoRef}>
                         <header>
+                            <div className="back-btn" onClick={handleClickMoreInfor}>
+                                <i className="fa-solid fa-circle-chevron-left"></i>
+                            </div>
                             {
                                 chat?.type === CHAT_STATUS.PRIVATE_CHAT ?
                                     <h3 className="title">Thông tin trò chuyện</h3> :
                                     <h3 className="title">Thông tin nhóm</h3>
                             }
                         </header>
-                        <div className="right-body" style={{ color: headerColor }}>
+                        <div className="right-body">
                             <div className="item-avatar">
                                 {
                                     chat?.type === CHAT_STATUS.PRIVATE_CHAT ? (
@@ -1831,16 +1978,16 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             <div className="hyphen"></div>
 
                             <div className="options-list">
-                                <div className="button-wrapper">
+                                {/* <div className="button-wrapper">
                                     <button className="button">
                                         <div className="button-icon">
                                             <img src="/images/notification.png" alt="Turn Off Notification Icon" />
                                         </div>
                                         <p>Tắt thông báo</p>
                                     </button>
-                                </div>
+                                </div> */}
                                 <div className="button-wrapper">
-                                    <button className="button">
+                                    <button className="button" onClick={handlePin}>
                                         <div className="button-icon">
                                             <img src="/images/pin.png" alt="Pin Dialog Icon" />
                                         </div>
@@ -1860,6 +2007,21 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                                 <p>Thêm thành viên</p>
                                             </button>
                                         </AddMemberModal>
+                                    </div>
+                                }
+                                {
+                                    chat.type === CHAT_STATUS.GROUP_CHAT &&
+                                    <div className="button-wrapper">
+                                        <LinkJoinGroupModal
+                                            group={chat}
+                                        >
+                                            <button className="button">
+                                                <div className="button-icon">
+                                                    <img src="/images/share-icon.png" alt="Share group" />
+                                                </div>
+                                                <p>Chia sẻ nhóm</p>
+                                            </button>
+                                        </LinkJoinGroupModal>
                                     </div>
                                 }
                                 {
@@ -1894,10 +2056,14 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             {
                                 chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="info-list">
-                                    <button className="common-group">
-                                        <img src="/images/people.png" alt="Create Group Icon" />
-                                        <p>Nhóm chung 0 thành viên</p>
-                                    </button>
+                                    <div className="common-group">
+                                        <img className="icon" src="/images/people.png" alt="Create Group Icon" />
+                                        <ChatTogetherDrawer
+                                            chats={totalChatTogethers}
+                                        >
+                                            <p>{totalChatTogethers.length} nhóm chung</p>
+                                        </ChatTogetherDrawer>
+                                    </div>
                                 </div>
                             }
                             {
@@ -1921,16 +2087,15 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                             {
                                 <div className="view-all-link">
                                     <div className="hyphen"></div>
-                                    <ViewAllLinksModal links={{}}>
+                                    <ViewAllLinksModal links={[]}>
                                     </ViewAllLinksModal>
                                 </div>
                             }
                             {
-                                chat.type === CHAT_STATUS.PRIVATE_CHAT &&
                                 <div className="security-setting">
                                     <div className="hyphen"></div>
-                                    <ViewSettingModal>
-                                    </ViewSettingModal>
+                                    <ViewSettingModal></ViewSettingModal>
+                                    <div className="hyphen"></div>
                                 </div>
                             }
 
@@ -1938,12 +2103,11 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                 chat.type === CHAT_STATUS.GROUP_CHAT &&
                                 chat.administrator === user.id &&
                                 <>
-                                    <div className="hyphen"></div>
                                     <div className="grant-adminstrator">
                                         <GrantModal
                                             chat={chat}
                                         >
-                                            <Button>Chuyền trưởng nhóm</Button>
+                                            <Button>Chuyển trưởng nhóm</Button>
                                         </GrantModal>
                                     </div>
                                 </>
@@ -1964,14 +2128,17 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                                     <p>Giải tán nhóm</p>
                                                 </Button>
                                             </DisbandGroupModal> :
-                                            <Button
-                                                type="primary"
-                                                danger
-                                                icon={<i className="fa-solid fa-sign-out"></i>}
-                                                className="leave-group-btn"
-                                            >
-                                                <p>Rời nhóm</p>
-                                            </Button>
+                                            <LeaveGroupModal>
+                                                <Button
+                                                    type="primary"
+                                                    danger
+                                                    icon={<i className="fa-solid fa-sign-out"></i>}
+                                                    className="leave-group-btn"
+                                                >
+                                                    <p>Rời nhóm</p>
+                                                </Button>
+                                            </LeaveGroupModal>
+
                                     }
 
                                 </div>

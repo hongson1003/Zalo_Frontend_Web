@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginStart } from "../../redux/actions/app.action";
-import { STATE } from "../../redux/types/type.app";
+import { STATE } from "../../redux/types/app.type";
 
 
 
@@ -40,15 +40,20 @@ const ForgotPasswordModal = ({ children, phoneNumberProp }) => {
     }, [phoneNumberProp]);
 
     const fetchUserByPhone = async (phoneNumber) => {
-        let rs = await axios.get(`/users/user-by-phone?phoneNumber=${phoneNumber}`);
-        if (rs.errCode === 0 && rs?.data) {
-            const data = rs.data;
-            data.status = STATE.FORGOT_PASSWORD;
-            dispatch(loginStart(data));
-            navigate(`/verify?id=${rs?.data?.id}`);
-            setIsModalOpen(false);
-        } else {
-            toast.error(rs.message);
+        try {
+            let rs = await axios.get(`/users/user-by-phone?phoneNumber=${phoneNumber}`);
+            if (rs.errCode === 0 && rs?.data) {
+                const data = rs.data;
+                data.status = STATE.FORGOT_PASSWORD;
+                dispatch(loginStart(data));
+                navigate(`/verify?id=${rs?.data?.id}`);
+                setIsModalOpen(false);
+            } else {
+                toast.error(rs.message);
+            }
+        } catch (error) {
+            console.log('Failed to fetch user by phone:', error);
+            toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!');
         }
     }
 

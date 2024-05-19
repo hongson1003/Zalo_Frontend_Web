@@ -4,6 +4,7 @@ import './emoijPopup.chat.scss';
 import _ from 'lodash';
 import Tym from "../../../components/customize/tym";
 import axios from '../../../utils/axios';
+import { toast } from "react-toastify";
 
 const Content = (
     { setSelectedReaction, handleTymMessage, setOpen, message, handleModifyMessage }
@@ -35,17 +36,22 @@ const Content = (
     }, []);
 
     const handleClearReaction = async () => {
-        if (!message || message.reactions.length === 0) return;
-        const res = await axios.put('/chat/feeling', {
-            messageId: message._id,
-        })
-        const messageData = res.data;
-        if (res.errCode === 0) {
-            setOpen(false);
-            handleModifyMessage({
-                _id: messageData._id,
-                reactions: messageData.reactions,
-            });
+        try {
+            if (!message || message.reactions.length === 0) return;
+            const res = await axios.put('/chat/feeling', {
+                messageId: message._id,
+            })
+            const messageData = res.data;
+            if (res.errCode === 0) {
+                setOpen(false);
+                handleModifyMessage({
+                    _id: messageData._id,
+                    reactions: messageData.reactions,
+                });
+            }
+        } catch (error) {
+            console.log('Error at handleClearReaction', error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau!');
         }
     }
 

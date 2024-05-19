@@ -34,7 +34,7 @@ const AddFriendModal = ({ children }) => {
             handleCancel();
             return true;
         } else {
-            toast.error('Không tìm thấy người dùng');
+            toast.warn('Không tìm thấy người dùng');
             return false;
         }
     };

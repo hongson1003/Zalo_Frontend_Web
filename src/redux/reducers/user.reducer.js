@@ -1,6 +1,6 @@
 import { KEYITEMS } from "../../utils/keyMenuItem";
-import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from "../types/type.app"
-import { CALL, CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/type.user";
+import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from "../types/app.type"
+import { CALL, CHAT_STATUS, MESSAGES, NOTIFICATIONS } from "../types/user.type";
 
 const initialState = {
     notificationsFriends: [],
@@ -53,6 +53,11 @@ export default function userReducer(state = initialState, action) {
             return stateFetchFunc;
         }
 
+        case MESSAGES.FETCH_MESSAGES_FUNC: {
+            let stateFetchMessagesFunc = { ...state };
+            stateFetchMessagesFunc.fetchMessages = action.payload;
+            return stateFetchMessagesFunc;
+        }
 
         default:
             return state

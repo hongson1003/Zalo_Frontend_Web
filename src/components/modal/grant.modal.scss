@@ -14,10 +14,10 @@
             cursor: pointer;
             padding: 10px;
             &:hover {
-                background-color: antiquewhite;
+                background-color: #f3f5f6;
             }
             &.selected {
-                background-color: aquamarine;
+                background-color: #e5efff;
             }
         }
     }

@@ -5,14 +5,13 @@ import { useSelector } from "react-redux";
 import { KEYITEMS } from "../../utils/keyMenuItem";
 import FriendSideBar from "./friend.sidebar";
 import ChatSidebar from "./chat.sidebar";
-import { FILTER } from "../../redux/types/type.user";
+import { FILTER } from "../../redux/types/user.type";
 
 
 const SidebarHome = ({ children }) => {
     const stateApp = useSelector(state => state?.appReducer);
     const [current, setCurrent] = useState(FILTER.EMPTY);
     const [statusChat, setStatusChat] = useState(FILTER.ALL);
-
 
 
     const renderContent = () => {
@@ -23,6 +22,7 @@ const SidebarHome = ({ children }) => {
                 return <ChatSidebar
                     current={current}
                     statusChat={statusChat}
+                    setStatusChat={setStatusChat}
                 />;
             default:
                 return <></>;

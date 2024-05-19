@@ -6,10 +6,10 @@ import { Radio, Space, Select, Switch } from 'antd';
 import ChangePasswordModal from './changePassword.modal';
 import { CloseCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
-import { STATE } from '../../redux/types/type.app';
+import { STATE } from '../../redux/types/app.type';
 import axios from '../../utils/axios';
 import { useSelector } from 'react-redux';
-import { FILTER, SETTING } from '../../redux/types/type.user';
+import { FILTER, SETTING } from '../../redux/types/user.type';
 
 const items = [
     {
@@ -103,20 +103,24 @@ export const PrivacySetting = () => {
     };
 
     const getInfo = async () => {
-        if (user) {
-            const res = await axios.get('/users/info?id=' + user.id);
-            if (res.errCode === 0) {
-                const { data } = res;
-                if (data.email) {
-                    setEmail(data.email);
-                    setStatus(STATE.RESOLVE);
+        try {
+            if (user) {
+                const res = await axios.get('/users/info?id=' + user.id);
+                if (res.errCode === 0) {
+                    const { data } = res;
+                    if (data.email) {
+                        setEmail(data.email);
+                        setStatus(STATE.RESOLVE);
+                    }
                 }
+            } else {
+                setEmail('');
+                toast.warn('Vui lòng đăng nhập để sử dụng chức năng này !!!')
             }
-        } else {
-            setEmail('');
-            toast.warn('Vui lòng đăng nhập để sử dụng chức năng này !!!')
+        } catch (error) {
+            console.log('getInfo', error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau !!!');
         }
-
     }
     useEffect(() => {
         getInfo();
@@ -128,48 +132,58 @@ export const PrivacySetting = () => {
 
     const handleSendEmail = async () => {
         // send email
-        setIsLoading(true);
-        const res = await axios.post('/users/send-verify-email', { email: text });
-        setIsLoading(false);
-        if (res.errCode === 0) {
-            setStatus(STATE.PENDING);
-            toast.success('Đã gửi email xác minh, vui lòng kiểm tra email để nhận mã xác thực !!!'
-                , {
-                    autoClose: 7000,
-                    position: 'top-center',
-                    closeButton: false
-                });
+        try {
+            setIsLoading(true);
+            const res = await axios.post('/users/send-verify-email', { email: text });
+            setIsLoading(false);
+            if (res.errCode === 0) {
+                setStatus(STATE.PENDING);
+                toast.success('Đã gửi email xác minh, vui lòng kiểm tra email để nhận mã xác thực !!!'
+                    , {
+                        autoClose: 7000,
+                        position: 'top-center',
+                        closeButton: false
+                    });
 
-            const interval = setInterval(() => {
-                setTimeOut((prev) => {
-                    if (prev === 0) {
-                        clearInterval(interval);
-                        setStatus('');
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
-        } else {
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau !!!'
-                , {
-                    autoClose: 7000,
-                    position: 'top-center',
-                });
+                const interval = setInterval(() => {
+                    setTimeOut((prev) => {
+                        if (prev === 0) {
+                            clearInterval(interval);
+                            setStatus('');
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+            } else {
+                toast.error('Có lỗi xảy ra, vui lòng thử lại sau !!!'
+                    , {
+                        autoClose: 7000,
+                        position: 'top-center',
+                    });
+            }
+        } catch (error) {
+            console.log('handleSendEmail', error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau !!!');
         }
     }
 
     const handleVerify = async () => {
-        setIsLoading(true);
-        const res = await axios.post('/users/verify-email', {
-            email: text,
-            code: otp
-        });
-        setIsLoading(false);
-        if (res.errCode === 0) {
-            setStatus(STATE.SUCCESS);
-            toast.success('Xác minh email thành công !!!');
-        } else {
-            toast.error('Mã xác minh không chính xác !!!');
+        try {
+            setIsLoading(true);
+            const res = await axios.post('/users/verify-email', {
+                email: text,
+                code: otp
+            });
+            setIsLoading(false);
+            if (res.errCode === 0) {
+                setStatus(STATE.SUCCESS);
+                toast.success('Xác minh email thành công !!!');
+            } else {
+                toast.error('Mã xác minh không chính xác !!!');
+            }
+        } catch (error) {
+            console.log('handleVerify', error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau !!!');
         }
     }
 

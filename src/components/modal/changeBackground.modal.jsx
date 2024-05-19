@@ -18,9 +18,14 @@ const ChangeBackgroundModal = ({ chat, children, handleChangeBackground }) => {
     };
 
     const setBackgroundForChat = async (chatId, backgroundId) => {
-        const response = await axios.put(`/chat/background`, { chatId, backgroundId });
-        if (response.errCode === 0) {
-            handleChangeBackground(response.data.background);
+        try {
+            const response = await axios.put(`/chat/background`, { chatId, backgroundId });
+            if (response.errCode === 0) {
+                handleChangeBackground(response.data.background);
+            }
+        } catch (error) {
+            console.error('Failed to set background:', error);
+            toast.error('Đã có lỗi xảy ra');
         }
     }
 
@@ -46,9 +51,14 @@ const ChangeBackgroundModal = ({ chat, children, handleChangeBackground }) => {
     }, [])
 
     const fetchBackgroundPaginate = async (page, limit) => {
-        const response = await axios.get(`/chat/background/pagination?page=${page}&limit=${limit}`);
-        if (response.errCode === 0) {
-            setBackgrounds(response.data);
+        try {
+            const response = await axios.get(`/chat/background/pagination?page=${page}&limit=${limit}`);
+            if (response.errCode === 0) {
+                setBackgrounds(response.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch backgrounds:', error);
+            toast.error('Đã có lỗi xảy ra');
         }
     }
 
@@ -61,7 +71,20 @@ const ChangeBackgroundModal = ({ chat, children, handleChangeBackground }) => {
     return (
         <React.Fragment>
             <span onClick={showModal}>{children}</span>
-            <Modal title="Chọn hình nền" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <Modal
+                title="Chọn hình nền"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={[
+                    <Button key="back" onClick={handleCancel}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleOk}>
+                        Đồng ý
+                    </Button>,
+                ]}
+            >
                 <Flex wrap="wrap" justify="center" gap={'10px'} className="background-container">
                     <div className="background-body">
                         <div

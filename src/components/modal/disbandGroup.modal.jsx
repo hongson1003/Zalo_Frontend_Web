@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import './disbandGroup.modal.scss';
-import { Input } from 'antd';
-import { Radio } from 'antd';
+import { Input, Radio, Popconfirm } from 'antd';
 import AvatarUser from '../user/avatar';
 import axios from '../../utils/axios';
 import { accessChat } from '../../redux/actions/user.action';
 import { socket } from '../../utils/io';
 import { sendNotifyToChatRealTime } from '../../utils/handleChat';
+import { MESSAGES } from '../../redux/types/user.type';
+import { toast } from 'react-toastify';
 
 const DisbandGroupModal = ({ children }) => {
 
@@ -18,25 +19,37 @@ const DisbandGroupModal = ({ children }) => {
     const [value, setValue] = useState('');
     const dispatch = useDispatch();
     const stateUser = useSelector(state => state.userReducer);
+    const [isLoading, setIsLoading] = useState(false);
+
     const showModal = () => {
         setIsModalOpen(true);
     };
+
     const handleOk = async () => {
-        const res = await axios.put('/chat/grantGroupLeader', {
-            memberId: value.id,
-            chatId: chat._id
-        })
-        const kq = await sendNotifyToChatRealTime(chat._id,
-            `${user?.userName} đã rời nhóm, ${value.userName} đã trở thành nhóm trưởng.`
-        );
-        if (res.errCode === 0 && kq === true) {
-            socket.then(socket => {
-                socket.emit('transfer-disband-group', { _id: chat._id });
-                dispatch(accessChat(null));
-                stateUser.fetchChats();
+        try {
+            setIsLoading(true);
+            const res = await axios.put('/chat/grantGroupLeader', {
+                memberId: value.id,
+                chatId: chat._id
             })
+            await sendNotifyToChatRealTime(chat._id,
+                `${user?.userName} đã rời nhóm, ${value.userName} đã trở thành nhóm trưởng.`,
+                MESSAGES.NOTIFY
+            );
+            if (res.errCode === 0) {
+                socket.then(socket => {
+                    socket.emit('transfer-disband-group', res.data);
+                    dispatch(accessChat(null));
+                    stateUser.fetchChats();
+                })
+            }
+            setIsLoading(false);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error('Failed to disband group:', error);
+            setIsLoading(false);
+            toast.error('Rời nhóm thất bại');
         }
-        setIsModalOpen(false);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -44,6 +57,13 @@ const DisbandGroupModal = ({ children }) => {
 
     const onChange = (e) => {
         setValue(e.target.value);
+    };
+
+    const confirm = (e) => {
+        handleOk();
+    };
+    const cancel = (e) => {
+        handleCancel();
     };
 
 
@@ -56,6 +76,24 @@ const DisbandGroupModal = ({ children }) => {
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
+                footer={[
+                    <Button key="back" onClick={handleCancel}>
+                        Hủy
+                    </Button>,
+
+                    <Popconfirm
+                        description="Bạn có chắc chắn muốn rời nhóm?"
+                        onConfirm={confirm}
+                        onCancel={cancel}
+                        okText="Xác nhận"
+                        cancelText="Hủy"
+                        key="submit"
+                    >
+                        <Button type="primary" disabled={!value} loading={isLoading}>
+                            Rời nhóm
+                        </Button>
+                    </Popconfirm>
+                ]}
             >
                 <hr />
                 <div className='disband-content'>

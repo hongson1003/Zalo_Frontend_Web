@@ -18,32 +18,36 @@ const ResetPassword = () => {
 
 
     const onFinish = async (values) => {
-        const data = {
-            id: state?.userInfo?.id,
-            phoneNumber: state?.userInfo?.phoneNumber,
-            newPassword: values.newPassword,
-            confirmPassword: values.confirmPassword
+        try {
+            const data = {
+                id: state?.userInfo?.id,
+                phoneNumber: state?.userInfo?.phoneNumber,
+                newPassword: values.newPassword,
+                confirmPassword: values.confirmPassword
+            }
+            if (values.newPassword !== values.confirmPassword) {
+                toast.error('Mật khẩu không khớp');
+                return;
+            }
+            if (values.newPassword.length < 6) {
+                toast.error('Mật khẩu phải có ít nhất 6 ký tự');
+                return;
+            }
+            delete data.confirmPassword;
+            const res = await axios.post('/auth/reset-password', data);
+            if (res.errCode === 0) {
+                setIsLoading(true);
+                toast.success('Đổi mật khẩu thành công');
+                setTimeout(() => {
+                    setIsLoading(false);
+                    navigate('/login');
+                }, 1000);
+            } else
+                toast.error(res.message);
+        } catch (error) {
+            console.log(error);
+            toast.error('Đã có lỗi xảy ra');
         }
-        if (values.newPassword !== values.confirmPassword) {
-            toast.error('Mật khẩu không khớp');
-            return;
-        }
-        if (values.newPassword.length < 6) {
-            toast.error('Mật khẩu phải có ít nhất 6 ký tự');
-            return;
-        }
-        delete data.confirmPassword;
-        const res = await axios.post('/auth/reset-password', data);
-        if (res.errCode === 0) {
-            setIsLoading(true);
-            toast.success('Đổi mật khẩu thành công');
-            setTimeout(() => {
-                setIsLoading(false);
-                navigate('/login');
-            }, 1000);
-        } else
-            toast.error(res.message);
-
     };
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);

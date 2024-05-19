@@ -1,6 +1,7 @@
-import { LOGIN_STATUS } from '../redux/types/type.app';
+import { LOGIN_STATUS } from '../redux/types/app.type';
 import axios, { setAuthorizationAxios } from '../utils/axios';
 import { loginFail, loginSuccess } from '../redux/actions/app.action';
+import { toast } from 'react-toastify';
 
 export const checkUserIsLogin = async () => {
     try {
@@ -13,6 +14,7 @@ export const checkUserIsLogin = async () => {
         }
     } catch (error) {
         console.log(error)
+        toast.error('Có lỗi xảy ra !')
     }
 }
 

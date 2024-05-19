@@ -47,7 +47,8 @@ const AvatarUser = (props) => {
                                 border: '1px solid #ffffff',
                                 cursor: 'pointer',
                                 backgroundColor: image
-                            }}>
+                            }}
+                        >
                             {getFirstLetters(name)}
                         </Avatar>
                     )

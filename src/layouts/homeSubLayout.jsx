@@ -12,61 +12,44 @@ const homeSublayout = () => {
 
 
     const [sizes, setSizes] = useState([
-        '280px',
+        '350px',
         'auto',
     ]);
     const [visibleLeft, setVisibleLeft] = useState('d-show');
     const [visibleRight, setVisibleRight] = useState('d-show');
-    const stateApp = useSelector(state => state?.appReducer);
+    const [windowSize, setWindowSize] = useState(window.innerWidth);
+    const subNav = useSelector(state => state.appReducer.subNav);
 
-    const [windowSize, setWindowSize] = useState([0, 0]);
-
-    // useLayoutEffect(() => {
-    //     function updateSize() {
-    //         setWindowSize([window.innerWidth, window.innerHeight]);
-    //     }
-    //     window.addEventListener('resize', updateSize);
-    //     updateSize();
-    //     return () => window.removeEventListener('resize', updateSize);
-    // }, []);
-
-    // useEffect(() => {
-    //     setVisibleLeft('d-show')
-    //     if (windowSize[0] < 750 && windowSize[0]) {
-    //         if (!stateApp?.subNav) {
-    //             setVisibleRight('d-none')
-    //             setSizes(['100%', '0.75%'])
-    //         } else {
-    //             setVisibleRight('d-show')
-    //             setSizes(['0px', '100%'])
-    //         }
-    //     } else {
-    //         if (windowSize[0] > 800) {
-    //             setVisibleRight('d-show')
-    //             setSizes(['25%', 'auto'])
-    //         }
-    //     }
-    // }, [windowSize, stateApp?.subNav?._id]);
-
-    const handleOnDoubleClick = () => {
-        if (sizes[0] !== '0px') {
-            setSizes(['0px', '100%'])
+    useEffect(() => {
+        if (windowSize < 768) {
+            if (!subNav) {
+                setSizes(['100%', '0px'])
+                setVisibleLeft('d-show')
+                setVisibleRight('d-none')
+            } else {
+                setSizes(['0px', '100%'])
+                setVisibleLeft('d-none')
+                setVisibleRight('d-show')
+            }
         } else {
-            setSizes(['26%', 'auto'])
+
+        }
+    }, [windowSize, subNav])
+
+
+
+    const handleOnDoubleClick = (e) => {
+        console.log(e.target.className)
+        if ('split-sash-content split-sash-content-active split-sash-content-vscode' === e.target.className) {
+            if (visibleLeft === 'd-show') {
+                setSizes(['0px', '100%'])
+                setVisibleLeft('d-none')
+            } else {
+                setSizes(['350px', 'auto'])
+                setVisibleLeft('d-show')
+            }
         }
     }
-
-    // useEffect(() => {
-    //     const split = document.getElementsByClassName('split-sash-content')[0];
-    //     if (split) {
-    //         split.addEventListener('dblclick', handleOnDoubleClick)
-    //     }
-    //     return () => {
-    //         if (split) {
-    //             split.removeEventListener('dblclick', handleOnDoubleClick)
-    //         }
-    //     }
-    // }, [sizes[0]])
 
     const handleOnChange = (size) => {
         // handle resize event
@@ -76,14 +59,18 @@ const homeSublayout = () => {
     useEffect(() => {
         const handleKeyDown = (event) => {
             const key = event.key;
-            if (key === 'f' && event.ctrlKey) {
+            if (key === 'M' && event.shiftKey && event.ctrlKey) {
                 event.preventDefault();
                 if (sizes[0] !== '0px') {
                     setSizes(['0px', '100%'])
                     setVisibleLeft('d-none')
+                    setVisibleRight('d-show')
+                    localStorage.setItem('show', 'false')
                 } else {
-                    setSizes(['25%', 'auto'])
+                    setSizes(['350px', 'auto'])
                     setVisibleLeft('d-show')
+                    setVisibleRight('d-show')
+                    localStorage.setItem('show', 'true')
                 }
             }
         }
@@ -121,8 +108,10 @@ const homeSublayout = () => {
                 split='vertical'
                 sizes={sizes}
                 onChange={size => handleOnChange(size)}
+                onDoubleClick={handleOnDoubleClick}
+                resizerSize={3}
             >
-                <Pane className={`${visibleLeft}`} minSize={280} maxSize={400}>
+                <Pane className={`${visibleLeft} pane-left`} minSize={280} maxSize={400}>
                     <SidebarHome />
                     <Drawer
                         title="Kết quả tìm kiếm"
@@ -134,7 +123,7 @@ const homeSublayout = () => {
                         width={'100%'}
                     >
                         {
-                            searchDrawer ?
+                            searchDrawer && listMessages.length > 0 ?
                                 <div className="search-drawer">
                                     {
                                         listMessages.map(({ message: item, ref }, index) => {
@@ -161,7 +150,7 @@ const homeSublayout = () => {
                     </Drawer>
                 </Pane>
                 <Pane
-                    className={`pane-content ${visibleRight}`}
+                    className={`pane-content ${visibleRight} pane-right`}
                     minSize={400}
                 >
                     <ContentMain

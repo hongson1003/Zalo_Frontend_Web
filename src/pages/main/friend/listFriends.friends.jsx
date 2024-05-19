@@ -6,8 +6,9 @@ import axios from '../../../utils/axios';
 import { accessChat } from '../../../redux/actions/user.action';
 import { changeKeyMenu } from "../../../redux/actions/app.action";
 import { KEYITEMS } from "../../../utils/keyMenuItem";
-import { STATE } from "../../../redux/types/type.app";
+import { STATE } from "../../../redux/types/app.type";
 import FriendPopover from "../../../components/popover/friend.popover";
+import { toast } from "react-toastify";
 
 const ListFriends = ({ data, fetchFriends }) => {
     const [friends, setFriends] = React.useState([]);
@@ -31,14 +32,19 @@ const ListFriends = ({ data, fetchFriends }) => {
 
 
     const handleOpenChat = async (friendId) => {
-        const res = await axios.post('/chat/access', {
-            "type": "PRIVATE_CHAT",
-            "participants": [stateApp.userInfo.user.id, friendId],
-            "status": true
-        });
-        if (res.errCode !== -1) {
-            dispatch(changeKeyMenu(KEYITEMS.MESSAGE));
-            dispatch(accessChat(res.data));
+        try {
+            const res = await axios.post('/chat/access', {
+                "type": "PRIVATE_CHAT",
+                "participants": [stateApp.userInfo.user.id, friendId],
+                "status": true
+            });
+            if (res.errCode !== -1) {
+                dispatch(changeKeyMenu(KEYITEMS.MESSAGE));
+                dispatch(accessChat(res.data));
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
         }
     }
 

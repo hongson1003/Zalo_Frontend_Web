@@ -4,12 +4,12 @@ import './newGroupChat.modal.scss';
 import { Radio, Drawer, Input, theme } from 'antd';
 import axios from '../../utils/axios';
 import AvatarUser from '../user/avatar';
-import { getFriend } from '../../utils/handleChat';
+import { getFriend, sendNotifyToChatRealTime } from '../../utils/handleChat';
 import { useSelector, useDispatch } from 'react-redux';
 import { getDetailListMembers } from '../../utils/handleChat';
 import ChooseImageModal from './chooseImage.modal';
 import { toast } from 'react-toastify';
-import { CHAT_STATUS } from '../../redux/types/type.user';
+import { CHAT_STATUS, MESSAGES } from '../../redux/types/user.type';
 import { accessChat } from '../../redux/actions/user.action';
 import { socket } from '../../utils/io';
 
@@ -103,33 +103,58 @@ const NewGroupChatModal = ({ children }) => {
             const resCreateGroupRes = await axios.post('/chat/group', payload);
             setIsLoading(false);
             if (resCreateGroupRes.errCode === 0) {
+                // gởi notify cho các thành viên
+                await sendNotifyToChatRealTime(resCreateGroupRes.data._id,
+                    `${user.userName} đã tạo nhóm chat ${name} ️🎉`
+                    , MESSAGES.NOTIFY)
                 socket.then(socket => {
                     socket.emit('join-room', resCreateGroupRes.data._id);
                     dispatch(accessChat(resCreateGroupRes.data));
                     setIsModalOpen(false)
-                    socket.emit('new-group-chat', resCreateGroupRes.data);
+                    socket.emit('new-chat', resCreateGroupRes.data);
                 })
             }
+
         } catch (error) {
             console.log(error);
             setIsLoading(false);
             toast.error('Upload ảnh thất bại');
         }
         setIsModalOpen(false);
+        setName('');
+        setGroupPhoto(null);
+        setIsModalOpen(false);
+        setSelected(false);
+        setList(prev => prev.map(item => {
+            item.checked = false;
+            return item;
+        }));
     };
 
     const handleCancel = () => {
+        setName('');
+        setGroupPhoto(null);
         setIsModalOpen(false);
+        setSelected(false);
+        setList(prev => prev.map(item => {
+            item.checked = false;
+            return item;
+        }));
     };
 
     const fetchFriends = async () => {
-        const res = await axios.get(`/users/friends?page=${page}&limit=${limit}`)
-        if (res.errCode === 0) {
-            const data = res.data;
-            if (data?.length > 0) {
-                data.forEach(item => item.checked = false);
+        try {
+            const res = await axios.get(`/users/friends?page=${page}&limit=${limit}`)
+            if (res.errCode === 0) {
+                const data = res.data;
+                if (data?.length > 0) {
+                    data.forEach(item => item.checked = false);
+                }
+                setList(data);
             }
-            setList(data);
+        } catch (error) {
+            console.log(error);
+            toast.error('Lỗi lấy danh sách bạn bè');
         }
     }
 

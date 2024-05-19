@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { STATE } from "../redux/types/type.app";
+import { STATE } from "../redux/types/app.type";
 import { useNavigate } from "react-router-dom";
 import { Result, Button } from 'antd';
 import { Link } from 'react-router-dom';

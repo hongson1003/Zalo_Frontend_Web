@@ -1,0 +1,54 @@
+.join-group-container {
+    min-height: 100vh;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .content-body {
+        width: 46%;
+        min-height: 75vh;
+        background-color: #aab9ed;
+        padding: 10px 35px;
+        border-radius: 10px;
+        .title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .group-info {
+            display: flex;
+            height: 50px;
+            flex-direction: column;
+            gap: 10px;
+            .group-info-content {
+                display: flex;
+                justify-content: flex-start;
+                gap: 10px;
+                align-items: center;
+                margin: 10px 0;
+                .label {
+                    min-width: 100px;
+                    font-weight: 560;
+                }
+                .content {
+                    font-style: italic;
+                    font-weight: 777;
+                }
+                &.groupPhoto {
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin: 10px auto;
+                    img {
+                        width: 120px;
+                        height: 120px;
+                        border-radius: 50%;
+                    }
+                }
+            }
+        }
+    }
+}

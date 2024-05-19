@@ -11,6 +11,7 @@ import ErrorPage from './pages/error.page';
 import NotFound from './pages/notFound.page';
 import TestPage from './pages/test.page';
 import VideoCallWindow from './windows/videoCall.window';
+import JoinGroup from './pages/ultils/joinGroup';
 
 
 
@@ -28,6 +29,10 @@ const routes = [
                 path: 'video-call',
                 element: <VideoCallWindow />
             },
+            {
+                path: 'chat/:id',
+                element: <JoinGroup />
+            }
         ],
     },
     {

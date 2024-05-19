@@ -24,6 +24,7 @@ export const MESSAGES = {
     FILE_FOLDER: 'FILE_FOLDER',
     NOTIFY: 'NOTIFY',
     NEW_FRIEND: 'NEW_FRIEND',
+    FETCH_MESSAGES_FUNC: 'FETCH_MESSAGES_FUNC',
 }
 
 export const FILE_TYPE = {

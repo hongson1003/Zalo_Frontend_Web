@@ -1,4 +1,57 @@
-.group-friend-container {
+.groups-container {
     width: 100%;
     height: 100%;
+    .friends-body {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0 0;
+        height: calc(100% - 65px);
+
+        .friends-main {
+            width: 95%;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            .interactaction {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-height: 80px;
+            }
+        }
+    }
+
+    .no-friends {
+        min-height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .list-groups {
+        display: flex;
+        flex-direction: column;
+        margin-top: 10px;
+        overflow-y: scroll;
+        height: calc(100% - 32px);
+        .group-item {
+            padding: 0px 10px;
+            margin: 15px 0;
+            margin-top: 2%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .group-item-left {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+                .name {
+                    font-weight: 600;
+                    font-size: 16px;
+                }
+            }
+        }
+    }
 }

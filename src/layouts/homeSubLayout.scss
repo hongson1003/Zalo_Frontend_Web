@@ -4,6 +4,14 @@
     .d-none {
         display: none;
     }
+    .d-show {
+        &.pane-left {
+            width: 100%;
+        }
+        &.pane-right {
+            width: 100%;
+        }
+    }
     .drawer-empty {
         display: flex;
         flex-direction: column;
@@ -39,6 +47,17 @@
                     }
                 }
             }
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .d-show {
+        &.pane-left {
+            width: 100% !important;
+        }
+        &.pane-right {
+            width: 100%;
         }
     }
 }

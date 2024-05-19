@@ -8,7 +8,7 @@ import { FRIEND_ITEM_MENU } from '../sidebar/friend.sidebar';
 import InvitedFriend from "./friend/invited.friend";
 import ListFriend from "./friend/list.friend";
 import GroupFriend from "./friend/group.friend";
-import { STATE } from "../../redux/types/type.app";
+import { STATE } from "../../redux/types/app.type";
 import DragDrop from "../../components/customize/dropImage";
 
 const ContentMain = ({ drawerMethods }) => {

@@ -3,14 +3,12 @@ import AvatarUser from './avatar';
 import { useDispatch, useSelector } from "react-redux";
 import './chat.user.scss'
 import { accessChat } from "../../redux/actions/user.action";
-import { CHAT_STATUS, MESSAGES } from "../../redux/types/type.user";
+import { CHAT_STATUS, MESSAGES } from "../../redux/types/user.type";
 import { getFriend } from '../../utils/handleChat';
 import _ from 'lodash';
 
 const ChatUser = ({ chat }) => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
-
-
     return (
         <div className={'chat-user-container'} >
             <div className="chat-left" >
@@ -27,7 +25,8 @@ const ChatUser = ({ chat }) => {
                                 chat?.groupPhoto ? (
                                     <AvatarUser
                                         image={chat?.groupPhoto}
-                                        size={50} />
+                                        size={50}
+                                    />
                                 ) : (
                                     chat?.participants?.length > 0 &&
                                     chat?.participants?.map(item => {
@@ -36,7 +35,8 @@ const ChatUser = ({ chat }) => {
                                                 <AvatarUser
                                                     image={item.avatar}
                                                     style={{
-                                                        width: '50%'
+                                                        width: '50%',
+                                                        height: '50%',
                                                     }}
                                                     name={getFriend(user, chat.participants)?.userName}
                                                 />
@@ -53,10 +53,19 @@ const ChatUser = ({ chat }) => {
                     <div className="top">
                         {
                             chat?.type === CHAT_STATUS.GROUP_CHAT ?
-                                <div className="group-name">
-                                    <img style={{ width: '15px', height: '15px' }} src={'/groupPhoto/group.png'} />
-                                    <span className="name">{chat?.name}</span>
-                                </div> :
+                                <>
+                                    <div className="group-name">
+                                        <img style={{ width: '15px', height: '15px' }} src={'/groupPhoto/group.png'} />
+                                        <span className="name">{chat?.name}</span>
+                                    </div>
+                                    {
+                                        chat.listPin.includes(user.id) &&
+                                        <p className="pin">
+                                            <i className="fa-solid fa-thumbtack"></i>
+                                        </p>
+                                    }
+                                </>
+                                :
                                 <>
                                     <p className="name">{getFriend(user, chat.participants)?.userName}</p>
                                     {

@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { Modal } from 'antd';
 import './pins.modal.scss';
-import { MESSAGES } from '../../redux/types/type.user';
+import { MESSAGES } from '../../redux/types/user.type';
 import axios from '../../utils/axios';
+import { socket } from '../../utils/io';
+import { sendNotifyToChatRealTime } from '../../utils/handleChat';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
-const PinsModal = ({ children, data, handleFindMessageFirst, fetchChats }) => {
+const PinsModal = ({ children, data, handleFindMessageFirst, fetchChats, fetchMessagePaginate }) => {
+    const user = useSelector(state => state.appReducer?.userInfo?.user);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const showModal = () => {
         setIsModalOpen(true);
@@ -17,10 +22,19 @@ const PinsModal = ({ children, data, handleFindMessageFirst, fetchChats }) => {
     };
 
     const handleOnClickUnpin = async (message) => {
-        const res = await axios.put('/chat/message/unPinMessage', { messageId: message._id });
-        if (res.errCode === 0) {
-            fetchChats();
-            handleOk();
+        try {
+            const res = await axios.put('/chat/message/unPinMessage', { messageId: message._id });
+            if (res.errCode === 0) {
+                const notifyRes = await sendNotifyToChatRealTime(res.data?.chat?._id, `${user.userName} đã bỏ ghim 1 tin nhắn`, MESSAGES.NOTIFY);
+                socket.then(socket => {
+                    socket.emit('pin-message', res.data?.chat?._id);
+                })
+                fetchMessagePaginate();
+                handleOk();
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -34,11 +48,12 @@ const PinsModal = ({ children, data, handleFindMessageFirst, fetchChats }) => {
                 onCancel={handleCancel}
                 footer={null}
                 forceRender
+                destroyOnClose={true}
             >
                 <div className='pined-modal'>
                     {
                         data && data.length > 0 &&
-                        data.map(({ message, ref }) => {
+                        data.map((message) => {
                             return (
                                 <div
                                     key={message._id}
@@ -48,7 +63,7 @@ const PinsModal = ({ children, data, handleFindMessageFirst, fetchChats }) => {
                                     <p
                                         className='pined-item-content'
                                         onClick={() => {
-                                            handleFindMessageFirst(ref);
+                                            handleFindMessageFirst(message.ref);
                                             handleOk();
                                         }}
                                     >

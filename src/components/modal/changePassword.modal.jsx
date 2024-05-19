@@ -14,26 +14,31 @@ const ChangePasswordModal = ({ children }) => {
         setIsModalOpen(true);
     };
     const handleOk = () => {
-        form
-            .validateFields()
-            .then(async (values) => {
-                form.resetFields();
-                const data = {
-                    oldPassword: values.currentPassword,
-                    newPassword: values.newPassword,
-                }
-                const res = await axios.put('/auth/change-password', data);
-                if (res.errCode === 0) {
-                    setIsModalOpen(false);
-                    toast.success('Đổi mật khẩu thành công!');
-                    return;
-                }
-                setErrors([{ name: 'currentPassword', errors: res.message }]);
-            })
-            .catch((info) => {
-                console.log('Validate Failed:', info);
-                setErrors(info.errorFields);
-            });
+        try {
+            form
+                .validateFields()
+                .then(async (values) => {
+                    form.resetFields();
+                    const data = {
+                        oldPassword: values.currentPassword,
+                        newPassword: values.newPassword,
+                    }
+                    const res = await axios.put('/auth/change-password', data);
+                    if (res.errCode === 0) {
+                        setIsModalOpen(false);
+                        toast.success('Đổi mật khẩu thành công!');
+                        return;
+                    }
+                    setErrors([{ name: 'currentPassword', errors: res.message }]);
+                })
+                .catch((info) => {
+                    console.log('Validate Failed:', info);
+                    setErrors(info.errorFields);
+                });
+        } catch (error) {
+            console.error('Failed to change password:', error);
+            toast.error('Đã có lỗi xảy ra');
+        }
     };
     const handleCancel = () => {
         setIsModalOpen(false);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from 'antd';
 import './home.message.search.scss';
 import { UserAddOutlined, UsergroupAddOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import AddFriendModal from '../../components/modal/addFriend.modal';
 import { KEYITEMS } from "../../utils/keyMenuItem";
 import { useSelector } from "react-redux";
 import NewGroupChatModal from "../../components/modal/newGroupChat.modal";
-import { FILTER } from "../../redux/types/type.user";
+import { FILTER } from "../../redux/types/user.type";
 
 
 const items1 = [
@@ -27,6 +27,7 @@ const { Search } = Input;
 const SearchMessage = ({ setCurrent: setSearchCurrent, setStatusChat, statusChat }) => {
 
     const state = useSelector(state => state?.appReducer);
+    const searchRef = React.useRef(null);
 
     const onSearch = (value, _e, info) => {
         setSearchCurrent(value);
@@ -42,6 +43,24 @@ const SearchMessage = ({ setCurrent: setSearchCurrent, setStatusChat, statusChat
         }
     }
 
+    const handleKeyDown = (e) => {
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            searchRef.current.focus();
+        }
+    }
+
+    useEffect(() => {
+        if (searchRef.current?.input) {
+            document.addEventListener('keydown', handleKeyDown);
+        }
+        return () => {
+            if (searchRef.current?.input) {
+                document.removeEventListener('keydown', handleKeyDown);
+            }
+        }
+    }, []);
+
     return (
         <div className="sidebar-nav">
             <div className="sidebar-nav-search">
@@ -50,6 +69,7 @@ const SearchMessage = ({ setCurrent: setSearchCurrent, setStatusChat, statusChat
                     onSearch={onSearch}
                     spellCheck={false}
                     onChange={(e) => handleOnChange(e.target.value)}
+                    ref={searchRef}
                 />
                 <div className="btn-group">
                     <AddFriendModal>

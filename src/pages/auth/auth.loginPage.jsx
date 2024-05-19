@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
-import { STATE } from "../../redux/types/type.app";
+import { STATE } from "../../redux/types/app.type";
 
 
 

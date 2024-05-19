@@ -6,6 +6,7 @@ import { items } from "../../sidebar/friend.sidebar";
 import InvitedUser from "../../../components/user/invited.user";
 import axios from "../../../utils/axios";
 import { socket } from "../../../utils/io";
+import { toast } from "react-toastify";
 
 const headerData = items[2];
 const options = [
@@ -33,9 +34,11 @@ const InvitedFriend = () => {
     }, []);
 
     useEffect(() => {
-        const ids = stateUser.notificationsFriends.map(item => item?.id);
-        handleReadNotifications(ids);
-    }, []);
+        if (stateUser.fetchNotificationsFriends) {
+            const ids = stateUser.notificationsFriends.map(item => item?.id);
+            handleReadNotifications(ids);
+        }
+    }, [stateUser.fetchNotificationsFriends]);
 
     useEffect(() => {
         if (optionValue === 'received') {
@@ -46,24 +49,39 @@ const InvitedFriend = () => {
     }, [optionValue]);
 
     const handleReadNotifications = async (ids) => {
-        await axios.post('/users/notifications/friendShip', { ids });
-        stateUser.fetchNotificationsFriendFunc();
+        try {
+            await axios.post('/users/notifications/friendShip', { ids });
+            stateUser.fetchNotificationsFriends();
+        } catch (error) {
+            console.log(error);
+            toast.warn('Có lỗi xảy ra !')
+        }
     }
 
     const fetchInvitedFriends = async () => {
-        const res = await axios.get(`/users/notifications/friendShip/invited`);
-        if (res.errCode === 0) {
-            setInvitedFriends(res?.data);
-        } else {
+        try {
+            const res = await axios.get(`/users/notifications/friendShip/invited`);
+            if (res.errCode === 0) {
+                setInvitedFriends(res?.data);
+            } else {
+                toast.warn('Có lỗi xảy ra !')
+            }
+        } catch (error) {
+            console.log(error);
             toast.warn('Có lỗi xảy ra !')
         }
     }
 
     const fetchSentInvitedFriends = async () => {
-        const res = await axios.get('/users/notifications/friendShip/sentInvited');
-        if (res.errCode === 0) {
-            setInvitedFriends(res?.data);
-        } else {
+        try {
+            const res = await axios.get('/users/notifications/friendShip/sentInvited');
+            if (res.errCode === 0) {
+                setInvitedFriends(res?.data);
+            } else {
+                toast.warn('Có lỗi xảy ra !')
+            }
+        } catch (error) {
+            console.log(error);
             toast.warn('Có lỗi xảy ra !')
         }
     }

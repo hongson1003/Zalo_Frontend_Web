@@ -15,14 +15,19 @@ const LoginPhone = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
 
     const onFinish = async (values) => {
-        let rs = await axios.post('/auth/login', values);
-        const data = rs.data;
-        if (rs.errCode === 0) {
-            dispatch(loginStart(data));
-            navigate(`/verify?id=${rs?.data?.id}`);
-        } else {
-            toast.error(rs.message);
-            setPhoneNumber(values.phoneNumber);
+        try {
+            let rs = await axios.post('/auth/login', values);
+            const data = rs.data;
+            if (rs.errCode === 0) {
+                dispatch(loginStart(data));
+                navigate(`/verify?id=${rs?.data?.id}`);
+            } else {
+                toast.error(rs.message);
+                setPhoneNumber(values.phoneNumber);
+            }
+        } catch (error) {
+            console.log('error', error);
+            toast.error('Đã có lỗi xảy ra');
         }
 
     };

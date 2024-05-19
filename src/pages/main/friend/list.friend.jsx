@@ -5,7 +5,7 @@ import { Input, Select } from 'antd';
 import ListFriends from "./listFriends.friends";
 import axios from '../../../utils/axios';
 import { toast } from "react-toastify";
-import { STATE } from "../../../redux/types/type.app";
+import { STATE } from "../../../redux/types/app.type";
 const headerData = items[0];
 
 const limit = 10;
@@ -36,13 +36,19 @@ const ListFriend = () => {
 
 
     const fetchFriends = async () => {
-        const res = await axios.get(`/users/friends?page=${page}&limit=${limit}`);
-        if (res.errCode === 0) {
-            setFriends(res.data);
-            setStateFriends(STATE.RESOLVE);
-        } else {
+        try {
+            const res = await axios.get(`/users/friends?page=${page}&limit=${limit}`);
+            if (res.errCode === 0) {
+                setFriends(res.data);
+                setStateFriends(STATE.RESOLVE);
+            } else {
+                setStateFriends(STATE.REJECT);
+                toast.warn(res.message);
+            }
+        } catch (error) {
+            console.log(error);
             setStateFriends(STATE.REJECT);
-            toast.warn(res.message);
+            toast.error('Có lỗi xảy ra !')
         }
     }
 

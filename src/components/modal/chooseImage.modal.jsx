@@ -38,37 +38,43 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
     };
 
     const uploadBackgroundToCloud = async (file) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', uploadPreset);
-        formData.append("cloud_name", cloudName);
-        formData.append("folder", folder);
-        if (file) {
-            const image = file.name;
-            const name = image.split('.')[0];
-            const extName = image.split('.')[1];
-            const imgUpload = name + '-' + new Date().getTime() + '.' + extName;
-            formData.append('public_id', imgUpload); // Thêm tham số public_id vào formData
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-                method: 'POST',
-                body: formData,
-            });
-            const data = await response.json();
-            if (data && data.secure_url) {
-                const res = await axios.put('/users/updateInfor', {
-                    coverImage: data.secure_url,
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', uploadPreset);
+            formData.append("cloud_name", cloudName);
+            formData.append("folder", folder);
+            if (file) {
+                const image = file.name;
+                const name = image.split('.')[0];
+                const extName = image.split('.')[1];
+                const imgUpload = name + '-' + new Date().getTime() + '.' + extName;
+                formData.append('public_id', imgUpload); // Thêm tham số public_id vào formData
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+                    method: 'POST',
+                    body: formData,
                 });
-                if (res.errCode === 0) {
-                    toast.success('Cập nhật ảnh bìa thành công');
-                    fetchInfoUser(res.data.id);
-                    handleChangeAvatar(null, null);
+                const data = await response.json();
+                if (data && data.secure_url) {
+                    const res = await axios.put('/users/updateInfor', {
+                        coverImage: data.secure_url,
+                    });
+                    if (res.errCode === 0) {
+                        toast.success('Cập nhật ảnh bìa thành công');
+                        fetchInfoUser(res.data.id);
+                        handleChangeAvatar(null, null);
+                    }
                 }
             }
+        } catch (error) {
+            console.log('Error when upload background cover: ', error);
+            toast.error('Có lỗi xảy ra khi cập nhật ảnh bìa');
         }
     }
 
     const handleCancel = () => {
-        handleChangeAvatar(null, null);
+        if (handleChangeAvatar)
+            handleChangeAvatar(null, null);
         setIsModalOpen(false);
     };
 
@@ -86,10 +92,14 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
     }
 
     const uploadAvatar = async (base64) => {
-        console.log('base64', base64)
-        const res = await axios.put('/users/avatar', { avatar: base64 });
-        if (res.errCode === 0) {
-            dispatch(editUser(res.data));
+        try {
+            const res = await axios.put('/users/avatar', { avatar: base64 });
+            if (res.errCode === 0) {
+                dispatch(editUser(res.data));
+            }
+        } catch (error) {
+            console.error('Failed to upload avatar:', error);
+            toast.error('Đã có lỗi xảy ra');
         }
     }
 

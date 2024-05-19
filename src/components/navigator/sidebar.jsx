@@ -23,7 +23,6 @@ const Friends = () => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const app = useSelector(state => state.appReducer);
 
-
     const onlyRef = useRef(false);
     const stylePhoneBook = {
         fontSize: '24px',
@@ -33,16 +32,26 @@ const Friends = () => {
     const [count, setCount] = useState(0);
 
     const handleReadNotifications = async (ids) => {
-        await axios.post('/users/notifications/friendShip', { ids });
+        try {
+            await axios.post('/users/notifications/friendShip', { ids });
+        } catch (error) {
+            console.log(error)
+            toast.error('Có lỗi xảy ra !')
+        }
     }
 
     const fetchNotifications = async () => {
-        const res = await axios.get(`/users/notifications/friendShip?userId=${user?.id}`);
-        if (res.errCode === 0) {
-            setCount(res.data.length);
-            dispatch(notificationsFriends(res.data));
-        } else {
-            toast.warn('Có lỗi xảy ra !')
+        try {
+            const res = await axios.get(`/users/notifications/friendShip?userId=${user?.id}`);
+            if (res.errCode === 0) {
+                setCount(res.data.length);
+                dispatch(notificationsFriends(res.data));
+            } else {
+                toast.warn('Có lỗi xảy ra !')
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error('Có lỗi xảy ra !')
         }
     }
 
@@ -87,10 +96,15 @@ const Messages = () => {
     const [count, setCount] = useState(0);
 
     const fetchChatNotRead = async () => {
-        const res = await axios.get('/chat/not-read');
-        if (res.errCode === 0) {
-            setCount(res.data.length);
-            dispatch(notificationsChats(res.data));
+        try {
+            const res = await axios.get('/chat/not-read');
+            if (res.errCode === 0) {
+                setCount(res.data.length);
+                dispatch(notificationsChats(res.data));
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error('Có lỗi xảy ra !')
         }
     }
 
@@ -151,19 +165,30 @@ const Sidebar = () => {
     const navigator = useNavigate();
 
     const updateOnline = async (time) => {
-        await axios.put('/users/updateOnline', { time });
+        try {
+            await axios.put('/users/updateOnline', { time });
+        } catch (error) {
+            console.log(error)
+            toast.error('Có lỗi xảy ra !')
+        }
     }
 
     const handleLogout = async () => {
-        await updateOnline(new Date());
-        socket.then(socket => {
-            socket.emit('offline', state?.userInfo?.user?.id)
-        })
-        let rs = await axios.post('/auth/logout');
-        if (rs.errCode === 0) {
-            dispatch(logoutSuccess());
-            navigator('/login');
-        } else {
+        try {
+            await updateOnline(new Date());
+            socket.then(socket => {
+                socket.emit('offline', state?.userInfo?.user?.id)
+            })
+            let rs = await axios.post('/auth/logout');
+            if (rs.errCode === 0) {
+                dispatch(logoutSuccess());
+                navigator('/login');
+            } else {
+                updateOnline(null);
+                toast.error('Không thể đăng xuất, có lỗi xảy ra !')
+            }
+        } catch (error) {
+            console.log(error)
             updateOnline(null);
             toast.error('Không thể đăng xuất, có lỗi xảy ra !')
         }
@@ -238,6 +263,7 @@ const Sidebar = () => {
                 mode="inline"
                 items={items}
                 onClick={handleOnSelectItem}
+                selectedKeys={[state?.nav]}
                 className='custom-menu'
                 defaultSelectedKeys={'ms'}
             />

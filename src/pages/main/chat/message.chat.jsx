@@ -7,9 +7,11 @@ import _ from 'lodash';
 import { useSelector } from "react-redux";
 import axios from '../../../utils/axios';
 import { socket } from '../../../utils/io';
-import { MESSAGES, METHOD_MESSAGE } from "../../../redux/types/type.user";
-import { set } from "firebase/database";
+import { MESSAGES, METHOD_MESSAGE } from "../../../redux/types/user.type";
 import ForwardModal from "../../../components/modal/forward.modal";
+import { sendNotifyToChatRealTime } from "../../../utils/handleChat";
+import { toast } from "react-toastify";
+
 const items = [
     {
         key: METHOD_MESSAGE.COPY,
@@ -60,47 +62,73 @@ const items = [
 
 const content = ({ optionsRef, message, handleModifyMessage, isDelete, fetchChats, setOpenPopover }) => {
     const contentRef = useRef(null);
+    const userState = useSelector(state => state.userReducer);
+    const user = useSelector(state => state.appReducer?.userInfo?.user);
 
     const deleteMessage = async (messageId) => {
-        const res = await axios.put('/chat/message/deleteMessage', {
-            messageId: messageId
-        });
-        if (res.errCode === 0) {
-            handleModifyMessage(res.data);
-            socket.then(socket => {
-                socket.emit('modify-message', res.data);
-            })
+        try {
+            const res = await axios.put('/chat/message/deleteMessage', {
+                messageId: messageId
+            });
+            if (res.errCode === 0) {
+                handleModifyMessage(res.data);
+                socket.then(socket => {
+                    socket.emit('modify-message', res.data);
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
     const deleteMessageMySelf = async (messageId) => {
-        const res = await axios.put('/chat/message/recall', {
-            messageId: messageId
-        });
-        if (res.errCode === 0) {
-            handleModifyMessage(res.data);
-            // socket.then(socket => {
-            //     socket.emit('modify-message', res.data);
-            // })
+        try {
+            const res = await axios.put('/chat/message/recall', {
+                messageId: messageId
+            });
+            if (res.errCode === 0) {
+                handleModifyMessage(res.data);
+                // socket.then(socket => {
+                //     socket.emit('modify-message', res.data);
+                // })
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
     const handlePinMessage = async (messageId) => {
-        const res = await axios.put('/chat/message/pinMessage', {
-            messageId: messageId,
-            chat: message.chat
-        });
-        setOpenPopover(false);
-        if (res.errCode === 0) {
-            fetchChats();
+        try {
+            const res = await axios.put('/chat/message/pinMessage', {
+                messageId: messageId,
+                chat: message.chat
+            });
+            if (res.errCode === 0) {
+                await sendNotifyToChatRealTime(res.data?.chat?._id, `${user.userName} đã ghim 1 tin nhắn`, MESSAGES.NOTIFY);
+                socket.then(socket => {
+                    socket.emit('pin-message', res.data?.chat?._id);
+                })
+                userState.fetchMessages();
+            }
+            setOpenPopover(false);
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
+    }
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(message.content);
+        setOpenPopover(false);
     }
 
     const handleOnClick = (Element) => {
         const { key } = Element;
         switch (key) {
             case METHOD_MESSAGE.COPY:
-                console.log('Copy hình ảnh');
+                handleCopy();
                 break;
             case METHOD_MESSAGE.PIN:
                 handlePinMessage(message._id);
@@ -174,7 +202,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
         if (!previousReaction.current) return;
         if (previousReaction.current !== currentReaction) {
             if (messageRef.current) {
-                setSelectedReaction(objReaction.icon || '👌');
+                setSelectedReaction(objReaction?.icon || '👌');
                 frameTymRef.current.classList.add('show-frame-tym');
                 messageRef.current.classList.add('active');
                 setTimeout(() => {
@@ -233,15 +261,20 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
     }, 500), []);
 
     const handleSendReaction = async (messageId, userId, icon) => {
-        const res = await axios.post('/chat/feeling', {
-            messageId,
-            userId,
-            icon
-        })
-        if (res.errCode === 0) {
-            socket.then(socket => {
-                socket.emit('send-reaction', res.data);
+        try {
+            const res = await axios.post('/chat/feeling', {
+                messageId,
+                userId,
+                icon
             })
+            if (res.errCode === 0) {
+                socket.then(socket => {
+                    socket.emit('send-reaction', res.data);
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
 
     }
@@ -356,15 +389,20 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
                         message?.reactions?.length > 0 &&
                         <div className="reactions">
                             {
-                                message?.reactions.map((reaction, index) => {
-                                    if (index < 3) {
-                                        return (
-                                            <span className="reaction-item" key={reaction.userId + reaction.icon}>
-                                                {reaction?.icon}
-                                            </span>
-                                        )
-                                    }
+                                // customize reaction with reaction.icon unique
+                                message?.reactions && message?.reactions.filter((reaction, index) => {
+                                    const icon = reaction.icon;
+                                    return message?.reactions.findIndex(reaction => reaction.icon === icon) === index;
                                 })
+                                    .map((reaction, index) => {
+                                        if (index < 3) {
+                                            return (
+                                                <span className="reaction-item" key={reaction.userId + reaction.icon}>
+                                                    {reaction?.icon}
+                                                </span>
+                                            )
+                                        }
+                                    })
                             }
                             {
                                 message?.reactions?.length > 0 && <span>{
