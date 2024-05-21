@@ -18,6 +18,7 @@ import { socket } from '../../utils/io';
 import { notificationsFriends, fetchNotificationsFriendFunc, fetchNotificationChatFunc, notificationsChats } from "../../redux/actions/user.action";
 import SettingModal from "../modal/setting.modal";
 import { FRIEND_ITEM_MENU } from "../../pages/sidebar/friend.sidebar";
+import { STATE } from "../../redux/types/app.type";
 
 const Friends = () => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
@@ -109,12 +110,15 @@ const Messages = () => {
     }
 
     useEffect(() => {
-        if (onlyRef.current === false) {
+        if (onlyRef.current === false && appState.isLogin === STATE.RESOLVE) {
             fetchChatNotRead();
             dispatch(fetchNotificationChatFunc(fetchChatNotRead));
             onlyRef.current = true;
         }
-    }, []);
+        return () => {
+            onlyRef.current = false;
+        }
+    }, [appState]);
 
     const handleReceiveMessageSocket = (data) => {
         if (chat?._id !== data?.chat) {

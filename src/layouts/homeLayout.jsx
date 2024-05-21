@@ -31,8 +31,9 @@ const HomeLayout = () => {
 
   // check authentication
   useEffect(() => {
-    if (state.isLogin !== STATE.RESOLVE)
+    if (state.isLogin === STATE.REJECT) {
       navigate('/login');
+    }
     if (state.isLogin === STATE.RESOLVE) {
       const path = window.location.pathname;
       if (path === '/')
