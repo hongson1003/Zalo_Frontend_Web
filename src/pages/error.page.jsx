@@ -9,11 +9,6 @@ import { Link } from 'react-router-dom';
 const ErrorPage = () => {
     const state = useSelector(state => state?.appReducer);
     const navigate = useNavigate();
-    useEffect(() => {
-        if (state.error === false) {
-            navigate('/');
-        }
-    }, [state.error])
     return (
         <div>
             <Result style={{ width: '100%' }}

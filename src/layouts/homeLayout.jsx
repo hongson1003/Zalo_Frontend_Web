@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Layout } from 'antd';
 const { Content, Sider } = Layout;
-import './homelayout.scss';
+import './homeLayout.scss';
 import Sidebar from '../components/navigator/sidebar';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
@@ -31,6 +31,9 @@ const HomeLayout = () => {
 
   // check authentication
   useEffect(() => {
+    if (state.error){
+      navigate('/outside/error');
+    }
     if (state.isLogin === STATE.REJECT) {
       navigate('/login');
     }
