@@ -80,7 +80,6 @@ const DisbandGroupModal = ({ children }) => {
                     <Button key="back" onClick={handleCancel}>
                         Hủy
                     </Button>,
-
                     <Popconfirm
                         description="Bạn có chắc chắn muốn rời nhóm?"
                         onConfirm={confirm}
@@ -89,7 +88,7 @@ const DisbandGroupModal = ({ children }) => {
                         cancelText="Hủy"
                         key="submit"
                     >
-                        <Button type="primary" disabled={!value} loading={isLoading}>
+                        <Button danger type="primary" disabled={!value} loading={isLoading}>
                             Rời nhóm
                         </Button>
                     </Popconfirm>

@@ -46,7 +46,7 @@ const ResetPassword = () => {
                 toast.error(res.message);
         } catch (error) {
             console.log(error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     };
     const onFinishFailed = (errorInfo) => {

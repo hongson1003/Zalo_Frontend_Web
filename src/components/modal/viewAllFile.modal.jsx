@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { DownOutlined, FileOutlined, FileTextOutlined, FilePdfOutlined, FileExcelOutlined, FileWordOutlined } from '@ant-design/icons';
 import { Button, Image} from 'antd';
 import './viewAllFiles.modal.scss'; 
+import ListDrawer from '../drawer/viewAll.chat.drawer';
+
 const ViewAllFilesModal = ({ files }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -50,18 +52,20 @@ const ViewAllFilesModal = ({ files }) => {
 
   return (
     <div className="view-files">
-      <div className='header'>
+      <div className='header'  style={{ cursor: 'pointer' }} onClick={toggleExpanded}>
         <p className="title">Files</p>
-        <div className="button" style={{ cursor: 'pointer' }} onClick={toggleExpanded}>
+        <div className="button">
           <DownOutlined style={{ fontSize: '10px', fontWeight: '700', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
         </div>
       </div>
       {expanded && (
-         <div style={{ marginTop: '10px', marginLeft: '10px', flexDirection: 'column', alignItems: 'center' }}>
+         <div className='view-files-body'>
              {files.map((item, index) => (
                   <FileItem key={index} file={item} />
               ))}
-          <Button style = {{width: '95%', backgroundColor: '#F5F5F5', marginTop: '10px'}}>Xem tất cả</Button>
+              <ListDrawer>
+              <Button style = {{width: '95%', backgroundColor: '#F5F5F5', marginTop: '10px'}}>Xem tất cả</Button>
+              </ListDrawer>
         </div>
       )}                
     </div>

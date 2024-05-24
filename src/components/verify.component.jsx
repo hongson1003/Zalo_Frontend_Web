@@ -134,7 +134,7 @@ const VerifyComponent = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     }
 

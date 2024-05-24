@@ -13,9 +13,11 @@ const LoginPhone = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const onFinish = async (values) => {
         try {
+            setIsLoading(true);
             let rs = await axios.post('/auth/login', values);
             const data = rs.data;
             if (rs.errCode === 0) {
@@ -25,9 +27,10 @@ const LoginPhone = () => {
                 toast.error(rs.message);
                 setPhoneNumber(values.phoneNumber);
             }
+            setIsLoading(false);
         } catch (error) {
+            setIsLoading(false);
             console.log('error', error);
-            toast.error('Đã có lỗi xảy ra');
         }
 
     };
@@ -60,7 +63,7 @@ const LoginPhone = () => {
             </Form.Item>
 
             <Form.Item>
-                <Button type="primary" htmlType="submit" className="login-form-button" block>
+                <Button type="primary" htmlType="submit" className="login-form-button" block loading={isLoading}>
                     <span>Đăng nhập</span>
                 </Button>
 

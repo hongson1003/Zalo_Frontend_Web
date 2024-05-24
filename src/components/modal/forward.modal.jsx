@@ -98,7 +98,7 @@ const ForwardModal = ({ children, message, }) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
 
     }

@@ -9,8 +9,6 @@ import { Drawer, theme } from 'antd';
 import AvatarUser from "../components/user/avatar";
 
 const homeSublayout = () => {
-
-
     const [sizes, setSizes] = useState([
         '350px',
         'auto',
@@ -39,7 +37,6 @@ const homeSublayout = () => {
 
 
     const handleOnDoubleClick = (e) => {
-        console.log(e.target.className)
         if ('split-sash-content split-sash-content-active split-sash-content-vscode' === e.target.className) {
             if (visibleLeft === 'd-show') {
                 setSizes(['0px', '100%'])

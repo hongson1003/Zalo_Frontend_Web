@@ -117,11 +117,12 @@ const ChatSidebar = ({ current: currentSearch, statusChat, setStatusChat }) => {
     }, [fetchChats]);
 
     useEffect(() => {
-        fetchChats();
-    }, [fetchChats, statusChat])
+        if (user){
+            fetchChats();
+        }
+    }, [fetchChats, statusChat, user])
 
     const handleTransferDisbandGroupSocket = () => {
-        console.log('Nhóm đã bị giải tán');
         fetchChats();
     };
 
@@ -181,6 +182,14 @@ const ChatSidebar = ({ current: currentSearch, statusChat, setStatusChat }) => {
         }
     }
 
+    const handleDissolutionChat = (data) => {
+        fetchChats();
+        if (chat?._id === data._id) {
+            dispatch(accessChat(null));
+            toast.warn('Nhóm ' + data.name + ' đã bị giải tán');
+        }
+    }
+
     useEffect(() => {
         if (userState.fetchNotificationChats) {
             socket.then((socket) => {
@@ -192,6 +201,8 @@ const ChatSidebar = ({ current: currentSearch, statusChat, setStatusChat }) => {
                 socket.on('receive-message', handleReceiveMessageSocket);
                 socket.on('change-background', handleOnChangeBackgroundSocket);
                 socket.on('delete-member', handleDeletedMemberSocket);
+                socket.on('dissolutionGroupChat', handleDissolutionChat);
+
             });
         }
 
@@ -205,6 +216,7 @@ const ChatSidebar = ({ current: currentSearch, statusChat, setStatusChat }) => {
                 socket.off('receive-message', handleReceiveMessageSocket);
                 socket.off('change-background', handleOnChangeBackgroundSocket);
                 socket.off('delete-member', handleDeletedMemberSocket);
+                socket.off('dissolutionGroupChat', handleDissolutionChat);
             });
         };
     }, [userState]);

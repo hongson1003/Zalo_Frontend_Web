@@ -38,11 +38,11 @@ const LoginQR = () => {
                             }, 1000);
                         })
                     })
-                })
+                });
+                onlyRender.current = true;
             })
         }
-        onlyRender.current = true;
-    });
+    }, []);
     return (
         <>
             <Flex

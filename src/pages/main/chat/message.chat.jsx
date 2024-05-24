@@ -78,7 +78,7 @@ const content = ({ optionsRef, message, handleModifyMessage, isDelete, fetchChat
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+            
         }
     }
 
@@ -95,7 +95,7 @@ const content = ({ optionsRef, message, handleModifyMessage, isDelete, fetchChat
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+            
         }
     }
 
@@ -115,7 +115,7 @@ const content = ({ optionsRef, message, handleModifyMessage, isDelete, fetchChat
             setOpenPopover(false);
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+            
         }
     }
 
@@ -274,7 +274,7 @@ const MessageChat = ({ children, isLeft, message, handleModifyMessage, isImage, 
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+            
         }
 
     }

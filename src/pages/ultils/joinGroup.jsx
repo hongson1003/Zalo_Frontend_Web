@@ -56,7 +56,7 @@ const JoinGroup = () => {
                     navigate('/home');
                 }, 1000);
             } else if (res.errCode === 1) {
-                toast.error('Bạn đã tham gia nhóm này rồi!');
+                toast.success('Bạn đã tham gia nhóm này rồi!');
                 setIsLoading(false);
                 navigate('/home');
             } else {
@@ -71,8 +71,10 @@ const JoinGroup = () => {
     }
 
     useEffect(() => {
-        fetchGroupByID();
-    }, [])
+        if (user){
+            fetchGroupByID();
+        }
+    }, [user])
 
     return (
         <div className="join-group-container">
@@ -80,7 +82,7 @@ const JoinGroup = () => {
                 <p className="title">Thông tin nhóm</p>
                 <div className="group-info">
                     <div className="group-info-content groupPhoto">
-                        <img src={group.groupPhoto} />
+                        <img src={group.groupPhoto || '/groupPhoto/avatar-group.png'} />
                     </div>
                     <div className="group-info-content name">
                         <p className="label">Tên nhóm:</p>

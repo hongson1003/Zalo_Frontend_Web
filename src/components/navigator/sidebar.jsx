@@ -23,8 +23,6 @@ import { STATE } from "../../redux/types/app.type";
 const Friends = () => {
     const user = useSelector(state => state.appReducer?.userInfo?.user);
     const app = useSelector(state => state.appReducer);
-
-    const onlyRef = useRef(false);
     const stylePhoneBook = {
         fontSize: '24px',
     }
@@ -37,7 +35,7 @@ const Friends = () => {
             await axios.post('/users/notifications/friendShip', { ids });
         } catch (error) {
             console.log(error)
-            toast.error('Có lỗi xảy ra !')
+            
         }
     }
 
@@ -48,38 +46,37 @@ const Friends = () => {
                 setCount(res.data.length);
                 dispatch(notificationsFriends(res.data));
             } else {
-                toast.warn('Có lỗi xảy ra !')
+                
             }
         } catch (error) {
             console.log(error)
-            toast.error('Có lỗi xảy ra !')
+        }
+    }
+
+    const handleNeedAcceptAddFriend = (data) => {
+        if (FRIEND_ITEM_MENU.INVITE_FRIEND === app?.subNav) {
+            handleReadNotifications([data?.id]);
+        } else {
+            fetchNotifications();
         }
     }
 
     useEffect(() => {
-        if (onlyRef.current === false) {
+        dispatch(fetchNotificationsFriendFunc(fetchNotifications));
+        if (user){
             socket.then(socket => {
-                socket.on('need-accept-addFriend', (data) => {
-                    if (FRIEND_ITEM_MENU.INVITE_FRIEND === app?.subNav) {
-                        handleReadNotifications([data?.id]);
-                    } else {
-                        fetchNotifications();
-                    }
-                })
-            })
-            dispatch(fetchNotificationsFriendFunc(fetchNotifications));
-        }
-        if (user)
+                socket.on('need-accept-addFriend', handleNeedAcceptAddFriend)
+            });
             fetchNotifications();
-        onlyRef.current = true;
-
-        return () => {
-            onlyRef.current = false;
-            socket.then(socket => {
-                socket.off('need-accept-addFriend');
-            })
         }
-    }, [app.subNav]);
+        return () => {
+            if (user){
+                socket.then(socket => {
+                    socket.off('need-accept-addFriend', handleNeedAcceptAddFriend);
+                })
+            }
+        }
+    }, [user]);
 
     return (
         <WrapperItemSidebar count={count}>
@@ -105,7 +102,7 @@ const Messages = () => {
             }
         } catch (error) {
             console.log(error)
-            toast.error('Có lỗi xảy ra !')
+            
         }
     }
 
@@ -141,9 +138,6 @@ const Messages = () => {
         };
     }, [appState, chat]);
 
-
-
-
     return (
         <WrapperItemSidebar
             count={count}
@@ -173,7 +167,7 @@ const Sidebar = () => {
             await axios.put('/users/updateOnline', { time });
         } catch (error) {
             console.log(error)
-            toast.error('Có lỗi xảy ra !')
+            
         }
     }
 
@@ -269,7 +263,6 @@ const Sidebar = () => {
                 onClick={handleOnSelectItem}
                 selectedKeys={[state?.nav]}
                 className='custom-menu'
-                defaultSelectedKeys={'ms'}
             />
         </div >
     )

@@ -25,7 +25,11 @@ const SidebarHome = ({ children }) => {
                     setStatusChat={setStatusChat}
                 />;
             default:
-                return <></>;
+                return <ChatSidebar
+                current={current}
+                statusChat={statusChat}
+                setStatusChat={setStatusChat}
+            />;
         }
     }
 

@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 const FriendPopover = ({ children, user, fetchFriends }) => {
 
     const handleBlockUser = () => {
-        console.log('Block user', user);
         toast.warn('Chức năng chặn người dùng đang được phát triển!');
     }
 

@@ -39,10 +39,19 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
 
     //Handle date
     const [newInfo, setInfo] = useState({
-        name: user?.userName,
-        gender: 0,
+        name: '',
+        gender: null,
         dob: dayjs(new Date(), dateFormat)
     });
+
+    useEffect(() =>{
+        setInfo({
+            name: user?.userName,
+            gender: user?.gender,
+            dob:  dayjs(profile?.birthdate, dateFormat),
+        })
+    }, [user])
+
 
 
     const onDateChange = (date, dateString) => {
@@ -89,7 +98,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -142,7 +150,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             setEditing(STATE.PENDING);
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -203,7 +210,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -255,7 +261,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -277,7 +282,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     };
 
@@ -314,7 +318,6 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
             }
         } catch (error) {
             console.log(error);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
         }
     }
 
@@ -407,7 +410,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                         <div className='top-10px'>
                             <span style={{ fontWeight: 'bold', marginRight: '5px' }}>{!itsMe ? friendData?.userName : user?.userName}</span>
                             {
-                                !readOnly &&
+                                itsMe &&
                                 <EditOutlined style={{ fontSize: '18px', cursor: 'pointer' }}
                                     onClick={handleOpenUpdate}
                                 />

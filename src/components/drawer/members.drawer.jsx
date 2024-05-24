@@ -74,7 +74,7 @@ const MemberDrawer = ({ children, chat }) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     }
 
@@ -84,7 +84,7 @@ const MemberDrawer = ({ children, chat }) => {
             setSelectedFriendShipMember(res.data);
         } catch (error) {
             console.log(error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     }
 

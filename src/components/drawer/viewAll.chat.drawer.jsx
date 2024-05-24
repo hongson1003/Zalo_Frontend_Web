@@ -40,7 +40,7 @@ function ListImages() {
             }
         } catch (error) {
             console.error('Failed to fetch images:', error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     }
 
@@ -150,7 +150,6 @@ const ListChatDrawer = ({ children }) => {
     };
 
     const onChange = (key) => {
-        console.log(key);
     };
 
     const TitleDrawer = () => {

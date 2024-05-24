@@ -25,12 +25,19 @@ const InvitedFriend = () => {
     const [invitedFriends, setInvitedFriends] = React.useState([]);
     const [optionValue, setOptionValue] = React.useState('received');
 
+    const handleNeedAcceptAddFriend = (data) => {
+        fetchInvitedFriends();
+    }
+
     useEffect(() => {
         socket.then(socket => {
-            socket.on('need-accept-addFriend', () => {
-                fetchInvitedFriends();
-            });
+            socket.on('need-accept-addFriend', handleNeedAcceptAddFriend);
         });
+        return () => {
+            socket.then(socket => {
+                socket.off('need-accept-addFriend', handleNeedAcceptAddFriend);
+            })
+        }
     }, []);
 
     useEffect(() => {
@@ -54,7 +61,7 @@ const InvitedFriend = () => {
             stateUser.fetchNotificationsFriends();
         } catch (error) {
             console.log(error);
-            toast.warn('Có lỗi xảy ra !')
+            
         }
     }
 
@@ -64,11 +71,11 @@ const InvitedFriend = () => {
             if (res.errCode === 0) {
                 setInvitedFriends(res?.data);
             } else {
-                toast.warn('Có lỗi xảy ra !')
+                
             }
         } catch (error) {
             console.log(error);
-            toast.warn('Có lỗi xảy ra !')
+            
         }
     }
 
@@ -78,11 +85,11 @@ const InvitedFriend = () => {
             if (res.errCode === 0) {
                 setInvitedFriends(res?.data);
             } else {
-                toast.warn('Có lỗi xảy ra !')
+                
             }
         } catch (error) {
             console.log(error);
-            toast.warn('Có lỗi xảy ra !')
+            
         }
     }
     const onChange = (value) => {

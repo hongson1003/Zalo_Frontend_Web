@@ -51,7 +51,8 @@ import ViewSettingModal from "../../../components/modal/securitySetting.modal";
 import LeaveGroupModal from "../../../components/modal/leaveGroup.modal";
 import ChatTogetherDrawer from "../../../components/drawer/chatTogether.drawer";
 import LinkJoinGroupModal from "../../../components/modal/linkJoinGroup.modal";
-import { fetchMessages } from "../../../redux/actions/user.action";
+import { accessChat, fetchMessages } from "../../../redux/actions/user.action";
+import { Popconfirm  } from 'antd';
 
 
 const ChatMain = ({ file, fileTypes, drawerMethods }) => {
@@ -122,6 +123,30 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
         }
     }, [messages.length, chat, userState.fetchChats]);
 
+
+    useEffect(() => {
+        if (!chat._id) {
+            dispatch(changeKeySubMenu(''));
+        }
+        textAreaRef.current.focus();
+    }, [chat]);
+
+    const handleReceiveReaction = (data) => {
+        handleModifyMessage(data);
+    };
+
+    const handleTransferDisbandGroup = (data) => {
+        fetchMessagePaginate();
+        dispatch(editGroup(data));
+    };
+
+    const handleLeaveGroup = (data) => {
+        if (chat?._id === data.chatId) {
+            const participants = chat.participants.filter(item => item.id !== data.userId);
+            dispatch(editGroup({ ...chat, participants }));
+        }
+    };
+
     const updateSeenBy = async () => {
         try {
             const res = await axios.put('/chat/seen', {
@@ -186,28 +211,27 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     //     }
     // }
 
-    useEffect(() => {
-        if (!chat._id) {
-            dispatch(changeKeySubMenu(''));
+    const confirm = async(e) => {
+        try {
+            const res = await axios.post('/chat/group/dissolution',chat);
+            if (res.errCode ===0 ){
+                socket.then(socket => {
+                    socket.emit('dissolutionGroupChat', chat);
+                    setTimeout(() => {
+                        dispatch(accessChat(null)); 
+                    }, 500);
+                })
+                userState.fetchChats();
+            }else {
+                toast.warn('Có lỗi xảy ra, không thể giải tán nhóm');
+            }
+        } catch (error) {
+            console.log(error)
         }
-        textAreaRef.current.focus();
-    }, [chat]);
+      };
+      const cancel = (e) => {
 
-    const handleReceiveReaction = (data) => {
-        handleModifyMessage(data);
-    };
-
-    const handleTransferDisbandGroup = (data) => {
-        fetchMessagePaginate();
-        dispatch(editGroup(data));
-    };
-
-    const handleLeaveGroup = (data) => {
-        if (chat?._id === data.chatId) {
-            const participants = chat.participants.filter(item => item.id !== data.userId);
-            dispatch(editGroup({ ...chat, participants }));
-        }
-    };
+      };
 
     const handleGrant = (data) => {
         dispatch(editGroup(data));
@@ -345,7 +369,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
     };
 
     const handleReceiveModifyMessageSocket = (data) => {
-        if (data._id && data.chat === chat._id) {
+        if (data._id && data?.chat?._id === chat._id) {
             handleModifyMessage(data);
         }
     };
@@ -363,6 +387,14 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
             fetchMessagePaginate();
     }
 
+    const handleDissolutionChat = (data) => {  
+        userState.fetchChats();
+        if (chat?._id === data._id) {
+            dispatch(accessChat(null));
+        }
+    }
+
+
     useEffect(() => {
         socket.then((socket) => {
             socket.on('typing', handleTypingSocket);
@@ -371,6 +403,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
             socket.on('receive-modify-message', handleReceiveModifyMessageSocket);
             socket.on('change-background', handleChangeBackgroundSocket);
             socket.on('pin-message', handlePinMessageSocket);
+            socket.on('dissolutionGroupChat', handleDissolutionChat);
         });
 
         return () => {
@@ -381,6 +414,7 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                 socket.off('receive-modify-message', handleReceiveModifyMessageSocket);
                 socket.off('change-background', handleChangeBackgroundSocket);
                 socket.off('pin-message', handlePinMessageSocket);
+                socket.off('dissolutionGroupChat', handleDissolutionChat);
             });
         };
     }, [chat]);
@@ -614,20 +648,20 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                 <i className="fa-solid fa-magnifying-glass icon"></i>
             </div >
         },
-        {
-            key: 'phone',
-            icon: <div className="box-icon">
-                <i className="fa-solid fa-phone icon"></i>
-            </div>
-        },
-        {
-            key: 'video-call',
-            icon: <WrapperVideo>
-                <div className="box-icon">
-                    <i className="fa-solid fa-video icon"></i>
-                </div>
-            </WrapperVideo>
-        },
+        // {
+        //     key: 'phone',
+        //     icon: <div className="box-icon">
+        //         <i className="fa-solid fa-phone icon"></i>
+        //     </div>
+        // },
+        // {
+        //     key: 'video-call',
+        //     icon: <WrapperVideo>
+        //         <div className="box-icon">
+        //             <i className="fa-solid fa-video icon"></i>
+        //         </div>
+        //     </WrapperVideo>
+        // },
         {
             key: 'foremore',
             icon:
@@ -2084,13 +2118,13 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                     </ViewAllFilesModal>
                                 </div>
                             }
-                            {
+                            {/* {
                                 <div className="view-all-link">
                                     <div className="hyphen"></div>
                                     <ViewAllLinksModal links={[]}>
                                     </ViewAllLinksModal>
                                 </div>
-                            }
+                            } */}
                             {
                                 <div className="security-setting">
                                     <div className="hyphen"></div>
@@ -2118,20 +2152,28 @@ const ChatMain = ({ file, fileTypes, drawerMethods }) => {
                                 <div className="leave-group">
                                     {
                                         chat?.administrator === user?.id ?
+                                            <div className="group-important-delete">
                                             <DisbandGroupModal>
                                                 <Button
-                                                    type="primary"
-                                                    danger
                                                     icon={<i className="fa-solid fa-sign-out"></i>}
                                                     className="leave-group-btn"
                                                 >
-                                                    <p>Giải tán nhóm</p>
+                                                    <p>Rời nhóm</p>
                                                 </Button>
-                                            </DisbandGroupModal> :
+                                            </DisbandGroupModal>
+                                            <Popconfirm
+                                                description="Bạn có chắc chắn muốn giải tán nhóm không?"
+                                                onConfirm={confirm}
+                                                onCancel={cancel}
+                                                okText="Đồng ý"
+                                                cancelText="Hủy bỏ"
+                                                placement="top"
+                                            >
+                                                <Button>Giải tán nhóm</Button>
+                                            </Popconfirm>
+                                            </div> :
                                             <LeaveGroupModal>
                                                 <Button
-                                                    type="primary"
-                                                    danger
                                                     icon={<i className="fa-solid fa-sign-out"></i>}
                                                     className="leave-group-btn"
                                                 >

@@ -15,8 +15,8 @@ import { editGroup } from '../../redux/actions/app.action';
 import { Input } from 'antd';
 import LeaveGroupModal from './leaveGroup.modal';
 import DisbandGroupModal from './disbandGroup.modal';
-import { getDetailListMembers } from '../../utils/handleChat';
-import { toast } from 'react-toastify';
+import { getDetailListMembers, sendNotifyToChatRealTime } from '../../utils/handleChat';
+import { MESSAGES } from '../../redux/types/user.type';
 
 const cloudName = import.meta.env.VITE_APP_CLOUNDINARY_CLOUD_NAME;
 
@@ -61,6 +61,7 @@ const InforGroupModal = ({ children, selectChat }) => {
                     method: 'POST',
                     body: file,
                 });
+                await sendNotifyToChatRealTime(chat?._id, `${user?.userName} đã thay đổi ảnh nhóm`, MESSAGES.NOTIFY);
                 const { secure_url } = await response.json();
                 setGroupPhoto(secure_url);
                 url = secure_url;
@@ -77,6 +78,9 @@ const InforGroupModal = ({ children, selectChat }) => {
                 groupPhoto: url,
                 name
             });
+            if (chat?.groupPhoto !== groupPhoto &&!file){
+                sendNotifyToChatRealTime(chat?._id, `${user?.userName} đã thay đổi ảnh nhóm`, MESSAGES.NOTIFY);
+            }
             if (res.errCode === 0) {
                 dispatch(editGroup(res.data));
                 stateUser.fetchChats();
@@ -87,7 +91,7 @@ const InforGroupModal = ({ children, selectChat }) => {
         } catch (error) {
             console.log(error);
             setIsLoading(false);
-            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+            
         }
     };
 
@@ -198,7 +202,7 @@ const InforGroupModal = ({ children, selectChat }) => {
                                 {
                                     user?.id === chat?.administrator ?
                                         <DisbandGroupModal>
-                                            <p>Giải tán nhóm</p>
+                                            <p>Rời nhóm</p>
                                         </DisbandGroupModal> :
                                         <LeaveGroupModal>
                                             <p >Rời nhóm</p>

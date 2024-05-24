@@ -42,7 +42,7 @@ const NewGroupChatModal = ({ children }) => {
         if (user) {
             fetchGroupPhotos();
         }
-    }, []);
+    }, [user]);
 
     const showDrawer = () => {
         setOpen(true);
@@ -176,7 +176,7 @@ const NewGroupChatModal = ({ children }) => {
         if (user) {
             fetchFriends();
         }
-    }, [])
+    }, [user])
 
 
     const renderFooter = () => {

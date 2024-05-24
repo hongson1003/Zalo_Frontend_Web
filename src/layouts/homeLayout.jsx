@@ -15,6 +15,7 @@ import axios from '../utils/axios';
 import { getFriend } from '../utils/handleChat';
 
 const HomeLayout = () => {
+
   const navigate = useNavigate();
   const state = useSelector(state => state?.appReducer);
   const dispatch = useDispatch();
@@ -44,8 +45,7 @@ const HomeLayout = () => {
     }
   }, [state]);
 
-  // connect to socket
-  useState(() => {
+  useEffect(() => {
     if (state?.userInfo) {
       socket.then((socket) => {
         socket.emit('setup', state?.userInfo?.user);
@@ -54,41 +54,11 @@ const HomeLayout = () => {
             socket.emit('join-room', state?.userInfo?.user.id)
             dispatch(connectSocketSuccess());
           }
-
         })
       })
     }
-  }, []);
+  }, [state.userInfo]);
 
-  // const fetchStipopDownloaded = async () => {
-  //   try {
-  //     const userId = '1'; // Thay '1' bằng userId thực tế của người dùng
-  //     const apiKey = '35271430ffc4bcbfb11849e2aa9bb1d4';
-
-  //     const apiUrl = `https://messenger.stipop.io/v1/download/${userId}`;
-  //     const requestOptions = {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'apikey': apiKey
-  //       }
-  //     };
-
-  //     const response = await fetch(apiUrl, requestOptions);
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to fetch Stipop API');
-  //     }
-
-  //     const data = await response.json();
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.error('Error fetching Stipop API:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchStipopDownloaded();
-  // }, [])
 
   useEffect(() => {
     const triggerOnline = async () => {

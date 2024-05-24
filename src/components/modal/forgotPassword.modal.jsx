@@ -53,7 +53,7 @@ const ForgotPasswordModal = ({ children, phoneNumberProp }) => {
             }
         } catch (error) {
             console.log('Failed to fetch user by phone:', error);
-            toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!');
+            
         }
     }
 

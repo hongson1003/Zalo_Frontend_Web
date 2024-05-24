@@ -122,9 +122,11 @@ export const PrivacySetting = () => {
             toast.error('Có lỗi xảy ra, vui lòng thử lại sau !!!');
         }
     }
+
+
     useEffect(() => {
         getInfo();
-    }, [])
+    }, [user])
 
     const handleAddEmail = () => {
         setStatus(STATE.READY);

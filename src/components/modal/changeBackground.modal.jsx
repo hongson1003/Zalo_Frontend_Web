@@ -25,7 +25,7 @@ const ChangeBackgroundModal = ({ chat, children, handleChangeBackground }) => {
             }
         } catch (error) {
             console.error('Failed to set background:', error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     }
 
@@ -58,7 +58,7 @@ const ChangeBackgroundModal = ({ chat, children, handleChangeBackground }) => {
             }
         } catch (error) {
             console.error('Failed to fetch backgrounds:', error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     }
 

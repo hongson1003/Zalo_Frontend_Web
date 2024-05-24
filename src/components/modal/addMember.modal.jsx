@@ -53,7 +53,7 @@ const AddMemberModal = ({ children, chat }) => {
         } catch (error) {
             console.error('Failed to add member:', error);
             setIsLoading(false);
-            toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!');
+            
         }
     };
     const handleCancel = () => {
@@ -73,7 +73,7 @@ const AddMemberModal = ({ children, chat }) => {
             }
         } catch (error) {
             console.error('Failed to fetch friends:', error);
-            toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!');
+            
         }
     }
 

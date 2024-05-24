@@ -48,7 +48,7 @@ const ListFriend = () => {
         } catch (error) {
             console.log(error);
             setStateFriends(STATE.REJECT);
-            toast.error('Có lỗi xảy ra !')
+            
         }
     }
 

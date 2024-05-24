@@ -99,7 +99,7 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
             }
         } catch (error) {
             console.error('Failed to upload avatar:', error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     }
 
@@ -183,7 +183,7 @@ const ChooseImageModal = ({ children, setGroupPhoto, setFile, data, type, handle
                             <PictureOutlined />
                             <span>Tải ảnh lên từ máy tính</span>
                         </label>
-                        <input type='file' hidden id='upload' onChange={handleOnChangeImage} />
+                        <input type='file' accept='image/png, image/gif, image/jpeg' hidden id='upload' onChange={handleOnChangeImage} />
                     </div>
 
                     <div className='group-collection'>

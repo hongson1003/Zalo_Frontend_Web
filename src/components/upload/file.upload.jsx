@@ -31,7 +31,7 @@ const File = ({ url, name, children, type, size, className }) => {
                     <p>{name}</p>
                     <p>{size}</p>
                 </div>
-                <div className="option-file" onClick={() => console.log('click')}>
+                <div className="option-file">
                     <Button type="default">
                         <a
                             className="download-file"

@@ -37,7 +37,7 @@ const ChangePasswordModal = ({ children }) => {
                 });
         } catch (error) {
             console.error('Failed to change password:', error);
-            toast.error('Đã có lỗi xảy ra');
+            
         }
     };
     const handleCancel = () => {
