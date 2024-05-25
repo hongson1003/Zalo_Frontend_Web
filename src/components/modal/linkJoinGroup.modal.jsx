@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { Modal } from 'antd';
 const url = import.meta.env.VITE_APP_URL;
 import { Button, message } from 'antd';
+import { QRCode } from 'antd';
 
 
 
 const LinkJoinGroupModal = ({ group, children }) => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -42,30 +45,49 @@ const LinkJoinGroupModal = ({ group, children }) => {
                 footer={null}
                 centered
             >
-                <div>
-                    <p>Link tham gia nhóm:</p>
-                    <p style={{
-                        color: 'blue',
-                        marginLeft: '10px',
-                        fontSize: '18px',
-                        fontWeight: 'bold',
-                        fontStyle: 'italic',
-                    }}>
-                        <span>{`${url}/chat/${group._id}`}</span>
-                        &nbsp;
-                        {contextHolder}
-                        <span style={{
-                            color: 'black',
-                            cursor: 'pointer',
-                        }}
-                            onClick={() => {
-                                navigator.clipboard.writeText(`${url}/chat/${group._id}`);
-                                success();
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '20px',
+                }}>
+                    <div>
+                        <p>Link tham gia nhóm:</p>
+                        <p style={{
+                            color: 'blue',
+                            marginLeft: '10px',
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            fontStyle: 'italic',
+                        }}>
+                            <span>{`${url}/chat/${group._id}`}</span>
+                            &nbsp;
+                            {contextHolder}
+                            <span style={{
+                                color: 'black',
+                                cursor: 'pointer',
                             }}
-                        >
-                            <i className="fa-solid fa-copy"></i>
-                        </span>
-                    </p>
+                                onClick={() => {
+                                    navigator.clipboard.writeText(`${url}/chat/${group._id}`);
+                                    success();
+                                }}
+                            >
+                                <i className="fa-solid fa-copy"></i>
+                            </span>
+                        </p>
+                    </div>
+                    <div>
+                        <QRCode
+                            style={{
+                                marginBottom: 16,
+                            }}
+                            value={JSON.stringify({
+                                type: 'JOIN-CHAT',
+                                groupId: group._id,
+                            })}
+                        />
+                    </div>
 
                 </div>
             </Modal>

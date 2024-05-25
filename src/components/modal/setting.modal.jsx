@@ -179,6 +179,7 @@ export const PrivacySetting = () => {
             setIsLoading(false);
             if (res.errCode === 0) {
                 setStatus(STATE.SUCCESS);
+                getInfo();
                 toast.success('Xác minh email thành công !!!');
             } else {
                 toast.error('Mã xác minh không chính xác !!!');

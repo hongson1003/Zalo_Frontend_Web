@@ -13,19 +13,19 @@ import { sendNotifyToChatRealTime } from '../../utils/handleChat';
 import { MESSAGES } from '../../redux/types/user.type';
 import { toast } from 'react-toastify';
 
-const Content = ({ friendData, friendShipData, handleRemoveMember }) => {
+const Content = ({ friendData, friendShipData, handleRemoveMember, fetchFriendShip }) => {
 
     const handleDeleteMember = () => {
         handleRemoveMember(friendData);
     }
-
 
     return (
         <div>
             <InforUserModal
                 friendData={friendData}
                 type={'button'}
-                friendShipData={friendShipData}
+                friendShipData={friendShipData || null}
+                fetchFriendShip={fetchFriendShip}
             >
                 <Button type="text">Xem thông tin</Button>
             </InforUserModal>
@@ -74,17 +74,16 @@ const MemberDrawer = ({ children, chat }) => {
             }
         } catch (error) {
             console.log(error);
-            
         }
     }
 
     const handleselectedFriendShipMember = async (member) => {
         try {
             const res = await axios.get('/users/friendShip?userId=' + member.id);
-            setSelectedFriendShipMember(res.data);
+            setSelectedFriendShipMember(res.data || null);
         } catch (error) {
             console.log(error);
-            
+
         }
     }
 
@@ -122,6 +121,7 @@ const MemberDrawer = ({ children, chat }) => {
                                             friendData={participant}
                                             type={'button'}
                                             friendShipData={selectedFriendShipMember}
+                                            fetchFriendShip={() => handleselectedFriendShipMember(participant)}
                                         >
                                             <div key={index} className='member' onClick={() => handleselectedFriendShipMember(participant)}>
                                                 <AvatarUser
@@ -147,11 +147,19 @@ const MemberDrawer = ({ children, chat }) => {
                                                         {
                                                             friendData: participant,
                                                             friendShipData: selectedFriendShipMember,
-                                                            handleRemoveMember: handleRemoveMember
+                                                            handleRemoveMember: handleRemoveMember,
+                                                            fetchFriendShip: () => handleselectedFriendShipMember(participant)
                                                         }
                                                     )}
                                                     trigger={'click'}
                                                     className='popover-member'
+                                                    afterOpenChange={(visible) => {
+                                                        if (!visible) {
+                                                            setSelectedFriendShipMember(null);
+                                                        } else {
+                                                            handleselectedFriendShipMember(participant);
+                                                        }
+                                                    }}
                                                 >
                                                     <span >
                                                         <EllipsisOutlined />

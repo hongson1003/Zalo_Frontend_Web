@@ -36,6 +36,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
     const [editing, setEditing] = useState(STATE.PENDING);
     const dateFormat = 'YYYY/MM/DD';
     const [backgroundCoverPreview, setBackgroundCoverPreview] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     //Handle date
     const [newInfo, setInfo] = useState({
@@ -44,11 +45,11 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
         dob: dayjs(new Date(), dateFormat)
     });
 
-    useEffect(() =>{
+    useEffect(() => {
         setInfo({
             name: user?.userName,
             gender: user?.gender,
-            dob:  dayjs(profile?.birthdate, dateFormat),
+            dob: dayjs(profile?.birthdate, dateFormat),
         })
     }, [user])
 
@@ -185,7 +186,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                         ) : (
                             <div className={`modal-footer ${needAddFriend && 'appear'}`} onMouseOver={e => handleOnMouse(e)}>
                                 <Button type='default' onClick={handleComeBack}>Thông tin</Button>
-                                <Button type='dashed' onClick={handleAddFriend}>Thêm bạn</Button>
+                                <Button loading={isLoading} type='dashed' onClick={handleAddFriend}>Thêm bạn</Button>
                             </div>
                         )
                 }
@@ -195,6 +196,7 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
 
     const handleAddFriend = async () => {
         try {
+            setIsLoading(true);
             const res = await axios.post('/users/friendShip',
                 { userId: friendData?.id, content: description }
             );
@@ -203,12 +205,16 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 socket.then(socket => {
                     socket.emit('send-add-friend', friendData);
                 })
+                setIsLoading(false);
                 toast.success('Đã gửi lời mời kết bạn');
                 handleCancel();
             } else {
+                setIsLoading(false);
                 toast.warn(res.message);
             }
         } catch (error) {
+            setIsLoading(false);
+            handleCancel();
             console.log(error);
         }
     }
@@ -255,7 +261,9 @@ const InforUserModal = ({ children, friendData, friendShipData, type, handleOk: 
                 { userId: friendData?.id, content: description }
             );
             if (res.errCode === 3) {
-                fetchFriendShip(friendData?.id);
+                await fetchFriendShip(friendData?.id);
+                toast.success('Đã thu hồi lời mời kết bạn');
+                handleCancel();
             } else {
                 toast.warn(res.message);
             }
