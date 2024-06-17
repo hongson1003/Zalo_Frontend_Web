@@ -13,63 +13,60 @@ import TestPage from './pages/test.page';
 import VideoCallWindow from './windows/videoCall.window';
 import JoinGroup from './pages/ultils/joinGroup';
 
-
-
 const routes = [
-    {
-        path: '/',
-        element: <HomeLayout />,
-        exact: true,
-        children: [
-            {
-                path: 'home',
-                element: <HomeSubLayout />,
-            },
-            {
-                path: 'video-call',
-                element: <VideoCallWindow />
-            },
-            {
-                path: 'chat/:id',
-                element: <JoinGroup />
-            }
-        ],
-    },
-    {
-        path: '/login',
-        element: <LoginPage />,
-    },
-    {
-        path: '/verify',
-        element: <VerifyComponent />
-    },
-    {
-        path: '/reset-password',
-        element: <ResetPassword />
-    },
-    {
-        path: '/outside',
-        element: <OutsideLayout />,
-        children: [
-            {
-                path: 'error',
-                element: <ErrorPage />
-            },
-
-        ],
-    },
-    {
-        path: '/error',
-        element: <ErrorPage />
-    },
-    {
-        path: '/test',
-        element: <TestPage />
-    },
-    {
-        path: '*',
-        element: <NotFound />
-    },
+  {
+    path: '/',
+    element: <HomeLayout />,
+    exact: true,
+    children: [
+      {
+        path: 'home',
+        element: <HomeSubLayout />,
+      },
+      {
+        path: 'video-call',
+        element: <VideoCallWindow />,
+      },
+      {
+        path: 'chat/:id',
+        element: <JoinGroup />,
+      },
+    ],
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/verify',
+    element: <VerifyComponent />,
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPassword />,
+  },
+  {
+    path: '/outside',
+    element: <OutsideLayout />,
+    children: [
+      {
+        path: 'error',
+        element: <ErrorPage />,
+      },
+    ],
+  },
+  {
+    path: '/error',
+    element: <ErrorPage />,
+  },
+  {
+    path: '/test',
+    element: <TestPage />,
+  },
+  {
+    path: '*',
+    element: <NotFound />,
+  },
 ];
 
 export const router = createBrowserRouter(routes);

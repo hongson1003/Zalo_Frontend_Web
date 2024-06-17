@@ -1,65 +1,65 @@
 .info-group-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 20px;
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    p {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #000;
+      i {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .send-message {
+    max-height: 80px;
+    padding: 10px 2px;
+    border-bottom: 5px solid #eaedf0;
+    .send-btn {
+      width: 100%;
+      background-color: #eaedf0;
+      color: #000;
+    }
+  }
+
+  .members {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 20px;
-    .header {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        p {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #000;
-            i {
-                cursor: pointer;
-            }
-        }
+    height: 100%;
+    gap: 5px;
+    .title {
+      font-size: 14px;
+      font-weight: 700;
     }
-
-    .send-message {
-        max-height: 80px;
-        padding: 10px 2px;
-        border-bottom: 5px solid #eaedf0;
-        .send-btn {
-            width: 100%;
-            background-color: #eaedf0;
-            color: #000;
-        }
+    .members-items {
+      display: flex;
+      align-items: center;
+      .member {
+        border-radius: 50%;
+        overflow: hidden;
+      }
     }
-
-    .members {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        height: 100%;
-        gap: 5px;
-        .title {
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .members-items {
-            display: flex;
-            align-items: center;
-            .member {
-                border-radius: 50%;
-                overflow: hidden;
-            }
-        }
-    }
-    .setting-group-item {
-        display: flex;
-        align-items: center;
-        padding-left: 10px;
-        gap: 10px;
-        cursor: pointer;
-    }
-    .out-group-item {
-        display: flex;
-        align-items: center;
-        padding-left: 10px;
-        gap: 10px;
-        cursor: pointer;
-        color: red;
-    }
+  }
+  .setting-group-item {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .out-group-item {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    gap: 10px;
+    cursor: pointer;
+    color: red;
+  }
 }

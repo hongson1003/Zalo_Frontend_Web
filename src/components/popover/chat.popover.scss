@@ -1,19 +1,19 @@
 .chat-popover {
-    padding: 10px 0;
-    p {
-        font-size: 14px;
-        padding: 5px 10px;
-        cursor: pointer;
-        &:hover {
-            background-color: #f3f5f6;
-        }
-        &.delete {
-            color: red;
-        }
+  padding: 10px 0;
+  p {
+    font-size: 14px;
+    padding: 5px 10px;
+    cursor: pointer;
+    &:hover {
+      background-color: #f3f5f6;
     }
+    &.delete {
+      color: red;
+    }
+  }
 }
 
 .ant-popconfirm-inner-content {
-    padding: 10px;
-    max-width: 400px;
+  padding: 10px;
+  max-width: 400px;
 }

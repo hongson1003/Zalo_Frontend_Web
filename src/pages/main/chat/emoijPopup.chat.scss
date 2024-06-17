@@ -1,26 +1,26 @@
 .popover-emoij {
-    // inset: auto auto 330.664px 537.305px !important;
-    // bottom: 10px !important;
-    .emoij-popup-container {
-        max-width: 250px;
-        width: 300px;
-        height: 30px;
-        background-color: #ffffff;
-        border-radius: 20px;
-        padding: 10px;
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
-        .reaction {
-            cursor: pointer;
-            font-size: 15px;
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE 10+ */
-            user-select: none; /* Các trình duyệt hiện đại */
-            // &:active {
-            //     pointer-events: none;
-            // }
-        }
+  // inset: auto auto 330.664px 537.305px !important;
+  // bottom: 10px !important;
+  .emoij-popup-container {
+    max-width: 250px;
+    width: 300px;
+    height: 30px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    .reaction {
+      cursor: pointer;
+      font-size: 15px;
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE 10+ */
+      user-select: none; /* Các trình duyệt hiện đại */
+      // &:active {
+      //     pointer-events: none;
+      // }
     }
+  }
 }

@@ -1,78 +1,78 @@
 .chat-user-container {
-    padding: 10px 5px 20px 15px;
+  padding: 10px 5px 20px 15px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+  cursor: pointer;
+  .chat-left {
     display: flex;
+    gap: 15px;
     align-items: center;
     width: 100%;
-    gap: 20px;
-    cursor: pointer;
-    .chat-left {
+    .right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+      .top {
         display: flex;
-        gap: 15px;
         align-items: center;
-        width: 100%;
-        .right {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 5px;
-            width: 100%;
-            .top {
-                display: flex;
-                align-items: center;
-                .name {
-                    font-weight: 500;
-                    font-size: 16px;
-                    // max-width: calc(100% - 50px);
-                    display: -webkit-inline-box; /* Thiết lập hiển thị theo kiểu box */
-                    -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
-                    -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
-                    overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
-                    text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá phần tử */
-                }
-                .group-name {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    font-size: 16px;
-                }
-                p {
-                    display: inline;
-                    vertical-align: middle;
-                    &.pin {
-                        text-align: right;
-                        margin-left: 10px;
-                        flex: 1;
-                        padding: 0 8px;
-                    }
-                    i {
-                        color: #7589a3;
-                    }
-                }
-            }
-            .bottom {
-                p {
-                    font-size: 14px;
-                    display: -webkit-inline-box; /* Thiết lập hiển thị theo kiểu box */
-                    vertical-align: middle;
-                    -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
-                    -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
-                    overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
-                    text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá phần tử */
-                }
-            }
+        .name {
+          font-weight: 500;
+          font-size: 16px;
+          // max-width: calc(100% - 50px);
+          display: -webkit-inline-box; /* Thiết lập hiển thị theo kiểu box */
+          -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
+          -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
+          overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
+          text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá phần tử */
         }
+        .group-name {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 16px;
+        }
+        p {
+          display: inline;
+          vertical-align: middle;
+          &.pin {
+            text-align: right;
+            margin-left: 10px;
+            flex: 1;
+            padding: 0 8px;
+          }
+          i {
+            color: #7589a3;
+          }
+        }
+      }
+      .bottom {
+        p {
+          font-size: 14px;
+          display: -webkit-inline-box; /* Thiết lập hiển thị theo kiểu box */
+          vertical-align: middle;
+          -webkit-line-clamp: 1; /* Giới hạn số dòng hiển thị */
+          -webkit-box-orient: vertical; /* Hướng hiển thị dọc */
+          overflow: hidden; /* Ẩn nội dung vượt quá phần tử */
+          text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá phần tử */
+        }
+      }
     }
+  }
 }
 .active-chat {
-    background-color: #e5efff;
+  background-color: #e5efff;
 }
 
 .avatar-group {
-    min-width: 50px;
-    max-width: 50px;
-    height: 50px;
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+  min-width: 50px;
+  max-width: 50px;
+  height: 50px;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }

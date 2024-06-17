@@ -1,54 +1,54 @@
 .invited-user-container {
-    padding: 5px calc(10px + 1vw) 10px;
+  padding: 5px calc(10px + 1vw) 10px;
+  gap: 20px;
+  .top {
+    gap: calc(5px + 0.5vw);
+    width: 100%;
+    display: flex;
+    .description {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+      .username {
+        font-size: 16px;
+        font-weight: bold;
+      }
+      .date {
+        font-size: 14px;
+        color: #8e8e8e;
+      }
+      .content {
+        display: block;
+        padding: 10px;
+        resize: none;
+        min-height: 100px;
+        border: 2px solid #e6f4ff;
+        width: 100%;
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+  }
+  .footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     gap: 20px;
-    .top {
-        gap: calc(5px + 0.5vw);
-        width: 100%;
-        display: flex;
-        .description {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            width: 100%;
-            .username {
-                font-size: 16px;
-                font-weight: bold;
-            }
-            .date {
-                font-size: 14px;
-                color: #8e8e8e;
-            }
-            .content {
-                display: block;
-                padding: 10px;
-                resize: none;
-                min-height: 100px;
-                border: 2px solid #e6f4ff;
-                width: 100%;
-                &:focus {
-                    outline: none;
-                }
-            }
-        }
+    button {
+      width: 37%;
+      &:first-child {
+        background-color: #0091ff;
+        color: #ffffff;
+      }
     }
-    .footer {
-        width: 100%;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        gap: 20px;
-        button {
-            width: 37%;
-            &:first-child {
-                background-color: #0091ff;
-                color: #ffffff;
-            }
-        }
-    }
+  }
 }
 @media screen and (max-width: 768px) {
-    .footer {
-        margin: auto;
-        width: 100%;
-    }
+  .footer {
+    margin: auto;
+    width: 100%;
+  }
 }

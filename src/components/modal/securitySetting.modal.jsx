@@ -12,14 +12,20 @@ const ViewSettingModal = () => {
 
   return (
     <div className="view-settings" onClick={toggleExpanded}>
-      <div className='header' >
+      <div className="header">
         <p className="title">Thiết lập bảo mật</p>
         <div className="button" style={{ cursor: 'pointer' }}>
-          <DownOutlined style={{ fontSize: '10px', fontWeight: '700', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+          <DownOutlined
+            style={{
+              fontSize: '10px',
+              fontWeight: '700',
+              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
         </div>
       </div>
       {expanded && (
-        <div className='setting-body' style={{ marginTop: '10px' }}>
+        <div className="setting-body" style={{ marginTop: '10px' }}>
           <div className="info-list">
             <button className="common-group">
               <img src="/images/clock_time.png" alt="Create Group Icon" />
@@ -47,7 +53,7 @@ const ViewSettingModal = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default ViewSettingModal;

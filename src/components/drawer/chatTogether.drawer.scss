@@ -1,11 +1,11 @@
 .drawer-chat-together {
-    .ant-drawer-body {
-        padding: 5px;
+  .ant-drawer-body {
+    padding: 5px;
+  }
+  .drawer-chat-together-body {
+    .drawer-chat-together-item {
+      display: flex;
+      gap: 10px;
     }
-    .drawer-chat-together-body {
-        .drawer-chat-together-item {
-            display: flex;
-            gap: 10px;
-        }
-    }
+  }
 }

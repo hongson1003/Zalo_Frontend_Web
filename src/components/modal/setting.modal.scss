@@ -1,149 +1,149 @@
 .setting-modal {
-    .ant-modal-header {
-        padding-left: 10px;
-    }
-    .ant-modal-content {
-        padding: 10px;
-        width: 100%;
-        padding: 10px;
-        .ant-modal-body {
-            padding: 5px !important;
-            ul {
-                padding: 0 !important;
-                li {
-                    padding-left: 8px;
-                    padding-right: 8px;
-                }
-            }
-            .setting-container {
-                display: flex;
-                gap: 15px;
-                .setting-menu {
-                    max-width: 32%;
-                    width: 100%;
-                    padding: 5px 5px 5px 0 !important;
-                }
-                .main-content {
-                    flex: 1;
-                    background-color: #eef0f1;
-                    padding: 15px 15px;
-                    border-radius: 8px;
-                    .title {
-                        font-weight: 700;
-                        margin-bottom: 10px;
-                        &:nth-child(n + 1) {
-                            margin-top: 10px;
-                        }
-                    }
-                    .general {
-                        .dsbb {
-                            color: #888;
-                            font-size: 12px;
-                        }
-                        p + p {
-                            margin: 10px 0px;
-                        }
-                        .radio-group {
-                            margin-bottom: 10px;
-                        }
-                        .group-language {
-                            display: flex;
-                            gap: 10px;
-                            justify-content: space-between;
-                            align-items: center;
-                        }
-                    }
-
-                    .privacy {
-                        .note-group {
-                            display: flex;
-                            align-items: center;
-                            justify-content: space-between;
-                            margin: 10px 0;
-                            .note {
-                                font-size: 12px;
-                                font-style: italic;
-                                color: #888;
-                                max-width: 75%;
-                            }
-                        }
-                        .add-email {
-                            display: flex;
-                            justify-content: flex-start;
-                            align-items: center;
-                            gap: 10px;
-                            label {
-                                width: 200px;
-                                font-weight: 700;
-                            }
-                        }
-                    }
-
-                    .role-private {
-                        .session {
-                            & + .session {
-                                margin-top: 10px;
-                            }
-                            display: flex;
-                            flex-direction: column;
-                            border-radius: 10px;
-                            background-color: #ffffff;
-                            padding: 15px;
-                            .session-title {
-                                font-size: 15px;
-                                font-weight: 777;
-                            }
-                            .options {
-                                margin: 8px 0;
-                                display: flex;
-                                flex-direction: column;
-                                gap: 15px;
-                                .item {
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                    p {
-                                        font-size: 14px;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    .notify {
-                        .note {
-                            font-size: 12px;
-                            font-style: italic;
-                            color: #888;
-                        }
-                        .group-notify {
-                            margin-top: 15px;
-                            .radio-group {
-                                display: flex;
-                                justify-content: space-around;
-                                align-items: center;
-                                .notify-item {
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: center;
-                                    gap: 20px;
-                                    justify-content: center;
-                                    .image {
-                                        width: 120px;
-                                        height: 120px;
-                                    }
-                                }
-                            }
-                        }
-
-                        .amthanh {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        }
-                    }
-                }
-            }
+  .ant-modal-header {
+    padding-left: 10px;
+  }
+  .ant-modal-content {
+    padding: 10px;
+    width: 100%;
+    padding: 10px;
+    .ant-modal-body {
+      padding: 5px !important;
+      ul {
+        padding: 0 !important;
+        li {
+          padding-left: 8px;
+          padding-right: 8px;
         }
+      }
+      .setting-container {
+        display: flex;
+        gap: 15px;
+        .setting-menu {
+          max-width: 32%;
+          width: 100%;
+          padding: 5px 5px 5px 0 !important;
+        }
+        .main-content {
+          flex: 1;
+          background-color: #eef0f1;
+          padding: 15px 15px;
+          border-radius: 8px;
+          .title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            &:nth-child(n + 1) {
+              margin-top: 10px;
+            }
+          }
+          .general {
+            .dsbb {
+              color: #888;
+              font-size: 12px;
+            }
+            p + p {
+              margin: 10px 0px;
+            }
+            .radio-group {
+              margin-bottom: 10px;
+            }
+            .group-language {
+              display: flex;
+              gap: 10px;
+              justify-content: space-between;
+              align-items: center;
+            }
+          }
+
+          .privacy {
+            .note-group {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 10px 0;
+              .note {
+                font-size: 12px;
+                font-style: italic;
+                color: #888;
+                max-width: 75%;
+              }
+            }
+            .add-email {
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              gap: 10px;
+              label {
+                width: 200px;
+                font-weight: 700;
+              }
+            }
+          }
+
+          .role-private {
+            .session {
+              & + .session {
+                margin-top: 10px;
+              }
+              display: flex;
+              flex-direction: column;
+              border-radius: 10px;
+              background-color: #ffffff;
+              padding: 15px;
+              .session-title {
+                font-size: 15px;
+                font-weight: 777;
+              }
+              .options {
+                margin: 8px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                .item {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  p {
+                    font-size: 14px;
+                  }
+                }
+              }
+            }
+          }
+
+          .notify {
+            .note {
+              font-size: 12px;
+              font-style: italic;
+              color: #888;
+            }
+            .group-notify {
+              margin-top: 15px;
+              .radio-group {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                .notify-item {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 20px;
+                  justify-content: center;
+                  .image {
+                    width: 120px;
+                    height: 120px;
+                  }
+                }
+              }
+            }
+
+            .amthanh {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+          }
+        }
+      }
     }
+  }
 }

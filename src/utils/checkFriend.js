@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { STATE } from "../redux/types/app.type";
-import axios from "../utils/axios";
+import { toast } from 'react-toastify';
+import { STATE } from '../redux/types/app.type';
+import axios from '../utils/axios';
 
 export const getFriendState = async (meId, friendId) => {
   try {

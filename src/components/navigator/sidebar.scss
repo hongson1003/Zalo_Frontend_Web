@@ -1,44 +1,44 @@
 .sidebar-main {
-    width: calc(30px + 2vw);
-    min-height: 100vh;
-    height: 100%;
+  width: calc(30px + 2vw);
+  min-height: 100vh;
+  height: 100%;
+  background-color: #0091ff;
+  .base-avatar {
+    padding: 20px 0px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .custom-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: calc(100vh - 90px);
     background-color: #0091ff;
-    .base-avatar {
-        padding: 20px 0px;
-        display: flex;
-        justify-content: center;
-    }
+    .ant-menu-item {
+      margin: 0;
+      width: 100%;
+      border-radius: 0;
+      padding: calc(20px + 2vh) 0px !important;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      align-self: flex-start;
+      color: #ffffff;
 
-    .custom-menu {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        min-height: calc(100vh - 90px);
-        background-color: #0091ff;
-        .ant-menu-item {
-            margin: 0;
-            width: 100%;
-            border-radius: 0;
-            padding: calc(20px + 2vh) 0px !important;
-            justify-content: center;
-            flex-direction: column;
-            align-items: center;
-            align-self: flex-start;
-            color: #ffffff;
-
-            &:nth-child(-n + 3) {
-                align-self: flex-start;
-                &:nth-child(3) {
-                    margin-bottom: auto; /* Đẩy nhóm đầu lên trên cùng */
-                }
-            }
-            span {
-                font-size: 25px;
-            }
+      &:nth-child(-n + 3) {
+        align-self: flex-start;
+        &:nth-child(3) {
+          margin-bottom: auto; /* Đẩy nhóm đầu lên trên cùng */
         }
+      }
+      span {
+        font-size: 25px;
+      }
     }
+  }
 
-    .ant-menu-item-selected {
-        background-color: #006edc;
-    }
+  .ant-menu-item-selected {
+    background-color: #006edc;
+  }
 }

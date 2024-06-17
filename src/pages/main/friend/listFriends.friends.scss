@@ -1,30 +1,30 @@
 .friends-list {
-    margin-top: 10px;
-    overflow-y: scroll;
-    height: calc(100% - 32px);
+  margin-top: 10px;
+  overflow-y: scroll;
+  height: calc(100% - 32px);
 
-    .friend-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 15px 0;
-        margin-top: 2%;
-        display: flex;
-        justify-content: space-between;
-        padding: 0px 10px;
-        .friend-item-left {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            .name {
-                font-weight: 600;
-                font-size: 16px;
-            }
-        }
-        .friend-item-right {
-            cursor: pointer;
-        }
+  .friend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    margin-top: 2%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 10px;
+    .friend-item-left {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      .name {
+        font-weight: 600;
+        font-size: 16px;
+      }
     }
+    .friend-item-right {
+      cursor: pointer;
+    }
+  }
 }

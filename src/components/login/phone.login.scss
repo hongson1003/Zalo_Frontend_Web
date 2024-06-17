@@ -1,13 +1,29 @@
 .login-form {
-    .d-flex-center {
-        display: flex;
-        justify-content: center;
+  .d-flex-center {
+    display: flex;
+    justify-content: center;
+  }
+  width: 100%;
+  .forgot-pw {
+    font-size: calc(6px + 0.5vw);
+    text-align: center;
+    font-style: italic;
+    color: rgb(126, 126, 219);
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+      color: #333;
     }
-    width: 100%;
-    .forgot-pw {
-        font-size: calc(6px + 0.5vw);
-        text-align: center;
-        font-style: italic;
-        color: rgb(126, 126, 219);
+  }
+  .span-new-account {
+    font-size: calc(6px + 0.5vw);
+    text-align: center;
+    font-style: italic;
+    color: rgb(126, 126, 219);
+    &:hover {
+      color: #333;
+      cursor: pointer;
+      text-decoration: underline;
     }
+  }
 }

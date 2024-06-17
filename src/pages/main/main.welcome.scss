@@ -1,96 +1,96 @@
 .welcome-carousel {
+  width: 100%;
+  height: 100vh;
+  .main {
+    padding: 30px;
+    padding-top: 90px;
+    background-color: white;
     width: 100%;
-    height: 100vh;
-    .main {
-        padding: 30px;
-        padding-top: 90px;
-        background-color: white;
-        width: 100%;
-        height: 100%;
-        .title {
-            text-align: center;
-            font-size: calc(12px + 0.8vw);
-            .zalopc {
-                font-size: calc(14px + 0.8vw);
-                font-weight: bold;
-            }
-        }
-        .cover {
-            margin: auto;
-            margin-top: 20px;
-            max-width: 45%;
-            text-align: center;
-            font-size: calc(6px + 0.4vw);
-        }
-        .slick-list {
-            width: 100%;
-            height: 100%;
-            align-items: center;
-        }
-        .slick-arrow {
-            z-index: 1;
-            font-weight: 900;
-            color: blue !important;
-            &.slick-prev {
-                left: 10px;
-                color: rgb(113, 175, 247) !important;
-            }
-            &.slick-next {
-                right: 10px;
-                color: rgb(113, 175, 247) !important;
-            }
-            &::before {
-                font-size: 40px;
-                display: block;
-                border-radius: 50%;
-                color: rgb(113, 175, 247) !important;
-            }
-        }
-        .slick-dots {
-            bottom: 50px;
-            z-index: 1;
-            li {
-                button:before {
-                    font-size: 15px;
-                }
-            }
-        }
-        .slick-track {
-            width: 100%;
-            height: 100%;
-        }
-        img {
-            width: 100%;
-            height: 100vh;
-        }
-        .zalopc {
-            font-weight: bold;
-        }
-        .slick-slider {
-            align-items: center;
-            height: 100%;
-            height: 90%;
-            background-color: white;
-            .page_img {
-                width: 40%;
-                height: 70%;
-                margin-left: 20%;
-                border-radius: 10%;
-                margin: 3%;
-            }
-            .page_title {
-                text-align: center;
-                font-size: calc(0.5rem + 0.8vw);
-                max-width: 70%;
-            }
-        }
-        .slick-slider .page_wrapper {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: white;
-        }
+    height: 100%;
+    .title {
+      text-align: center;
+      font-size: calc(12px + 0.8vw);
+      .zalopc {
+        font-size: calc(14px + 0.8vw);
+        font-weight: bold;
+      }
     }
+    .cover {
+      margin: auto;
+      margin-top: 20px;
+      max-width: 45%;
+      text-align: center;
+      font-size: calc(6px + 0.4vw);
+    }
+    .slick-list {
+      width: 100%;
+      height: 100%;
+      align-items: center;
+    }
+    .slick-arrow {
+      z-index: 1;
+      font-weight: 900;
+      color: blue !important;
+      &.slick-prev {
+        left: 10px;
+        color: rgb(113, 175, 247) !important;
+      }
+      &.slick-next {
+        right: 10px;
+        color: rgb(113, 175, 247) !important;
+      }
+      &::before {
+        font-size: 40px;
+        display: block;
+        border-radius: 50%;
+        color: rgb(113, 175, 247) !important;
+      }
+    }
+    .slick-dots {
+      bottom: 50px;
+      z-index: 1;
+      li {
+        button:before {
+          font-size: 15px;
+        }
+      }
+    }
+    .slick-track {
+      width: 100%;
+      height: 100%;
+    }
+    img {
+      width: 100%;
+      height: 100vh;
+    }
+    .zalopc {
+      font-weight: bold;
+    }
+    .slick-slider {
+      align-items: center;
+      height: 100%;
+      height: 90%;
+      background-color: white;
+      .page_img {
+        width: 40%;
+        height: 70%;
+        margin-left: 20%;
+        border-radius: 10%;
+        margin: 3%;
+      }
+      .page_title {
+        text-align: center;
+        font-size: calc(0.5rem + 0.8vw);
+        max-width: 70%;
+      }
+    }
+    .slick-slider .page_wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: white;
+    }
+  }
 }

@@ -7,8 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint --cache --ext .js,.jsx src --report-unused-disable-directives --max-warnings 0",
-    "format": "prettier --cache --write \"src/**/*.{js,jsx,css,json,md}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "format": "prettier --write ."
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint",

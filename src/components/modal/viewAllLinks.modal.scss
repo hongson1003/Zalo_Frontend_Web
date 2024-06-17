@@ -1,29 +1,29 @@
 .view-links {
-    display: block;
+  display: block;
+  width: 100%;
+
+  .header {
     width: 100%;
-    
-    .header {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-  
-      .title {
-        text-align: left;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: black;
-        margin-left: 5%
-      }
-  
-      .button {
-        background-color: transparent;
-        border: none;
-        color: black;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        margin-right: 5%;
-      }
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .title {
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: black;
+      margin-left: 5%;
+    }
+
+    .button {
+      background-color: transparent;
+      border: none;
+      color: black;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 5%;
     }
   }
+}

@@ -1,5 +1,5 @@
-import { KEYITEMS } from "../../utils/keyMenuItem";
-import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from "../types/app.type";
+import { KEYITEMS } from '../../utils/keyMenuItem';
+import { LOGIN_STATUS, LOGOUT_STATUS, SOCKET, STATE } from '../types/app.type';
 
 const initialState = {
   isLogin: STATE.PENDING,

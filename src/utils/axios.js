@@ -1,23 +1,23 @@
-import axios from "axios";
-import axiosRetry from "axios-retry";
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 let isRefresh_token = false;
 let newToken = null;
-import store from "../redux/store";
-import { loginSuccess } from "../redux/actions/app.action";
+import store from '../redux/store';
+import { loginSuccess } from '../redux/actions/app.action';
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
   withCredentials: true,
 });
 
-instance.defaults.headers.common["Authorization"] = "";
+instance.defaults.headers.common['Authorization'] = '';
 
 export const setAuthorizationAxios = (token) => {
   if (token) {
     newToken = token;
-    instance.defaults.headers.common["Authorization"] = "Bearer " + token;
+    instance.defaults.headers.common['Authorization'] = 'Bearer ' + token;
   } else {
-    instance.defaults.headers.common["Authorization"] = "";
+    instance.defaults.headers.common['Authorization'] = '';
   }
 };
 
@@ -35,7 +35,7 @@ axiosRetry(instance, {
         isRefresh_token = true;
         // call api refresh token
         try {
-          let rs = await instance.post("/auth/check");
+          let rs = await instance.post('/auth/check');
           if (rs.errCode === 100) {
             // if success then set new token
             setAuthorizationAxios(rs.data.access_token);
@@ -61,7 +61,7 @@ instance.interceptors.request.use(
     // Do something before request is sent
     // console.log('config.header', config.headers)
     if (newToken) {
-      config.headers.Authorization = "Bearer " + newToken;
+      config.headers.Authorization = 'Bearer ' + newToken;
     }
     return config;
   },

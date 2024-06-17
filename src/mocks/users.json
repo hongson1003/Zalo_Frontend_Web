@@ -1,19 +1,19 @@
 [
-    {
-        "id": 1,
-        "phone": "0935201508",
-        "password": "123",
-        "name": "Hồng Sơn Nguyễn",
-        "image": "https://raw.githubusercontent.com/hongson1003/PostImage/main/anh-gai-xinh-2k5.jpg"
-    },
-    {
-        "id": 2,
-        "phone": "84728398293",
-        "password": "djfijf"
-    },
-    {
-        "id": 3,
-        "phone": "0339331841",
-        "password": "321"
-    }
+  {
+    "id": 1,
+    "phone": "0935201508",
+    "password": "123",
+    "name": "Hồng Sơn Nguyễn",
+    "image": "https://raw.githubusercontent.com/hongson1003/PostImage/main/anh-gai-xinh-2k5.jpg"
+  },
+  {
+    "id": 2,
+    "phone": "84728398293",
+    "password": "djfijf"
+  },
+  {
+    "id": 3,
+    "phone": "0339331841",
+    "password": "321"
+  }
 ]

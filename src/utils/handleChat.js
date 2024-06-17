@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import axios from "../utils/axios";
-import { socket } from "./io";
+import { toast } from 'react-toastify';
+import axios from '../utils/axios';
+import { socket } from './io';
 
 export const getFriend = (user, participants) => {
   if (!user || !participants || participants.length < 0) return null;
@@ -20,14 +20,14 @@ export const getDetailListMembers = (listMembers) => {
 
 export const sendNotifyToChatRealTime = async (chatId, message, type) => {
   try {
-    const res = await axios.post("/chat/notify", {
+    const res = await axios.post('/chat/notify', {
       chatId,
       message,
       type,
     });
     if (res.errCode === 0) {
       socket.then((socket) => {
-        socket.emit("send-message", res.data);
+        socket.emit('send-message', res.data);
         return res;
       });
     }
@@ -50,7 +50,7 @@ export function formatTimeAgo(timestamp) {
   const daysDifference = Math.floor(hoursDifference / 24);
 
   if (secondsDifference < 60) {
-    return "Vài giây";
+    return 'Vài giây';
   } else if (minutesDifference < 60) {
     return `${minutesDifference} phút`;
   } else if (hoursDifference < 24) {

@@ -1,31 +1,31 @@
 .login-qr {
-    svg {
-        margin: auto;
-        display: block;
-        padding: 6px 0px;
-        max-width: calc(200px + 5vw);
-    }
-    .more-qr {
-        margin-top: 5px;
-        text-align: center;
-        font-size: calc(10px + 0.4vw);
-    }
+  svg {
+    margin: auto;
+    display: block;
+    padding: 6px 0px;
+    max-width: calc(200px + 5vw);
+  }
+  .more-qr {
+    margin-top: 5px;
+    text-align: center;
+    font-size: calc(10px + 0.4vw);
+  }
 }
 .loading {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.8);
-    p {
-        font-size: calc(10px + 0.4vw);
-        color: #333;
-        font-weight: 700;
-    }
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  p {
+    font-size: calc(10px + 0.4vw);
+    color: #333;
+    font-weight: 700;
+  }
 }

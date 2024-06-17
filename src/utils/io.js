@@ -1,4 +1,4 @@
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client';
 
 // "undefined" means the URL will be computed from the `window.location` object
 const URL = import.meta.env.VITE_APP_API_URL;
@@ -13,7 +13,7 @@ async function customSocket(io, url) {
           socket = await io(url, { autoConnect: true, reconnection: false });
           resolve(socket);
         } catch (error) {
-          console.error("Lỗi kết nối máy chủ socket:", error);
+          console.error('Lỗi kết nối máy chủ socket:', error);
           reject(error); // Báo lỗi cho Promise
         }
       } else {
@@ -22,7 +22,7 @@ async function customSocket(io, url) {
     });
     return result;
   } catch (error) {
-    console.error("Lỗi tổng thể khi tạo socket:", error);
+    console.error('Lỗi tổng thể khi tạo socket:', error);
     // Hiển thị thông báo lỗi cho người dùng (tùy chọn)
   }
 }
